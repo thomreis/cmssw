@@ -14,44 +14,8 @@
 #include "L1Trigger/L1TMuonOverlap/interface/OMTFConfiguration.h"
 #include "L1Trigger/L1TMuonOverlap/interface/XMLConfigReader.h"
 
-unsigned int OMTFConfiguration::fwVersion;
-float OMTFConfiguration::minPdfVal;
-unsigned int OMTFConfiguration::nLayers;
-unsigned int OMTFConfiguration::nHitsPerLayer;
-unsigned int OMTFConfiguration::nRefLayers;
-unsigned int OMTFConfiguration::nPdfAddrBits;
-unsigned int OMTFConfiguration::nPdfValBits;
-unsigned int OMTFConfiguration::nPhiBits;
-unsigned int OMTFConfiguration::nPhiBins;
-unsigned int OMTFConfiguration::nRefHits;
-unsigned int OMTFConfiguration::nTestRefHits;
-unsigned int OMTFConfiguration::nProcessors;
-unsigned int OMTFConfiguration::nLogicRegions;
-unsigned int OMTFConfiguration::nInputs;
-unsigned int OMTFConfiguration::nGoldenPatterns;
 
-std::map<int,int> OMTFConfiguration::hwToLogicLayer;
-std::map<int,int> OMTFConfiguration::logicToHwLayer;
-std::map<int,int> OMTFConfiguration::logicToLogic;
-std::vector<int> OMTFConfiguration::refToLogicNumber;
-std::set<int> OMTFConfiguration::bendingLayers;
-std::vector<std::vector<int> > OMTFConfiguration::processorPhiVsRefLayer;
-OMTFConfiguration::vector3D_A OMTFConfiguration::connections;
-std::vector<std::vector<std::vector<std::pair<int,int> > > >OMTFConfiguration::regionPhisVsRefLayerVsInput;
-
-std::vector<std::vector<RefHitDef> >OMTFConfiguration::refHitsDefs;
-
-OMTFConfiguration::vector4D OMTFConfiguration::measurements4D;
-OMTFConfiguration::vector4D OMTFConfiguration::measurements4Dref;
-
-std::vector<unsigned int> OMTFConfiguration::barrelMin;
-std::vector<unsigned int> OMTFConfiguration::barrelMax;
-
-std::vector<unsigned int> OMTFConfiguration::endcap10DegMin;
-std::vector<unsigned int> OMTFConfiguration::endcap10DegMax;
-
-std::vector<unsigned int> OMTFConfiguration::endcap20DegMin;
-std::vector<unsigned int> OMTFConfiguration::endcap20DegMax;
+OMTFConfiguration * OMTFConfiguration::latest_instance_ = NULL;
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 RefHitDef::RefHitDef(unsigned int aInput, 
@@ -87,11 +51,13 @@ std::ostream & operator << (std::ostream &out, const  RefHitDef & aRefHitDef){
 ///////////////////////////////////////////////
 OMTFConfiguration::OMTFConfiguration(const edm::ParameterSet & theConfig){
 
+  latest_instance_ = this;
+
   if(theConfig.getParameter<bool>("configFromXML")){  
     if (!theConfig.exists("configXMLFile") ) return;
     std::string fName = theConfig.getParameter<edm::FileInPath>("configXMLFile").fullPath();
 
-    XMLConfigReader myReader;
+    XMLConfigReader myReader(this);
     myReader.setConfigFile(fName);
     configure(&myReader);
   }
@@ -269,7 +235,7 @@ std::ostream & operator << (std::ostream &out, const OMTFConfiguration & aConfig
 ///////////////////////////////////////////////
 bool OMTFConfiguration::isInRegionRange(int iPhiStart,
 				unsigned int coneSize,
-				int iPhi){
+				int iPhi) const {
 
   if(iPhi<0) iPhi+=OMTFConfiguration::nPhiBins;
   if(iPhiStart<0) iPhiStart+=OMTFConfiguration::nPhiBins;
@@ -289,7 +255,7 @@ bool OMTFConfiguration::isInRegionRange(int iPhiStart,
 ///////////////////////////////////////////////
 unsigned int OMTFConfiguration::getRegionNumberFromMap(unsigned int iInput,
 						       unsigned int iRefLayer,						       
-						       int iPhi){
+						       int iPhi) const {
 
   for(unsigned int iRegion=0;iRegion<OMTFConfiguration::nLogicRegions;++iRegion){
     if(iPhi>=OMTFConfiguration::regionPhisVsRefLayerVsInput[iInput][iRefLayer][iRegion].first &&
@@ -301,7 +267,7 @@ unsigned int OMTFConfiguration::getRegionNumberFromMap(unsigned int iInput,
 }
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-int OMTFConfiguration::globalPhiStart(unsigned int iProcessor){
+int OMTFConfiguration::globalPhiStart(unsigned int iProcessor) const {
 
   return *std::min_element(OMTFConfiguration::processorPhiVsRefLayer[iProcessor].begin(),
 			   OMTFConfiguration::processorPhiVsRefLayer[iProcessor].end());
@@ -309,7 +275,7 @@ int OMTFConfiguration::globalPhiStart(unsigned int iProcessor){
 }
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-uint32_t OMTFConfiguration::getLayerNumber(uint32_t rawId){
+uint32_t OMTFConfiguration::getLayerNumber(uint32_t rawId) const {
 
   uint32_t aLayer = 0;
   
