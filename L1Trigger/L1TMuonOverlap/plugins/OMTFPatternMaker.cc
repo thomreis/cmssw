@@ -35,10 +35,6 @@ OMTFPatternMaker::OMTFPatternMaker(const edm::ParameterSet& cfg):
   
   myInputMaker = new OMTFinputMaker();
   
-  myWriter = new XMLConfigWriter();
-  std::string fName = "OMTF";
-  myWriter->initialiseXMLDocument(fName);
-
   makeGoldenPatterns = theConfig.getParameter<bool>("makeGoldenPatterns");
   makeConnectionsMaps = theConfig.getParameter<bool>("makeConnectionsMaps");
   mergeXMLFiles = theConfig.getParameter<bool>("mergeXMLFiles");
@@ -77,6 +73,10 @@ void OMTFPatternMaker::beginRun(edm::Run const& run, edm::EventSetup const& iSet
   
   myOMTFConfig->configure(omtfParams);
   myOMTF->configure(myOMTFConfig, omtfParams);
+
+  myWriter = new XMLConfigWriter(myOMTFConfig);
+  std::string fName = "OMTF";
+  myWriter->initialiseXMLDocument(fName);
 
   ///For making the patterns use extended pdf width in phi
   ////Ugly hack to modify configuration parameters at runtime.
@@ -139,13 +139,13 @@ void OMTFPatternMaker::endJob(){
     myOMTFConfigMaker->printConnections(std::cout,iProcessor,3);
     myOMTFConfigMaker->printConnections(std::cout,iProcessor,4);
     myOMTFConfigMaker->printConnections(std::cout,iProcessor,5);
-    myWriter->writeConnectionsData(OMTFConfiguration::instance()->measurements4D);
+    myWriter->writeConnectionsData(myOMTFConfig->getMeasurements4D());
     myWriter->finaliseXMLDocument(fName);
   }
 
   if(mergeXMLFiles){
 
-    GoldenPattern *dummy = new GoldenPattern(Key(0,0,0));
+    GoldenPattern *dummy = new GoldenPattern(Key(0,0,0), myOMTFConfig);
     dummy->reset();
 
     std::string fName = "OMTF";
@@ -174,7 +174,7 @@ void OMTFPatternMaker::writeMergedGPs(){
   
   const std::map<Key,GoldenPattern*> & myGPmap = myOMTF->getPatterns();
 
-  GoldenPattern *dummy = new GoldenPattern(Key(0,0,0));
+  GoldenPattern *dummy = new GoldenPattern(Key(0,0,0), myOMTFConfig);
   dummy->reset();
 
   unsigned int iPtMin = 9;
@@ -240,7 +240,7 @@ void OMTFPatternMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     return;
   }
   
-  myInputMaker->initialize(evSetup);
+  myInputMaker->initialize(evSetup, myOMTFConfig);
 
   edm::Handle<L1MuDTChambPhContainer> dtPhDigis;
   edm::Handle<L1MuDTChambThContainer> dtThDigis;
