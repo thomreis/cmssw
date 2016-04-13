@@ -17,6 +17,7 @@ namespace L1Analysis
     explicit L1AnalysisRegMuonDataFormat(size_t nMax) {
       pt.reserve(nMax);
       eta.reserve(nMax);
+      hf.reserve(nMax);
       phi.reserve(nMax);
       qual.reserve(nMax);
       ch.reserve(nMax);
@@ -33,6 +34,7 @@ namespace L1Analysis
     void ResetRegional() {
       pt.clear();
       eta.clear();
+      hf.clear();
       phi.clear();
       qual.clear();
       ch.clear();
@@ -52,6 +54,7 @@ namespace L1Analysis
 
     std::vector<float> pt;
     std::vector<float> eta;
+    std::vector<int> hf;
     std::vector<float> phi;
     std::vector<float> qual;
     std::vector<float> ch;

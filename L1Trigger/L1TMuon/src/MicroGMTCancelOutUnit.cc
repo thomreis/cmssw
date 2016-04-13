@@ -14,16 +14,17 @@ MicroGMTCancelOutUnit::~MicroGMTCancelOutUnit ()
 
 void
 MicroGMTCancelOutUnit::initialise(L1TMuonGlobalParams* microGMTParams) {
+    // TODO: Need to still implement etaFine bit handling!
     int fwVersion = microGMTParams->fwVersion();
-    m_boPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->bOPosMatchQualLUTPath(), microGMTParams->bOPosMatchQualLUTMaxDR(), cancel_t::omtf_bmtf_pos, fwVersion);
-    m_boNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->bONegMatchQualLUTPath(), microGMTParams->bONegMatchQualLUTMaxDR(), cancel_t::omtf_bmtf_neg, fwVersion);
-    m_foPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fOPosMatchQualLUTPath(), microGMTParams->fOPosMatchQualLUTMaxDR(), cancel_t::omtf_emtf_pos, fwVersion);
-    m_foNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fONegMatchQualLUTPath(), microGMTParams->fONegMatchQualLUTMaxDR(), cancel_t::omtf_emtf_neg, fwVersion);
+    m_boPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->bOPosMatchQualLUTPath(), microGMTParams->bOPosMatchQualLUTMaxDR(), microGMTParams->bOPosMatchQualLUTfEta(), microGMTParams->bOPosMatchQualLUTfPhi(), cancel_t::omtf_bmtf_pos, fwVersion);
+    m_boNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->bONegMatchQualLUTPath(), microGMTParams->bONegMatchQualLUTMaxDR(), microGMTParams->bONegMatchQualLUTfEta(), microGMTParams->bONegMatchQualLUTfPhi(), cancel_t::omtf_bmtf_neg, fwVersion);
+    m_foPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fOPosMatchQualLUTPath(), microGMTParams->fOPosMatchQualLUTMaxDR(), microGMTParams->fOPosMatchQualLUTfEta(), microGMTParams->fOPosMatchQualLUTfPhi(), cancel_t::omtf_emtf_pos, fwVersion);
+    m_foNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fONegMatchQualLUTPath(), microGMTParams->fONegMatchQualLUTMaxDR(), microGMTParams->fONegMatchQualLUTfEta(), microGMTParams->fONegMatchQualLUTfPhi(), cancel_t::omtf_emtf_neg, fwVersion);
     //m_brlSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->brlSingleMatchQualLUTPath(), microGMTParams->brlSingleMatchQualLUTMaxDR(), cancel_t::bmtf_bmtf, fwVersion);
-    m_ovlPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->ovlPosSingleMatchQualLUTPath(), microGMTParams->ovlPosSingleMatchQualLUTMaxDR(), cancel_t::omtf_omtf_pos, fwVersion);
-    m_ovlNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->ovlNegSingleMatchQualLUTPath(), microGMTParams->ovlNegSingleMatchQualLUTMaxDR(), cancel_t::omtf_omtf_neg, fwVersion);
-    m_fwdPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fwdPosSingleMatchQualLUTPath(), microGMTParams->fwdPosSingleMatchQualLUTMaxDR(), cancel_t::emtf_emtf_pos, fwVersion);
-    m_fwdNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fwdNegSingleMatchQualLUTPath(), microGMTParams->fwdNegSingleMatchQualLUTMaxDR(), cancel_t::emtf_emtf_neg, fwVersion);
+    m_ovlPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->ovlPosSingleMatchQualLUTPath(), microGMTParams->ovlPosSingleMatchQualLUTMaxDR(), microGMTParams->ovlPosSingleMatchQualLUTfEta(), microGMTParams->ovlPosSingleMatchQualLUTfPhi(), cancel_t::omtf_omtf_pos, fwVersion);
+    m_ovlNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->ovlNegSingleMatchQualLUTPath(), microGMTParams->ovlNegSingleMatchQualLUTMaxDR(), microGMTParams->ovlNegSingleMatchQualLUTfEta(), microGMTParams->ovlNegSingleMatchQualLUTfPhi(), cancel_t::omtf_omtf_neg, fwVersion);
+    m_fwdPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fwdPosSingleMatchQualLUTPath(), microGMTParams->fwdPosSingleMatchQualLUTMaxDR(), microGMTParams->fwdPosSingleMatchQualLUTfEta(), microGMTParams->fwdPosSingleMatchQualLUTfPhi(), cancel_t::emtf_emtf_pos, fwVersion);
+    m_fwdNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParams->fwdNegSingleMatchQualLUTPath(), microGMTParams->fwdNegSingleMatchQualLUTMaxDR(), microGMTParams->fwdNegSingleMatchQualLUTfEta(), microGMTParams->fwdNegSingleMatchQualLUTfPhi(), cancel_t::emtf_emtf_neg, fwVersion);
 
     //m_lutDict[tftype::bmtf+tftype::bmtf*10] = m_brlSingleMatchQualLUT;
     m_lutDict[tftype::omtf_neg+tftype::bmtf*10] = m_boNegMatchQualLUT;

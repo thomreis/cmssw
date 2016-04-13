@@ -21,6 +21,11 @@ L1AnalysisUGMT::fillTrackFinder(const L1TRegionalMuonColl& coll, tftype mytype, 
       int globPhi = l1t::MicroGMTConfiguration::calcGlobalPhi(mu->hwPhi(), regTf, mu->processor());
       ugmt_.tfInfo[mytype].pt.push_back((mu->hwPt() - 1) * 0.5f);
       ugmt_.tfInfo[mytype].eta.push_back(mu->hwEta() * 0.010875);
+      if (mu->hwHF() == true) {
+           ugmt_.tfInfo[mytype].hf.push_back(1);
+      } else {
+           ugmt_.tfInfo[mytype].hf.push_back(0);
+      }
       ugmt_.tfInfo[mytype].phi.push_back(globPhi * 0.010908);
       ugmt_.tfInfo[mytype].qual.push_back(mu->hwQual());
       ugmt_.tfInfo[mytype].ch.push_back(mu->hwSign());
