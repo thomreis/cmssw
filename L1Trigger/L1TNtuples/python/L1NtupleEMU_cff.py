@@ -31,5 +31,5 @@ L1NtupleEMU = cms.Sequence(
   l1CaloTowerEmuTree
   +l1UpgradeEmuTree
   +l1EventTree
-#  +l1uGTTree
+  +l1uGTTree
 )
