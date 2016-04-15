@@ -29,36 +29,21 @@ import FWCore.ParameterSet.Config as cms
 # so these missing (required!) inputs are presently ignored by downstream modules.
 #
 
-# Ignoring Technical Triggers for now...
-
-# BSC Technical Trigger
-#import L1TriggerOffline.L1Analyzer.bscTrigger_cfi
-#simBscDigis = L1TriggerOffline.L1Analyzer.bscTrigger_cfi.bscTrigger.clone()
-
-# RPC Technical Trigger
-#import L1Trigger.RPCTechnicalTrigger.rpcTechnicalTrigger_cfi
-#simRpcTechTrigDigis = L1Trigger.RPCTechnicalTrigger.rpcTechnicalTrigger_cfi.rpcTechnicalTrigger.clone()
-
-#simRpcTechTrigDigis.RPCDigiLabel = 'simMuonRPCDigis'
-
-# HCAL Technical Trigger
-#import SimCalorimetry.HcalTrigPrimProducers.hcalTTPRecord_cfi
-#simHcalTechTrigDigis = SimCalorimetry.HcalTrigPrimProducers.hcalTTPRecord_cfi.simHcalTTPRecord.clone()
-
-# CASTOR Techical Trigger
-#import SimCalorimetry.CastorTechTrigProducer.castorTTRecord_cfi
-#simCastorTechTrigDigis = SimCalorimetry.CastorTechTrigProducer.castorTTRecord_cfi.simCastorTTRecord.clone()
+from L1Trigger.Configuration.SimL1TechnicalTriggers_cff import *
 
 from L1Trigger.L1TCalorimeter.simDigis_cff import *
 from L1Trigger.L1TMuon.simDigis_cff import *
 from L1Trigger.L1TGlobal.simDigis_cff import *
 
-SimL1Emulator = cms.Sequence(
+# define a core which can be extented in customizations:
+SimL1EmulatorCore = cms.Sequence(
     SimL1TCalorimeter +
     SimL1TMuon +
-#    SimL1TTechnical +
+    SimL1TechnicalTriggers +
     SimL1TGlobal
     )
+
+SimL1Emulator = cms.Sequence( SimL1EmulatorCore )
 
 #
 # Next we load ES producers for any conditions that are not yet in GT,

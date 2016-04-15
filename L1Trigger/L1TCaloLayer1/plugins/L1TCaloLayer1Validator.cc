@@ -153,7 +153,7 @@ L1TCaloLayer1Validator::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	 towerCount++;
 	 if(test_et > 0) nonZeroTowerCount++;
        }
-       if(!success && test_et == emul_et && test_iPhi == emul_iPhi && test_et > 3) {
+       if(!success && test_et == emul_et && test_iPhi == emul_iPhi) {
 	   if(verbose) std::cout << "Incidental match for ("
 				 << test_iEta << ", "
 				 << test_iPhi << ") : ("
