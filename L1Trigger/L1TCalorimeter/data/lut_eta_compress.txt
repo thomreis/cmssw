@@ -1,6 +1,6 @@
-# ieta compression LUT			      
+# ieta compression LUT
 # Converts abs(ieta) (6 bits) into 4 bit index
-# 
+#
 # anything after # is ignored with the exception of the header
 # the header is first valid line starting with #<header> versionStr nrBitsAddress nrBitsData </header>
 #<header> v1 8 4 </header>
@@ -68,5 +68,3 @@
 61 0
 62 0
 63 0
-64 0
-
