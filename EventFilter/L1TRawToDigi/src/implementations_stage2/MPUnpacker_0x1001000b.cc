@@ -10,7 +10,7 @@
 
 namespace l1t {
    namespace stage2 {
-      class MPUnpacker_v2 : public Unpacker {
+      class MPUnpacker_0x1001000b : public Unpacker {
          public:
             virtual bool unpack(const Block& block, UnpackerCollections *coll) override;
       };
@@ -22,7 +22,7 @@ namespace l1t {
 namespace l1t {
 namespace stage2 {
    bool
-   MPUnpacker_v2::unpack(const Block& block, UnpackerCollections *coll)
+   MPUnpacker_0x1001000b::unpack(const Block& block, UnpackerCollections *coll)
    {
 
      LogDebug("L1T") << "Block ID  = " << block.header().getID() << " size = " << block.header().getSize() << " AMC = " << block.amc().getAMCNumber();
@@ -224,4 +224,4 @@ namespace stage2 {
 }
 }
 
-DEFINE_L1T_UNPACKER(l1t::stage2::MPUnpacker_v2);
+DEFINE_L1T_UNPACKER(l1t::stage2::MPUnpacker_0x1001000b);
