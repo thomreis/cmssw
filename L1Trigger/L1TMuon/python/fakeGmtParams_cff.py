@@ -21,7 +21,7 @@ gmtParams = cms.ESProducer('L1TMuonGlobalParamsESProducer',
     fwVersion = cms.uint32(1),
 
     # get configuration from DB and ignore values in this file
-    configFromDb = cms.bool(True),
+    configFromDb = cms.bool(False),
 
     # uGMT inputs to disable
     # disabled inputs are not used in the algo but are still in the readout
