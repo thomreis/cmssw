@@ -4,6 +4,8 @@
 #include <vector>
 #include <ostream>
 
+class OMTFConfiguration;
+
 class OMTFResult{
 
  public:
@@ -11,7 +13,9 @@ class OMTFResult{
   typedef std::vector<unsigned int> vector1D;
   typedef std::vector<vector1D> vector2D;
 
-  OMTFResult();
+  OMTFResult(){};
+
+  void configure(const OMTFConfiguration * omtfConfig);
 
   const OMTFResult::vector2D & getResults() const {return results;}
 
@@ -25,6 +29,9 @@ class OMTFResult{
 
   const OMTFResult::vector1D & getHitsWord() const { return hitsBits;}
 
+  const OMTFResult::vector1D & getRefPhiRHits() const {return refPhiRHit1D;}
+
+  void setRefPhiRHits(unsigned int iRefLayer, int iRefPhiRHit);
 
   void addResult(unsigned int iRefLayer,
 		 unsigned int iLayer,
@@ -60,7 +67,12 @@ class OMTFResult{
 
   ///Words representing nimber of hit layers for each reference layer
   vector1D hitsBits;
+  
+  ///Reference phi for each reference layer - the input value
+  vector1D refPhiRHit1D; 
 
+  const OMTFConfiguration *myOmtfConfig;
+  
 };
 
 

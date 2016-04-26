@@ -35,6 +35,8 @@
 #include "DataFormats/JetReco/interface/JetID.h"
 #include "DataFormats/METReco/interface/PFMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/CaloMETCollection.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
 
 
 // ROOT output stuff
@@ -67,8 +69,12 @@ private:
   void doPFJets(edm::Handle<reco::PFJetCollection> pfJets);
   void doPFJetCorr(edm::Handle<reco::PFJetCollection> pfJets, edm::Handle<reco::JetCorrector> pfJetCorr); 
   void doCaloJets(edm::Handle<reco::CaloJetCollection> caloJets);
+  void doCaloMet(edm::Handle<reco::CaloMETCollection> caloMet);
+  void doCaloMetBE(edm::Handle<reco::CaloMETCollection> caloMetBE);
 
   void doPFMet(edm::Handle<reco::PFMETCollection> pfMet);
+
+  bool jetId(const reco::PFJet& jet);
 
 public:
   L1Analysis::L1AnalysisRecoJetDataFormat*              jet_data;
@@ -89,11 +95,14 @@ private:
   edm::EDGetTokenT<reco::JetCorrector>        jecToken_;
 
   edm::EDGetTokenT<reco::PFMETCollection>     pfMetToken_;
+  edm::EDGetTokenT<reco::CaloMETCollection>   caloMetToken_;
+  edm::EDGetTokenT<reco::CaloMETCollection>   caloMetBEToken_;
 
   
   // debug stuff
   bool pfJetsMissing_;
   double jetptThreshold_;
+  double jetetaMax_;
   unsigned int maxCl_;
   unsigned int maxJet_;
   unsigned int maxVtx_;
@@ -101,15 +110,18 @@ private:
 
   bool pfMetMissing_;
   bool pfJetCorrMissing_;
+  bool caloMetMissing_;
+  bool caloMetBEMissing_;
 
 };
-
 
 
 L1JetRecoTreeProducer::L1JetRecoTreeProducer(const edm::ParameterSet& iConfig):
   pfJetsMissing_(false),
   pfMetMissing_(false),
-  pfJetCorrMissing_(false)
+  pfJetCorrMissing_(false),
+  caloMetMissing_(false),
+  caloMetBEMissing_(false)
 {
   
   //  caloJetToken_ = consumes<reco::CaloJetCollection>(iConfig.getUntrackedParameter("caloJetToken",edm::InputTag("ak4CaloJets")));
@@ -118,8 +130,11 @@ L1JetRecoTreeProducer::L1JetRecoTreeProducer(const edm::ParameterSet& iConfig):
   jecToken_ = consumes<reco::JetCorrector>(iConfig.getUntrackedParameter<edm::InputTag>("jecToken",edm::InputTag("ak4PFCHSL1FastL2L3ResidualCorrector")));
 
   pfMetToken_ = consumes<reco::PFMETCollection>(iConfig.getUntrackedParameter("pfMetToken",edm::InputTag("pfMet")));
+  caloMetToken_ = consumes<reco::CaloMETCollection>(iConfig.getUntrackedParameter("caloMetToken",edm::InputTag("caloMet")));
+  caloMetBEToken_ = consumes<reco::CaloMETCollection>(iConfig.getUntrackedParameter("caloMetBEToken",edm::InputTag("caloMetBE")));
 
   jetptThreshold_ = iConfig.getParameter<double>      ("jetptThreshold");
+  jetetaMax_       = iConfig.getParameter<double>      ("jetetaMax");
   maxJet_         = iConfig.getParameter<unsigned int>("maxJet");
 
   jet_data = new L1Analysis::L1AnalysisRecoJetDataFormat();
@@ -168,6 +183,11 @@ void L1JetRecoTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<reco::JetCorrector> pfJetCorr;
   iEvent.getByToken(jecToken_, pfJetCorr);
 
+  edm::Handle<reco::CaloMETCollection> caloMet;
+  iEvent.getByToken(caloMetToken_, caloMet);
+
+  edm::Handle<reco::CaloMETCollection> caloMetBE;
+  iEvent.getByToken(caloMetBEToken_, caloMetBE);
 
   if (pfJets.isValid()) {
 
@@ -201,6 +221,25 @@ void L1JetRecoTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSe
     pfMetMissing_ = true;
   }
 
+  if (caloMet.isValid()) {
+
+    doCaloMet(caloMet);
+
+  }
+  else {
+    if (!caloMetMissing_) {edm::LogWarning("MissingProduct") << "CaloMet not found. Branch will not be filled" << std::endl;}
+    caloMetMissing_ = true;
+  }
+
+  if (caloMetBE.isValid()) {
+
+    doCaloMetBE(caloMetBE);
+
+  }
+  else {
+    if (!caloMetBEMissing_) {edm::LogWarning("MissingProduct") << "CaloMetBE not found. Branch will not be filled" << std::endl;}
+    caloMetBEMissing_ = true;
+  }
 
   tree_->Fill();
 
@@ -244,12 +283,6 @@ L1JetRecoTreeProducer::doCaloJets(edm::Handle<reco::CaloJetCollection> caloJets)
 void
 L1JetRecoTreeProducer::doPFJets(edm::Handle<reco::PFJetCollection> pfJets) {
   
-  float mHx = 0;
-  float mHy = 0;
-
-  met_data->Ht     = 0;
-  met_data->mHt    = -999.;
-  met_data->mHtPhi = -999.;
 
   for( auto it=pfJets->begin();
        it!=pfJets->end() && jet_data->nJets < maxJet_;
@@ -281,19 +314,9 @@ L1JetRecoTreeProducer::doPFJets(edm::Handle<reco::PFJetCollection> pfJets) {
     jet_data->cMult.push_back(it->chargedMultiplicity());
     jet_data->nMult.push_back(it->neutralMultiplicity()); 
     
-    jet_data->nJets++;
+    jet_data->nJets++;    
 
-    
-    if (it->pt()>jetptThreshold_){
-      mHx += -1.*it->px();
-      mHy += -1.*it->py();
-      met_data->Ht  += it->pt();
-    }
   }
-
-  TVector2 *tv2 = new TVector2(mHx,mHy);
-  met_data->mHt	   = tv2->Mod();
-  met_data->mHtPhi = tv2->Phi();
 
 }
 
@@ -301,30 +324,65 @@ L1JetRecoTreeProducer::doPFJets(edm::Handle<reco::PFJetCollection> pfJets) {
 void
 L1JetRecoTreeProducer::doPFJetCorr(edm::Handle<reco::PFJetCollection> pfJets, edm::Handle<reco::JetCorrector> pfJetCorr) {
 
-
-  std::vector< std::pair<float,float> > corrJetEtsAndCorrs;
   
-  //get jet correction and fill corrected jet ets and corrections
-  for( auto it=pfJets->begin(); it!=pfJets->end(); ++it) 
-    {
-      float corr = pfJetCorr.product()->correction(*it);
-      std::pair<float,float> corrJetEtAndCorr(corr*it->et(),corr);
-      corrJetEtsAndCorrs.push_back(corrJetEtAndCorr);
-    }
-
-  // sort corrected jet ets and correction factors 
-  // by corrected jet et
-  std::sort(corrJetEtsAndCorrs.rbegin(),corrJetEtsAndCorrs.rend());
-  
-  //fill jet data array with sorted jet ets and corr factors
-  std::vector<std::pair<float,float> >::iterator it;
+  float corrFactor = 1.;
   uint nJets = 0;
   
-  for(it = corrJetEtsAndCorrs.begin(); it != corrJetEtsAndCorrs.end() && nJets < maxJet_; ++it){
-    jet_data->etCorr.push_back(it->first);
-    jet_data->corrFactor.push_back(it->second);
+  float mHx = 0;
+  float mHy = 0;
+  
+  met_data->Ht     = 0;
+  met_data->mHt    = -999.;
+  met_data->mHtPhi = -999.;
+
+
+  for( auto it=pfJets->begin();
+       it!=pfJets->end() && nJets < maxJet_;
+       ++it) {
+    
+    corrFactor = pfJetCorr.product()->correction(*it);
+    
+    jet_data->etCorr.push_back(it->et()*corrFactor);
+    jet_data->corrFactor.push_back(corrFactor);
+
     nJets++;
+
+    if (it->pt()*corrFactor > jetptThreshold_ && fabs(it->eta())<jetetaMax_) {
+      mHx += -1.*it->px()*corrFactor;
+      mHy += -1.*it->py()*corrFactor;
+      met_data->Ht  += it->pt()*corrFactor;
+    }
+
   }
+
+  TVector2 *tv2 = new TVector2(mHx,mHy);
+  met_data->mHt	   = tv2->Mod();
+  met_data->mHtPhi = tv2->Phi();
+
+  // std::vector< std::pair<float,float> > corrJetEtsAndCorrs;
+  
+  // //get jet correction and fill corrected jet ets and corrections
+  // for( auto it=pfJets->begin(); it!=pfJets->end(); ++it) 
+  //   {
+  //     float corr = pfJetCorr.product()->correction(*it);
+  //     std::pair<float,float> corrJetEtAndCorr(corr*it->et(),corr);
+  //     corrJetEtsAndCorrs.push_back(corrJetEtAndCorr);
+  //   }
+
+  // // sort corrected jet ets and correction factors 
+  // // by corrected jet et
+  // std::sort(corrJetEtsAndCorrs.rbegin(),corrJetEtsAndCorrs.rend());
+  
+  // //fill jet data array with sorted jet ets and corr factors
+  // std::vector<std::pair<float,float> >::iterator it;
+  // uint nJets = 0;
+    
+  // for(it = corrJetEtsAndCorrs.begin(); it != corrJetEtsAndCorrs.end() && nJets < maxJet_; ++it){
+  //   jet_data->etCorr.push_back(it->first);
+  //   jet_data->corrFactor.push_back(it->second);
+  //   nJets++
+  // }
+
 }
 
 void
@@ -339,6 +397,56 @@ L1JetRecoTreeProducer::doPFMet(edm::Handle<reco::PFMETCollection> pfMet) {
 
 }
 
+void
+L1JetRecoTreeProducer::doCaloMet(edm::Handle<reco::CaloMETCollection> caloMet) {
+
+  const reco::CaloMETCollection *metCol = caloMet.product();
+  const reco::CaloMET theMet = metCol->front();
+
+  met_data->caloMet     = theMet.et();
+  met_data->caloMetPhi  = theMet.phi();
+  met_data->caloSumEt   = theMet.sumEt();
+
+}
+
+void
+L1JetRecoTreeProducer::doCaloMetBE(edm::Handle<reco::CaloMETCollection> caloMetBE) {
+
+  const reco::CaloMETCollection *metCol = caloMetBE.product();
+  const reco::CaloMET theMet = metCol->front();
+
+  met_data->caloMetBE    = theMet.et();
+  met_data->caloMetPhiBE = theMet.phi();
+  met_data->caloSumEtBE  = theMet.sumEt();
+
+}
+
+bool
+L1JetRecoTreeProducer::jetId(const reco::PFJet& jet) {
+
+  bool tmp = true;
+
+  tmp &= jet.neutralHadronEnergyFraction() < 0.9 ;
+  tmp &= jet.neutralEmEnergyFraction() < 0.9 ;
+  tmp &= (jet.chargedMultiplicity() + jet.neutralMultiplicity()) > 1 ;
+  tmp &= jet.muonEnergyFraction() < 0.8 ;
+  if (fabs(jet.eta()) < 2.4) {
+    tmp &= jet.chargedHadronEnergyFraction() > 0.0 ;
+    tmp &= jet.chargedMultiplicity() > 0 ;
+    tmp &= jet.chargedEmEnergyFraction() < 0.9 ;
+  }
+  if (fabs(jet.eta()) > 3.0) {
+    tmp &= jet.neutralEmEnergyFraction() < 0.9 ;
+    tmp &= jet.neutralMultiplicity() > 10 ;
+  }
+
+  // our custom selection
+  tmp &= jet.muonMultiplicity() == 0;
+  tmp &= jet.electronMultiplicity() == 0;
+
+  return tmp;
+
+}
 
 
 // ------------ method called once each job just before starting event loop  ------------
