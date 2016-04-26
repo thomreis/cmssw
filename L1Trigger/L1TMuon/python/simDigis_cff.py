@@ -77,8 +77,6 @@ if eras.stage2L1Trigger.isChosen():
     from L1Trigger.L1TMuon.simGmtCaloSumDigis_cfi import *
     from L1Trigger.L1TMuon.simMuonQualityAdjusterDigis_cfi import *
     from L1Trigger.L1TMuon.simGmtStage2Digis_cfi import *
-    #include legacy muons with new format for comparison
-    from L1Trigger.L1TCommon.muonLegacyInStage2FormatDigis_cfi import *
 #
 #
-    SimL1TMuon = cms.Sequence(SimL1TMuonCommon + simTwinMuxDigis + simBmtfDigis + simEmtfDigis + simOmtfDigis + simGmtCaloSumDigis + simMuonQualityAdjusterDigis + simGmtStage2Digis * muonLegacyInStage2FormatDigis )
+    SimL1TMuon = cms.Sequence(SimL1TMuonCommon + simTwinMuxDigis + simBmtfDigis + simEmtfDigis + simOmtfDigis + simGmtCaloSumDigis + simMuonQualityAdjusterDigis + simGmtStage2Digis)
