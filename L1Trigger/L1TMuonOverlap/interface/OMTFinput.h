@@ -6,6 +6,7 @@
 #include <bitset>
 
 class XMLConfigReader;
+class OMTFConfiguration;
 
 class OMTFinput{
 
@@ -14,7 +15,7 @@ class OMTFinput{
   typedef std::vector<int> vector1D;
   typedef std::vector<vector1D> vector2D;
 
-  OMTFinput();
+  OMTFinput(const OMTFConfiguration*);
 
   ///Add hit to given layer.
   ///iInput marks input number (max 14 per layer)
@@ -35,13 +36,15 @@ class OMTFinput{
 
   ///Merge data of two input objects.
   ///Method used in DiMuon studies.
-  void mergeData(OMTFinput *aInput);
+  void mergeData(const OMTFinput *aInput);
 
   const OMTFinput::vector1D & getLayerData(unsigned int iLayer, bool giveEta=false) const;
 
   std::bitset<128> getRefHits(unsigned int iProcessor) const;
 
   friend std::ostream & operator << (std::ostream &out, const OMTFinput & aInput);
+
+  OMTFinput & operator += (const OMTFinput & iInput) { mergeData(&iInput); return *this; }
 
  private:
 
@@ -57,6 +60,8 @@ class OMTFinput{
 
   ///RefHitsEta
   mutable vector1D refHitsEta;
+
+  const OMTFConfiguration* myOmtfConfig;
 
 };
 
