@@ -20,6 +20,7 @@ options.register ('streamer', False,   VarParsing.VarParsing.multiplicity.single
 options.register ('minidaq', False,    VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,    "MiniDaq run")
 options.register ('legacy', False,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,    "Legacy trigger triggering")
 options.register ('valonly', False,    VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,    "Fill only validation events with large readout window")
+options.register ('bottomonly', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,    "Bottom only configuration")
 
 ## options.input = '/store/data/Run2015D/ZeroBias/RAW/v1/000/260/627/00000/00A76FFA-0C82-E511-B441-02163E01450F.root'
 #options.input = '/store/data/Run2015D/ZeroBias1/RAW/v1/000/256/843/00000/FE8AD1BB-D05E-E511-B3A7-02163E01276B.root'
@@ -330,11 +331,15 @@ if options.minidaq or not options.legacy:
 
 # enable uGMT inputs
 process.gmtParams.caloInputsDisable = cms.bool(False)
-#process.gmtParams.bmtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # BMTF 0-11
-#process.gmtParams.omtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # OMTF+0-5, OMTF-0-5
-#process.gmtParams.emtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # EMTF+0-5, EMTF-0-5
-process.gmtParams.bmtfInputsToDisable = cms.vuint32(1,1,1,1,1,1,1,0,0,0,0,0) # BMTF 0-11
-process.gmtParams.omtfInputsToDisable = cms.vuint32(1,1,1,1,1,1,1,1,1,1,1,1) # OMTF+0-5, OMTF-0-5
-process.gmtParams.emtfInputsToDisable = cms.vuint32(1,1,1,0,0,1,1,1,1,0,0,1) # EMTF+0-5, EMTF-0-5
+if options.bottomonly:
+    print '# configure inputs for cosmics bottom only'
+    process.gmtParams.bmtfInputsToDisable = cms.vuint32(1,1,1,1,1,1,1,0,0,0,0,0) # BMTF 0-11
+    process.gmtParams.omtfInputsToDisable = cms.vuint32(1,1,1,1,1,1,1,1,1,1,1,1) # OMTF+0-5, OMTF-0-5
+    process.gmtParams.emtfInputsToDisable = cms.vuint32(1,1,1,0,0,1,1,1,1,0,0,1) # EMTF+0-5, EMTF-0-5
+else:
+    print '# configure inputs for collisions run'
+    process.gmtParams.bmtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # BMTF 0-11
+    process.gmtParams.omtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # OMTF+0-5, OMTF-0-5
+    process.gmtParams.emtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0) # EMTF+0-5, EMTF-0-5
 
 
