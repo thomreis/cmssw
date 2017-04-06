@@ -8,6 +8,7 @@
 <use name="L1Trigger/L1TCommon"/>
 
 <use name="DataFormats/L1TMuon"/>
+<use name="DataFormats/L1TCalorimeter"/>
 <use name="Geometry/Records"/>
 
 <use name="L1Trigger/DTTrackFinder"/>
