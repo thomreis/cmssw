@@ -64,7 +64,7 @@ void
 MuonHistos::FillBx(const int bx, const int bxId)
 {
   hMuPerBx_->Fill(bx);
-  hMuPerBxId_->Fill(bxId);
+  hMuPerBxId_->Fill(bxId+bx);
 }
 
 void
