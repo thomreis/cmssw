@@ -85,7 +85,7 @@ DTTrigPhase2Prod::DTTrigPhase2Prod(const ParameterSet& pset){
     grcode = pset.getUntrackedParameter<Int_t>("grouping_code");
     
     if      (grcode == 0) grouping_obj = new InitialGrouping(pset);
-    else if (grcode == 1) grouping_obj = new HoughGrouping(pset);
+    else if (grcode == 1) grouping_obj = new HoughGrouping(pset.getParameter<edm::ParameterSet>("HoughGrouping"));
     else if (grcode == 2) grouping_obj = new PseudoBayesGrouping(pset.getParameter<edm::ParameterSet>("PseudoBayesPattern"));
     else {
         if (debug) cout << "DTp2::constructor: Non-valid grouping code. Choosing InitialGrouping by default." << endl;
