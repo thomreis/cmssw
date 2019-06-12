@@ -80,6 +80,9 @@ DTTrigPhase2Prod::DTTrigPhase2Prod(const ParameterSet& pset){
     rpcRecHitsLabel = consumes<RPCRecHitCollection>(pset.getUntrackedParameter < edm::InputTag > ("rpcRecHits"));
     useRPC = pset.getUntrackedParameter<bool>("useRPC");
   
+
+
+
     
     // Choosing grouping scheme:
     grcode = pset.getUntrackedParameter<Int_t>("grouping_code");
@@ -261,7 +264,7 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     if (dump) {
       for (unsigned int i=0; i<correlatedMetaPrimitives.size(); i++){
 	  cout << iEvent.id().event() << " correlated mp " << i << ": ";
-	  printmP(metaPrimitives.at(i));
+	  printmP(correlatedMetaPrimitives.at(i));
 	  cout<<endl;
       }
     }
@@ -301,11 +304,9 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
 	}
 
     }
-
-    
     for (auto metaPrimitiveIt = correlatedMetaPrimitives.begin(); metaPrimitiveIt != correlatedMetaPrimitives.end(); ++metaPrimitiveIt){
       DTChamberId chId((*metaPrimitiveIt).rawId);
-      if(debug) std::cout<<"looping in final vector: SuperLayerId"<<chId<<" x="<<(*metaPrimitiveIt).x<<" quality="<<(*metaPrimitiveIt).quality<<std::endl;
+      if(debug) std::cout<<"looping in final vector: SuperLayerId"<<chId<<" x="<<(*metaPrimitiveIt).x<<" quality="<<(*metaPrimitiveIt).quality << " chi2="<< (*metaPrimitiveIt).chi2 <<std::endl;
       
       int sectorTP=chId.sector();
       if(sectorTP==13) sectorTP=4;
@@ -317,22 +318,28 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
 	  if(inner((*metaPrimitiveIt))) sl=1;
 	  else sl=3;
       }
+
+
+      double shift_back=0;
+      if (iEvent.eventAuxiliary().run() == 1) //FIX MC                                                                                                 
+	  shift_back = 400;
+
       
       if(p2_df==2){
-	if(debug)std::cout<<"pushing back phase-2 dataformat carlo-federica dataformat"<<std::endl;
-	outP2Ph.push_back(L1Phase2MuDTPhDigi((int)round((*metaPrimitiveIt).t0/25.),   // ubx (m_bx) //bx en la orbita
-					     chId.wheel(),   // uwh (m_wheel)     // FIXME: It is not clear who provides this?
-					     sectorTP,   // usc (m_sector)    // FIXME: It is not clear who provides this?
-					     chId.station(),   // ust (m_station)
-					     sl,   // ust (m_station)
+	  if(debug)std::cout<<"pushing back phase-2 dataformat carlo-federica dataformat"<<std::endl;
+	  outP2Ph.push_back(L1Phase2MuDTPhDigi((int)round((*metaPrimitiveIt).t0/25.)-shift_back,   // ubx (m_bx) //bx en la orbita
+					       chId.wheel(),   // uwh (m_wheel)     // FIXME: It is not clear who provides this?
+					       sectorTP,   // usc (m_sector)    // FIXME: It is not clear who provides this?
+					       chId.station(),   // ust (m_station)
+					       sl,   // ust (m_station)
 					     (int)round((*metaPrimitiveIt).phi*65536./0.8), // uphi (_phiAngle)
-					     (int)round((*metaPrimitiveIt).phiB*2048./1.4), // uphib (m_phiBending)
+					       (int)round((*metaPrimitiveIt).phiB*2048./1.4), // uphib (m_phiBending)
 					     (*metaPrimitiveIt).quality,  // uqua (m_qualityCode)
-					     (*metaPrimitiveIt).index,  // uind (m_segmentIndex)
-					     (int)round((*metaPrimitiveIt).t0),  // ut0 (m_t0Segment)
-					     (int)round((*metaPrimitiveIt).chi2*1000000),  // uchi2 (m_chi2Segment)
-					     -10    // urpc (m_rpcFlag)
-					     ));
+					       (*metaPrimitiveIt).index,  // uind (m_segmentIndex)
+					       (int)round((*metaPrimitiveIt).t0)-shift_back*25,  // ut0 (m_t0Segment)
+					       (int)round((*metaPrimitiveIt).chi2*1000000),  // uchi2 (m_chi2Segment)
+					       -10    // urpc (m_rpcFlag)
+					       ));
 	
       }
     }
