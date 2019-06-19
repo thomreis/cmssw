@@ -23,6 +23,7 @@
 #include "L1Trigger/DTPhase2Trigger/interface/PseudoBayesGrouping.h"
 #include "L1Trigger/DTPhase2Trigger/interface/MuonPathAnalyzer.h"
 #include "L1Trigger/DTPhase2Trigger/interface/MuonPathAnalyzerPerSL.h"
+#include "L1Trigger/DTPhase2Trigger/interface/MuonPathAnalyzerInChamber.h"
 #include "L1Trigger/DTPhase2Trigger/interface/MuonPathAssociator.h"
 #include "L1Trigger/DTPhase2Trigger/interface/MPFilter.h"
 #include "L1Trigger/DTPhase2Trigger/interface/MPQualityEnhancerFilter.h"
@@ -80,6 +81,7 @@ void endRun(edm::Run const& iRun, const edm::EventSetup& iEventSetup) override;
     bool outer(metaPrimitive mp);
     bool inner(metaPrimitive mp);
     void printmP(metaPrimitive mP);
+    void printmPC(metaPrimitive mP);
 
     double trigPos(metaPrimitive mP);
     double trigDir(metaPrimitive mp);
