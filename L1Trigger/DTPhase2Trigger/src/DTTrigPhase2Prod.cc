@@ -196,6 +196,19 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     digiMap.clear();
     
     
+    if (dump) {
+      for (unsigned int i=0; i<muonpaths.size(); i++){
+	cout << iEvent.id().event() << "      mpath " << i << ": ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getChannelId() << " ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getTDCTime() << " ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getLaterality() << " ";
+	cout << endl;	
+      }
+      cout << endl;
+    }
 
     // FILTER GROUPING
     std::vector<MuonPath*> filteredmuonpaths;
