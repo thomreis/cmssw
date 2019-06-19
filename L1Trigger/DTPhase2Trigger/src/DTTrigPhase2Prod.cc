@@ -196,27 +196,6 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     digiMap.clear();
     
     
-    if (grcode != 0) {
-      if (debug) cout << "DTTrigPhase2Prod::produce - WARNING: non-standard grouping chosen. Further execution still not functioning." << endl;
-      if (debug) std::cout<<"deleting muonpaths"<<std::endl;
-      for (unsigned int i=0; i<muonpaths.size(); i++){
-        delete muonpaths[i];
-      }
-      muonpaths.clear();
-      return;
-    if (dump) {
-      for (unsigned int i=0; i<muonpaths.size(); i++){
-	cout << iEvent.id().event() << "      mpath " << i << ": ";
-	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
-	  cout << muonpaths.at(i)->getPrimitive(lay)->getChannelId() << " ";
-	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
-	  cout << muonpaths.at(i)->getPrimitive(lay)->getTDCTime() << " ";
-	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
-	  cout << muonpaths.at(i)->getPrimitive(lay)->getLaterality() << " ";
-	cout << endl;	
-      }
-      cout << endl;
-    }
 
     // FILTER GROUPING
     std::vector<MuonPath*> filteredmuonpaths;
