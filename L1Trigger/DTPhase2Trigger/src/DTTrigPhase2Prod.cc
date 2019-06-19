@@ -189,9 +189,14 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     digiMap.clear();
     
     
-    if ((grcode != 0)) {
-        if (debug) cout << "DTTrigPhase2Prod::produce - WARNING: non-standard grouping chosen. Further execution still not functioning." << endl;
-        return;
+    if (grcode != 0) {
+      if (debug) cout << "DTTrigPhase2Prod::produce - WARNING: non-standard grouping chosen. Further execution still not functioning." << endl;
+      if (debug) std::cout<<"deleting muonpaths"<<std::endl;
+      for (unsigned int i=0; i<muonpaths.size(); i++){
+        delete muonpaths[i];
+      }
+      muonpaths.clear();
+      return;
     }
   
     // FILTER GROUPING
