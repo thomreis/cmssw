@@ -85,17 +85,32 @@ DTTrigPhase2Prod::DTTrigPhase2Prod(const ParameterSet& pset){
 
     
     // Choosing grouping scheme:
-    grcode = pset.getUntrackedParameter<Int_t>("grouping_code");
+    grcode = pset.getUntrackedParameter<int>("grouping_code");
     
     if      (grcode == 0) grouping_obj = new InitialGrouping(pset);
-    else if (grcode == 1) grouping_obj = new HoughGrouping(pset);
+    else if (grcode == 1) grouping_obj = new HoughGrouping(pset.getParameter<edm::ParameterSet>("HoughGrouping"));
     else if (grcode == 2) grouping_obj = new PseudoBayesGrouping(pset.getParameter<edm::ParameterSet>("PseudoBayesPattern"));
     else {
+
         if (debug) cout << "DTp2::constructor: Non-valid grouping code. Choosing InitialGrouping by default." << endl;
         grouping_obj = new InitialGrouping(pset);
     }
     
-    mpathanalyzer        = new MuonPathAnalyzerPerSL(pset);
+    if (grcode==0) {   
+      if (debug) cout << "DTp2:constructor: JM analyzer" << endl;
+      mpathanalyzer        = new MuonPathAnalyzerPerSL(pset);
+    } else {
+      cout << "++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+      cout << "               WARNING!!!!!                   " <<endl;
+      cout << "++++++++++++++++++++++++++++++++++++++++++++++" <<endl;
+      cout << " This grouping option is not fully supported  " <<endl;
+      cout << " yet.                                         " <<endl;
+      cout << " USE IT AT YOUR OWN RISK!                     " <<endl;
+      cout << "++++++++++++++++++++++++++++++++++++++++++++++" <<endl;      
+      if (debug) cout << "DTp2:constructor: Full chamber analyzer" << endl;  
+      mpathanalyzer        = new MuonPathAnalyzerInChamber(pset);      
+    } 
+    
     mpathqualityenhancer = new MPQualityEnhancerFilter(pset);
     mpathredundantfilter = new MPRedundantFilter(pset);
     mpathassociator      = new MuonPathAssociator(pset);
@@ -163,10 +178,10 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     if(debug) std::cout <<"\t Getting the RPC RecHits"<<std::endl;
     Handle<RPCRecHitCollection> rpcHits;
     iEvent.getByToken(rpcRecHitsLabel,rpcHits);
-
-  
-    //Santi's code
-    // GROUPING BEGIN
+    
+    ///////////////////////////////////
+    // GROUPING CODE: 
+    ////////////////////////////////
     DTDigiMap digiMap;
     DTDigiCollection::DigiRangeIterator detUnitIt;
     for (detUnitIt=dtdigis->begin(); detUnitIt!=dtdigis->end(); ++detUnitIt) {
@@ -184,41 +199,85 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
         DTDigiMap_iterator dmit = digiMap.find(chid);
         
         if (dmit !=digiMap.end()) grouping_obj->run(iEvent, iEventSetup, (*dmit).second, &muonpaths);
-    }
-    
+    }   
     digiMap.clear();
     
     
-    if ((grcode != 0)) {
-        if (debug) cout << "DTTrigPhase2Prod::produce - WARNING: non-standard grouping chosen. Further execution still not functioning." << endl;
-        return;
+    if (dump) {
+      for (unsigned int i=0; i<muonpaths.size(); i++){
+	cout << iEvent.id().event() << "      mpath " << i << ": ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getChannelId() << " ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getTDCTime() << " ";
+	for (int lay=0; lay<muonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << muonpaths.at(i)->getPrimitive(lay)->getLaterality() << " ";
+	cout << endl;	
+      }
+      cout << endl;
     }
-  
+
     // FILTER GROUPING
     std::vector<MuonPath*> filteredmuonpaths;
-    mpathredundantfilter->run(iEvent, iEventSetup, muonpaths,filteredmuonpaths);
-
-    if(debug) std::cout<<"deleting muonpaths"<<std::endl;
-    for (unsigned int i=0; i<muonpaths.size(); i++){
-      delete muonpaths[i];
+    if (grcode==0) {
+      mpathredundantfilter->run(iEvent, iEventSetup, muonpaths,filteredmuonpaths);   
     }
-    muonpaths.clear();
-
-    // GROUPING ENDS
-    
-    
-    if (debug) cout << "MUON PATHS found: " << filteredmuonpaths.size() <<" in event"<<iEvent.id().event()<<endl;
-    if(debug) std::cout<<"filling NmetaPrimtives"<<std::endl;
-    std::vector<metaPrimitive> metaPrimitives;
-    mpathanalyzer->run(iEvent, iEventSetup,  filteredmuonpaths, metaPrimitives);  // New grouping implementation
     
     if (dump) {
-	for (unsigned int i=0; i<metaPrimitives.size(); i++){
+      for (unsigned int i=0; i<filteredmuonpaths.size(); i++){
+	cout << iEvent.id().event() << " filt. mpath " << i << ": ";
+	for (int lay=0; lay<filteredmuonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << filteredmuonpaths.at(i)->getPrimitive(lay)->getChannelId() << " ";
+	for (int lay=0; lay<filteredmuonpaths.at(i)->getNPrimitives(); lay++)
+	  cout << filteredmuonpaths.at(i)->getPrimitive(lay)->getTDCTime() << " ";
+	cout << endl;	
+      }
+      cout << endl;
+    }
+    
+    
+    ///////////////////////////////////////////
+    /// FITTING SECTION; 
+    ///////////////////////////////////////////
+    if(debug) cout << "MUON PATHS found: " << muonpaths.size() << " ("<< filteredmuonpaths.size() <<") in event "<< iEvent.id().event()<<endl;
+    if(debug) std::cout<<"filling NmetaPrimtives"<<std::endl;
+    std::vector<metaPrimitive> metaPrimitives;
+    std::vector<MuonPath*> outmpaths;
+    if (grcode==0) {
+      if (debug) cout << "Fitting 1SL " << endl;      
+      mpathanalyzer->run(iEvent, iEventSetup,  filteredmuonpaths, metaPrimitives);  
+    }
+    else   {
+      // implementation for advanced (2SL) grouping, no filter required..
+      if (debug) cout << "Fitting 2SL at once " << endl;
+      mpathanalyzer->run(iEvent, iEventSetup,  muonpaths, outmpaths);   
+    }
+      
+    if (dump) {
+      for (unsigned int i=0; i<outmpaths.size(); i++){
+	cout << iEvent.id().event() << " mp " << i << ": "
+	     << outmpaths.at(i)->getBxTimeValue() << " "
+	     << outmpaths.at(i)->getHorizPos() << " "
+	     << outmpaths.at(i)->getTanPhi() << " "
+	     << outmpaths.at(i)->getPhi() << " "
+	     << outmpaths.at(i)->getPhiB() << " "
+	     << outmpaths.at(i)->getQuality() << " "
+	     << outmpaths.at(i)->getChiSq() << " "
+	     << endl;
+      }
+      for (unsigned int i=0; i<metaPrimitives.size(); i++){
 	    cout << iEvent.id().event() << " mp " << i << ": ";
 	    printmP(metaPrimitives.at(i));
 	    cout<<endl;
 	}
     }
+
+    
+    if(debug) std::cout<<"deleting muonpaths"<<std::endl;
+    for (unsigned int i=0; i<muonpaths.size(); i++){
+      delete muonpaths[i];
+    }
+    muonpaths.clear();
 
     for (unsigned int i=0; i<filteredmuonpaths.size(); i++){
       delete filteredmuonpaths[i];
@@ -226,20 +285,21 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     filteredmuonpaths.clear();
     
     
-    //FILTER SECTIONS:
-    
+    /////////////////////////////////////
+    //  FILTER SECTIONS:
+    ////////////////////////////////////
     //filtro de duplicados puro popdr'ia ir ac'a mpredundantfilter.cpp primos?
     //filtro en |tanPhi|<~1.?
 
     if(debug) std::cout<<"declaring new vector for filtered"<<std::endl;    
 
     std::vector<metaPrimitive> filteredMetaPrimitives;
-    mpathqualityenhancer->run(iEvent, iEventSetup, metaPrimitives, filteredMetaPrimitives);  // New grouping implementation
+    if (grcode==0) mpathqualityenhancer->run(iEvent, iEventSetup, metaPrimitives, filteredMetaPrimitives);  
     
     if (dump) {
       for (unsigned int i=0; i<filteredMetaPrimitives.size(); i++){
 	  cout << iEvent.id().event() << " filtered mp " << i << ": ";
-	  printmP(metaPrimitives.at(i));
+	  printmP(filteredMetaPrimitives.at(i));
 	  cout<<endl;
       }
     }
@@ -250,23 +310,42 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     if(debug) std::cout<<"DTp2 in event:"<<iEvent.id().event()<<" we found "<<filteredMetaPrimitives.size()<<" filteredMetaPrimitives (superlayer)"<<std::endl;
     if(debug) std::cout<<"filteredMetaPrimitives: starting correlations"<<std::endl;    
     
+    /////////////////////////////////////
     //// CORRELATION: 
+    /////////////////////////////////////
     std::vector<metaPrimitive> correlatedMetaPrimitives;
-    mpathassociator->run(iEvent, iEventSetup, dtdigis, filteredMetaPrimitives, correlatedMetaPrimitives);  
-    
+    if (grcode==0) mpathassociator->run(iEvent, iEventSetup, dtdigis, filteredMetaPrimitives, correlatedMetaPrimitives);  
+    else {
+      //for(auto muonpath = muonpaths.begin();muonpath!=muonpaths.end();++muonpath) {
+      for(auto muonpath = outmpaths.begin();muonpath!=outmpaths.end();++muonpath) {
+	correlatedMetaPrimitives.push_back(metaPrimitive({(*muonpath)->getRawId(),(double)(*muonpath)->getBxTimeValue(),
+		(*muonpath)->getHorizPos(), (*muonpath)->getTanPhi(),
+		(*muonpath)->getPhi(), 	    (*muonpath)->getPhiB(),
+		(*muonpath)->getChiSq(),    (int)(*muonpath)->getQuality(),
+		(*muonpath)->getPrimitive(0)->getChannelId(), (*muonpath)->getPrimitive(0)->getTDCTime(), (*muonpath)->getPrimitive(0)->getLaterality(),
+		(*muonpath)->getPrimitive(1)->getChannelId(), (*muonpath)->getPrimitive(1)->getTDCTime(), (*muonpath)->getPrimitive(1)->getLaterality(),
+		(*muonpath)->getPrimitive(2)->getChannelId(), (*muonpath)->getPrimitive(2)->getTDCTime(), (*muonpath)->getPrimitive(2)->getLaterality(),
+		(*muonpath)->getPrimitive(3)->getChannelId(), (*muonpath)->getPrimitive(3)->getTDCTime(), (*muonpath)->getPrimitive(3)->getLaterality(),
+		(*muonpath)->getPrimitive(4)->getChannelId(), (*muonpath)->getPrimitive(4)->getTDCTime(), (*muonpath)->getPrimitive(4)->getLaterality(),
+		(*muonpath)->getPrimitive(5)->getChannelId(), (*muonpath)->getPrimitive(5)->getTDCTime(), (*muonpath)->getPrimitive(5)->getLaterality(),
+		(*muonpath)->getPrimitive(6)->getChannelId(), (*muonpath)->getPrimitive(6)->getTDCTime(), (*muonpath)->getPrimitive(6)->getLaterality(),
+		(*muonpath)->getPrimitive(7)->getChannelId(), (*muonpath)->getPrimitive(7)->getTDCTime(), (*muonpath)->getPrimitive(7)->getLaterality(),
+		}));
+      }
+    } 
     filteredMetaPrimitives.clear();
     filteredMetaPrimitives.erase(filteredMetaPrimitives.begin(),filteredMetaPrimitives.end());
 
     if(debug) std::cout<<"DTp2 in event:"<<iEvent.id().event()
 		       <<" we found "<<correlatedMetaPrimitives.size()
 		       <<" correlatedMetPrimitives (chamber)"<<std::endl;
-
-    if (dump) {
+    
+    if (dump) { 
       for (unsigned int i=0; i<correlatedMetaPrimitives.size(); i++){
 	  cout << iEvent.id().event() << " correlated mp " << i << ": ";
-	  printmP(correlatedMetaPrimitives.at(i));
+	  printmPC(correlatedMetaPrimitives.at(i));
 	  cout<<endl;
-      }
+      } 
     }
     
 
@@ -277,7 +356,6 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     // First we asociate a new index to the metaprimitive depending on quality or phiB; 
     uint32_t rawId = -1; 
     int numP = -1;
-
     for (auto metaPrimitiveIt = correlatedMetaPrimitives.begin(); metaPrimitiveIt != correlatedMetaPrimitives.end(); ++metaPrimitiveIt){
 	numP++;
 	rawId = (*metaPrimitiveIt).rawId;   
@@ -304,6 +382,8 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
 	}
 
     }
+
+
     for (auto metaPrimitiveIt = correlatedMetaPrimitives.begin(); metaPrimitiveIt != correlatedMetaPrimitives.end(); ++metaPrimitiveIt){
       DTChamberId chId((*metaPrimitiveIt).rawId);
       if(debug) std::cout<<"looping in final vector: SuperLayerId"<<chId<<" x="<<(*metaPrimitiveIt).x<<" quality="<<(*metaPrimitiveIt).quality << " chi2="<< (*metaPrimitiveIt).chi2 <<std::endl;
@@ -312,13 +392,11 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
       if(sectorTP==13) sectorTP=4;
       if(sectorTP==14) sectorTP=10;
       sectorTP=sectorTP-1;
-      
       int sl=0;
       if((*metaPrimitiveIt).quality < 6 || (*metaPrimitiveIt).quality == 7){
 	  if(inner((*metaPrimitiveIt))) sl=1;
 	  else sl=3;
       }
-
 
       double shift_back=0;
       if (iEvent.eventAuxiliary().run() == 1) //FIX MC                                                                                                 
@@ -332,9 +410,9 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
 					       sectorTP,   // usc (m_sector)    // FIXME: It is not clear who provides this?
 					       chId.station(),   // ust (m_station)
 					       sl,   // ust (m_station)
-					     (int)round((*metaPrimitiveIt).phi*65536./0.8), // uphi (_phiAngle)
+					       (int)round((*metaPrimitiveIt).phi*65536./0.8), // uphi (_phiAngle)
 					       (int)round((*metaPrimitiveIt).phiB*2048./1.4), // uphib (m_phiBending)
-					     (*metaPrimitiveIt).quality,  // uqua (m_qualityCode)
+					       (*metaPrimitiveIt).quality,  // uqua (m_qualityCode)
 					       (*metaPrimitiveIt).index,  // uind (m_segmentIndex)
 					       (int)round((*metaPrimitiveIt).t0)-shift_back*25,  // ut0 (m_t0Segment)
 					       (int)round((*metaPrimitiveIt).chi2*1000000),  // uchi2 (m_chi2Segment)
@@ -445,10 +523,44 @@ void DTTrigPhase2Prod::printmP(metaPrimitive mP){
              <<" r:"<<rango(mP);
 }
 
+void DTTrigPhase2Prod::printmPC(metaPrimitive mP){
+  DTChamberId ChId(mP.rawId);
+  std::cout<<ChId<<"\t"
+             <<" "<<setw(2)<<left<<mP.wi1
+             <<" "<<setw(2)<<left<<mP.wi2
+             <<" "<<setw(2)<<left<<mP.wi3
+             <<" "<<setw(2)<<left<<mP.wi4
+             <<" "<<setw(2)<<left<<mP.wi5
+             <<" "<<setw(2)<<left<<mP.wi6
+             <<" "<<setw(2)<<left<<mP.wi7
+             <<" "<<setw(2)<<left<<mP.wi8
+             <<" "<<setw(5)<<left<<mP.tdc1
+             <<" "<<setw(5)<<left<<mP.tdc2
+             <<" "<<setw(5)<<left<<mP.tdc3
+             <<" "<<setw(5)<<left<<mP.tdc4
+             <<" "<<setw(5)<<left<<mP.tdc5
+             <<" "<<setw(5)<<left<<mP.tdc6
+             <<" "<<setw(5)<<left<<mP.tdc7
+             <<" "<<setw(5)<<left<<mP.tdc8
+             <<" "<<setw(2)<<left<<mP.lat1
+             <<" "<<setw(2)<<left<<mP.lat2
+             <<" "<<setw(2)<<left<<mP.lat3
+             <<" "<<setw(2)<<left<<mP.lat4
+             <<" "<<setw(2)<<left<<mP.lat5
+             <<" "<<setw(2)<<left<<mP.lat6
+             <<" "<<setw(2)<<left<<mP.lat7
+             <<" "<<setw(2)<<left<<mP.lat8
+             <<" "<<setw(10)<<right<<mP.x
+             <<" "<<setw(9)<<left<<mP.tanPhi
+             <<" "<<setw(5)<<left<<mP.t0
+             <<" "<<setw(13)<<left<<mP.chi2
+             <<" r:"<<rango(mP);
+}
+
 int DTTrigPhase2Prod::rango(metaPrimitive mp) {
     if(mp.quality==1 or mp.quality==2) return 3;
     if(mp.quality==3 or mp.quality==4) return 4;
-    return 0;
+    return mp.quality;
 }
 
 GlobalPoint DTTrigPhase2Prod::getRPCGlobalPosition(RPCDetId rpcId, const RPCRecHit& rpcIt) const{

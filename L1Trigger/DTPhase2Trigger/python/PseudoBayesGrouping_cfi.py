@@ -3,13 +3,13 @@ import FWCore.ParameterSet.Config as cms
 PseudoBayesPattern = cms.PSet(pattern_filename = cms.untracked.FileInPath("L1Trigger/DTPhase2Trigger/data/PseudoBayesPatterns_uncorrelated_v0.root"),
                               debug = cms.untracked.bool(False),
                               #Minimum number of layers hit (total). Together with the two parameters under this it means 4+4, 4+3 or 3+3
-                              minNLayerHits   = cms.untracked.int32(6),
+                              minNLayerHits   = cms.untracked.int32(4),
                               #Minimum number of hits in the most hit superlayer
-                              minSingleSLHitsMax = cms.untracked.int32(3),
+                              minSingleSLHitsMax = cms.untracked.int32(2),
                               #Minimum number of hits in the less hit superlayer
-                              minSingleSLHitsMin = cms.untracked.int32(3),
+                              minSingleSLHitsMin = cms.untracked.int32(2),
                               #By default pattern width is 1, 0 can be considered (harder fits but, lower efficiency of high quality), 2 is the absolute limit unless we have extremely bent muons somehow
-                              allowedVariance = cms.untracked.int32(1),
+                              allowedVariance = cms.untracked.int32(0),
                               #If true, it will provide all candidate sets with the same hits of the same quality (with lateralities defined). If false only the leading one (with its lateralities).
                               allowDuplicates = cms.untracked.bool(False),
                               #Also provide best estimates for the lateralities
