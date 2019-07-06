@@ -263,13 +263,13 @@ void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inM
 	}
         for (int j = i+1; j<(int)inMPaths.size(); j++){
           if (areCousins(inMPaths[i],inMPaths[j])==0){ //they arent cousins
-	    cout << "mp"; printmP(inMPaths[i]); cout<< " is not cousin from mp"; printmP(inMPaths[j]); cout << endl; 
+	    //cout << "mp"; printmP(inMPaths[i]); cout<< " is not cousin from mp"; printmP(inMPaths[j]); cout << endl; 
 	    if (oneOf4 == false){
-	      cout << "kept3 mp" << i << endl; ;  
+	      //cout << "kept3 mp" << i << endl; ;  
 	      outMPaths.push_back(inMPaths[i]);
 	    } else {
 	      outMPaths.push_back(inMPaths[bestI]);
-	      cout << "kept4 mp" << bestI << endl;  
+	      //cout << "kept4 mp" << bestI << endl;  
 	      bestI = -1; 
 	      bestChi2 = 9999;
 	      oneOf4 = false; 
