@@ -45,30 +45,19 @@ void MPQualityEnhancerFilter::run(edm::Event& iEvent, const edm::EventSetup& iEv
   if (debug){ cout <<"Ended Cousins Filter. The final primitives before Refiltering are: " << endl;
   //if (debug){ cout <<"Ended Cousins Filter. The final primitives before UniqueFilter are: " << endl;
     for (unsigned int i=0; i<buff.size(); i++){
-    //for (unsigned int i=0; i<buff.size(); i++){
       printmP(buff[i]);cout<<endl;
-      //printmP(buff[i]);cout<<endl;
     }
       cout << "Total Primitives = " << buff.size()<< endl;  
-      //cout << "Total Primitives = " << buff.size()<< endl;  
   } 
   refilteringCousins(buff,buff2); 
-  buff.clear();
-  buff.erase(buff.begin(),buff.end());
-  //if (debug){ cout <<"Ended Cousins Filter. The final primitives before UniqueFilter are: " << endl;
   if (debug){ cout <<"Ended Cousins Refilter. The final primitives before UniqueFilter are: " << endl;
     for (unsigned int i=0; i<buff2.size(); i++){
-    //for (unsigned int i=0; i<buff.size(); i++){
       printmP(buff2[i]);cout<<endl;
-      //printmP(buff[i]);cout<<endl;
     }
       cout << "Total Primitives = " << buff2.size()<< endl;  
-      //cout << "Total Primitives = " << buff.size()<< endl;  
   } 
   filterUnique(buff2,outMPaths);
-  buff2.clear();
-  buff2.erase(buff2.begin(),buff2.end());
-  //filterUnique(buff,outMPaths);
+ // filterUnique(buff,outMPaths);
 
   if (debug){ cout <<"Ended Unique Filter. The final primitives are: " << endl;
     for (unsigned int i=0; i<outMPaths.size(); i++){
@@ -77,11 +66,11 @@ void MPQualityEnhancerFilter::run(edm::Event& iEvent, const edm::EventSetup& iEv
       cout << "Total Primitives = " << outMPaths.size()<< endl;  
   } 
 
-/*  buff.clear();
+  buff.clear();
   buff.erase(buff.begin(),buff.end());
   buff2.clear();
   buff2.erase(buff2.begin(),buff2.end());
-*/  
+  
   if (debug) cout <<"MPQualityEnhancerFilter: done" << endl;
 }
 
@@ -196,7 +185,7 @@ void MPQualityEnhancerFilter::filterCousins(std::vector<metaPrimitive> &inMPaths
 	outMPaths.push_back(inMPaths[0]);
 	if(debug)std::cout<<"filtering: kept0 i="<<0<<std::endl;
     }
-    else {
+    else if (inMPaths.size() > 1) {
 	for(int i=0; i<int(inMPaths.size()); i++){ 
 	    if(debug){
 	        std::cout<<"filtering:";
@@ -254,16 +243,20 @@ void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inM
     int bestI = -1; 
     double bestChi2 = 9999;
     bool oneOf4 = false; 
+    bool enter = true; 
     if (inMPaths.size()>1){
       for (int i = 0; i<(int)inMPaths.size(); i++){
+	enter = true; 
 	if (rango(inMPaths[i])==4) {
 	  oneOf4 = true; 
           bestI = i;
 	  bestChi2 = inMPaths[i].chi2; 
 	}
+        //for (int j = 0; j<(int)inMPaths.size(); j++){
         for (int j = i+1; j<(int)inMPaths.size(); j++){
           if (areCousins(inMPaths[i],inMPaths[j])==0){ //they arent cousins
 	    //cout << "mp"; printmP(inMPaths[i]); cout<< " is not cousin from mp"; printmP(inMPaths[j]); cout << endl; 
+	    enter = false; // We dont want to save them two times
 	    if (oneOf4 == false){
 	      //cout << "kept3 mp" << i << endl; ;  
 	      outMPaths.push_back(inMPaths[i]);
@@ -284,13 +277,14 @@ void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inM
 		  bestChi2 = inMPaths[j].chi2;
 		}
 	      } else { // if rango of j is 4 and this MP has no rango 4, I will not accept this rango 3 mp
-		break;
+		enter = false; break;
 	      }
 	    } // if range of j is not 4, I do not do anything until I get a rango 4 or a no-primo-mp
 	  }
         }
+        if (enter == true) outMPaths.push_back(inMPaths[i]);
       }
-    } else {
+    } else if (inMPaths.size() == 1) {
       outMPaths.push_back(inMPaths[0]);
     }
 
