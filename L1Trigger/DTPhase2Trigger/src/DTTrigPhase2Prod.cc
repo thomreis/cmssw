@@ -116,6 +116,7 @@ DTTrigPhase2Prod::DTTrigPhase2Prod(const ParameterSet& pset){
     mpathqualityenhancer = new MPQualityEnhancerFilter(pset);
     mpathredundantfilter = new MPRedundantFilter(pset);
     mpathassociator      = new MuonPathAssociator(pset);
+    rpc_integrator       = new RPCIntegrator(pset);
 }
 
 DTTrigPhase2Prod::~DTTrigPhase2Prod(){
@@ -130,6 +131,7 @@ DTTrigPhase2Prod::~DTTrigPhase2Prod(){
   delete mpathqualityenhancer; // Filter destructor
   delete mpathredundantfilter; // Filter destructor
   delete mpathassociator; // Associator destructor
+  delete rpc_integrator;
 }
 
 
@@ -140,9 +142,6 @@ void DTTrigPhase2Prod::beginRun(edm::Run const& iRun, const edm::EventSetup& iEv
   if(debug) std::cout<<"getting DT geometry"<<std::endl;
   iEventSetup.get<MuonGeometryRecord>().get(dtGeo);//1103
 
-  if(debug) std::cout<<"getting RPC geometry"<<std::endl;
-  iEventSetup.get<MuonGeometryRecord>().get(rpcGeo);
-  
   ESHandle< DTConfigManager > dtConfig ;
   iEventSetup.get< DTConfigManagerRcd >().get( dtConfig );
 
@@ -178,8 +177,8 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
     iEvent.getByToken(dtDigisToken, dtdigis);
     
     if(debug) std::cout <<"\t Getting the RPC RecHits"<<std::endl;
-    Handle<RPCRecHitCollection> rpcHits;
-    iEvent.getByToken(rpcRecHitsLabel,rpcHits);
+    edm::Handle<RPCRecHitCollection> rpcRecHits;
+    iEvent.getByToken(rpcRecHitsLabel,rpcRecHits);
     
     ///////////////////////////////////
     // GROUPING CODE: 
@@ -350,6 +349,13 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
       } 
     }
     
+    // RPC integration
+    if(useRPC) {
+        if (debug) std::cout << "Start integrating RPC" << std::endl;
+        rpc_integrator->initialise(iEventSetup);
+        rpc_integrator->translateRPC(rpcRecHits);
+        rpc_integrator->confirmDT(correlatedMetaPrimitives);
+    }
 
     /// STORING RESULTs 
 
@@ -399,58 +405,15 @@ void DTTrigPhase2Prod::produce(Event & iEvent, const EventSetup& iEventSetup){
 					       (*metaPrimitiveIt).index,  // uind (m_segmentIndex)
 					       (int)round((*metaPrimitiveIt).t0)-shift_back*25,  // ut0 (m_t0Segment)
 					       (int)round((*metaPrimitiveIt).chi2*1000000),  // uchi2 (m_chi2Segment)
-					       -10    // urpc (m_rpcFlag)
+					       (*metaPrimitiveIt).rpcFlag    // urpc (m_rpcFlag)
 					       ));
 	
       }
     }
-    
-    // Store RPC hits
-    if(useRPC) {
-        int dt_phi_granularity = 65536/0.8;
-        for (RPCRecHitCollection::const_iterator rpcIt = rpcHits->begin(); rpcIt != rpcHits->end(); rpcIt++) {
-            // Retrieve RPC info and translate it to DT convention if needed
-            int rpc_bx = rpcIt->BunchX();
-            int rpc_time = int(rpcIt->time());
-            RPCDetId rpcDetId = (RPCDetId)(*rpcIt).rpcId();
-            if(debug) std::cout << "Getting RPC info from : " << rpcDetId << std::endl;
-            int rpc_region = rpcDetId.region();
-            if(rpc_region != 0 ) continue; // Region = 0 Barrel
-            int rpc_wheel = rpcDetId.ring(); // In barrel, wheel is accessed via ring() method ([-2,+2])
-            int rpc_dt_sector = rpcDetId.sector()-1; // DT sector:[0,11] while RPC sector:[1,12]
-            int rpc_station = rpcDetId.station();
-            int rpc_layer = rpcDetId.layer();
-
-            if(debug) std::cout << "Getting RPC global point and translating to DT local coordinates" << std::endl;
-            GlobalPoint rpc_gp = getRPCGlobalPosition(rpcDetId, *rpcIt);
-            double rpc_global_phi = rpc_gp.phi();
-            int rpc_localDT_phi = std::numeric_limits<int>::min();
-            // Adaptation of https://github.com/cms-sw/cmssw/blob/master/L1Trigger/L1TTwinMux/src/RPCtoDTTranslator.cc#L349
-            if (rpcDetId.sector() == 1) rpc_localDT_phi = int(rpc_global_phi * dt_phi_granularity);
-            else {
-                if (rpc_global_phi >= 0) rpc_localDT_phi = int((rpc_global_phi - (rpcDetId.sector() - 1) * Geom::pi() / 6.) * dt_phi_granularity);
-                else rpc_localDT_phi = int((rpc_global_phi + (13 - rpcDetId.sector()) * Geom::pi() / 6.) * dt_phi_granularity);
-            }
-            int rpc_phiB = -100000; // single hit has no phiB, DT phiB ranges approx from -1500 to 1500
-            int rpc_quality = -1; // to be decided
-            int rpc_index = 0;
-            int rpc_flag = 3; // only single hit for now
-            if(p2_df == 2){
-                if(debug)std::cout<<"pushing back phase-2 dataformat carlo-federica dataformat"<<std::endl;
-                outP2Ph.push_back(L1Phase2MuDTPhDigi(rpc_bx,
-                            rpc_wheel,
-                            rpc_dt_sector,
-                            rpc_station,
-                            rpc_layer, //this would be the layer in the new dataformat
-                            rpc_localDT_phi,
-                            rpc_phiB,
-                            rpc_quality,
-                            rpc_index,
-                            rpc_time,
-                            -1, // signle hit --> no chi2
-                            rpc_flag
-                            ));
-            }
+    // Storing RPC hits that were not used elsewhere
+    if(p2_df == 2 && useRPC) {
+        for (auto rpc_dt_digi = rpc_integrator->rpcRecHits_translated.begin(); rpc_dt_digi != rpc_integrator->rpcRecHits_translated.end(); rpc_dt_digi++) {
+            outP2Ph.push_back(*rpc_dt_digi);
         }
     }
 
@@ -544,16 +507,6 @@ int DTTrigPhase2Prod::rango(metaPrimitive mp) {
     if(mp.quality==1 or mp.quality==2) return 3;
     if(mp.quality==3 or mp.quality==4) return 4;
     return mp.quality;
-}
-
-GlobalPoint DTTrigPhase2Prod::getRPCGlobalPosition(RPCDetId rpcId, const RPCRecHit& rpcIt) const{
-
-  RPCDetId rpcid = RPCDetId(rpcId);
-  const LocalPoint& rpc_lp = rpcIt.localPosition();
-  const GlobalPoint& rpc_gp = rpcGeo->idToDet(rpcid)->surface().toGlobal(rpc_lp);
-
-  return rpc_gp;
-
 }
 
 void  DTTrigPhase2Prod::assignIndex(std::vector<metaPrimitive> &inMPaths)
