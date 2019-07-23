@@ -9,14 +9,14 @@ process.DTGeometryESModule.applyAlignment = False
 process.load("L1Trigger.DTPhase2Trigger.dtTriggerPhase2PrimitiveDigis_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
-#process.GlobalTag.globaltag = "90X_dataRun2_Express_v2"
-#process.GlobalTag.globaltag = "80X_dataRun2_2016SeptRepro_v7"
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
+process.GlobalTag.globaltag = "106X_upgrade2018_realistic_v4"
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
 #Calibrate Digis
 process.load("Phase2L1Trigger.CalibratedDigis.CalibratedDigis_cfi")
 process.CalibratedDigis.dtDigiTag = "simMuonDTDigis"
+process.CalibratedDigis.scenario = 0 # 0 for mc, 1 for data, 2 for slice test
 #process.CalibratedDigis.flat_calib = 325 #turn to 0 to use the DB  , 325 for JM and Jorge benchmark
 
 #DTTriggerPhase2
@@ -36,26 +36,24 @@ process.rpcRecHits.rpcDigiLabel = cms.InputTag('simMuonRPCDigis')
 process.load('Configuration.Geometry.GeometryExtended2023D38Reco_cff')
 process.load('Configuration.Geometry.GeometryExtended2023D38_cff')
 process.dtTriggerPhase2PrimitiveDigis.useRPC = True
+process.dtTriggerPhase2PrimitiveDigis.max_quality_to_overwrite_t0 = 9 # strict inequality
+process.dtTriggerPhase2PrimitiveDigis.scenario = 0 # 0 for mc, 1 for data, 2 for slice test
 
 process.source = cms.Source("PoolSource",fileNames = cms.untracked.vstring(
         #'file:/eos/user/c/carrillo/digis_segments_Run2016BSingleMuonRAW-RECO.root'
         'file:/eos/cms/store/group/dpg_dt/comm_dt/TriggerSimulation/SamplesReco/SingleMu_FlatPt-2to100/Version_10_5_0/SimRECO_1.root'
+        #'file:/eos/cms/store/group/dpg_rpc/comm_rpc/UpgradePhaseII/RPC_PLUS_DT/SingleMu_FlatPt-2to100_10_5_0_MaryCruz_WithRPCRecHits/SimRECO_1.root'
         )
                             )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(5000)
 )
 
 process.out = cms.OutputModule("PoolOutputModule",
                                outputCommands = cms.untracked.vstring('keep *'),
-                               fileName = cms.untracked.string('DTTriggerPhase2Primitives100_withRPC.root')
+                               fileName = cms.untracked.string('DTTriggerPhase2Primitives5000_withRPC.root')
 )
 
 process.p = cms.Path(process.rpcRecHits*process.CalibratedDigis*process.dtTriggerPhase2PrimitiveDigis)
 process.this_is_the_end = cms.EndPath(process.out)
-
-
-
-
-
 

@@ -17,6 +17,7 @@ process.GlobalTag.globaltag = "100X_upgrade2018_realistic_v10"
 process.load("Phase2L1Trigger.CalibratedDigis.CalibratedDigis_cfi")
 #process.CalibratedDigis.flat_calib = 325 #turn to 0 to use the DB  , 325 for JM and Jorge benchmark
 process.CalibratedDigis.dtDigiTag = "simMuonDTDigis" #turn to 0 to use the DB  , 325 for JM and Jorge benchmark
+process.CalibratedDigis.scenario = 0 # 0 for mc, 1 for data, 2 for slice test
 
 #DTTriggerPhase2
 process.load("L1Trigger.DTPhase2Trigger.dtTriggerPhase2PrimitiveDigis_cfi")
@@ -28,6 +29,7 @@ process.load("L1Trigger.DTPhase2Trigger.dtTriggerPhase2PrimitiveDigis_cfi")
 #process.dtTriggerPhase2PrimitiveDigis.pinta = True
 #process.dtTriggerPhase2PrimitiveDigis.min_phinhits_match_segment = 4
 #process.dtTriggerPhase2PrimitiveDigis.debug = True
+process.dtTriggerPhase2PrimitiveDigis.scenario = 0
 
 process.source = cms.Source("PoolSource",fileNames = cms.untracked.vstring(
         'file:/eos/cms/store/group/dpg_dt/comm_dt/TriggerSimulation/SamplesReco/SingleMu_FlatPt-2to100/Version_10_5_0/SimRECO_1.root',
@@ -51,7 +53,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.out = cms.OutputModule("PoolOutputModule",
                                outputCommands = cms.untracked.vstring('keep *'),
-                               fileName = cms.untracked.string('/tmp/carrillo/mc/DTTriggerPhase2Primitives.root')
+                               fileName = cms.untracked.string('DTTriggerPhase2Primitives_testsmc.root')
 )
 
 process.p = cms.Path(process.CalibratedDigis*process.dtTriggerPhase2PrimitiveDigis)
