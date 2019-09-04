@@ -111,11 +111,10 @@ phase2_SimL1Emulator += l1EGammaEEProducer
 from L1Trigger.L1CaloTrigger.L1CaloJets_cff import *
 phase2_SimL1Emulator += l1CaloJetsSequence
 
-# Barrel L1Tk + Stub
+# TPS Algorithm L1Tk + Stub
 # ########################################################################
-from L1Trigger.L1TTrackMatch.L1TTrackerPlusStubs_cfi import *
-l1KBmtfStubMatchedMuons = l1StubMatchedMuons.clone()
-phase2_SimL1Emulator += l1KBmtfStubMatchedMuons
+from L1Trigger.L1TMuonTPS.L1TTrackerPlusStubs_cfi import *
+phase2_SimL1Emulator += l1TrackerPlusStubsSequence
 # EndCap L1Tk + Stub
 # ########################################################################
 from L1Trigger.L1TTrackMatch.L1TkMuonStubProducer_cfi import *
