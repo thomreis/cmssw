@@ -1,0 +1,185 @@
+// Matching Algorithm
+#include "L1Trigger/L1TTrackMatch/interface/L1TkElectronTrackMatchAlgo.h"
+#include "L1Trigger/L1TTrackMatch/interface/pTFrom2Stubs.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
+
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIEGTkIso.h"
+
+L1Analysis::L1AnalysisPhaseIIEGTkIso::L1AnalysisPhaseIIEGTkIso(const edm::ParameterSet& pSet) :
+  pSet_(pSet),
+  egBarrelEtMin_((float)pSet.getParameter<double>("egBarrelMinEt")),
+  egHGCEtMin_((float)pSet.getParameter<double>("egHGCMinEt")),
+  trkPtMin_((float)pSet.getParameter<double>("trackMinPt")),
+  trkChi2Max_((float)pSet.getParameter<double>("trackMaxChi2")),
+  useTwoStubsPt_(pSet.getParameter<bool>("useTwoStubsPt")),
+  dPhiCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaPhi")),
+  dRCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaR")),
+  trkPtMinIso_((float)pSet.getParameter<double>("trackMinPtForIso")),
+  trkChi2MaxIso_((float)pSet.getParameter<double>("trackMaxChi2ForIso")),
+  dRMinIso_((float)pSet.getParameter<double>("dRMinForIso")),
+  dRMaxIso_((float)pSet.getParameter<double>("dRMaxForIso"))
+{
+}
+
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t::EGammaBxCollection>& egBarrel, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom)
+{
+  //std::cout << "This event contains " << tttrack->size() << " tracks." << std::endl;
+
+  // barrel
+  for (auto bx = egBarrel->getFirstBX(); bx <= egBarrel->getLastBX(); ++bx) {
+    for (l1t::EGammaBxCollection::const_iterator it = egBarrel->begin(bx); it != egBarrel->end(bx); ++it) {
+      if (it->et() > egBarrelEtMin_) {
+        setBranches(it, tttrack, tGeom, bx, false);
+      }
+    }
+  }
+
+  // HGC
+  for (auto bx = egHGC->getFirstBX(); bx <= egHGC->getLastBX(); ++bx) {
+    for (l1t::EGammaBxCollection::const_iterator it = egHGC->begin(bx); it != egHGC->end(bx); ++it) {
+      if (it->et() > egHGCEtMin_) {
+        setBranches(it, tttrack, tGeom, bx, true);
+      }
+    }
+  }
+}
+
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int bx, const bool isHGC)
+{
+  //std::cout << "EG " << l1Phase2EGTkIso_.nEG << ": et: " << it->et() << ", eta: " << it->eta() << ", phi: " << it->phi() << std::endl;
+  ++l1Phase2EGTkIso_.nEG;
+  l1Phase2EGTkIso_.EGEt.push_back(it->et());
+  l1Phase2EGTkIso_.EGEta.push_back(it->eta());
+  l1Phase2EGTkIso_.EGPhi.push_back(it->phi());
+  l1Phase2EGTkIso_.EGIso.push_back(it->isoEt());
+  l1Phase2EGTkIso_.EGHwQual.push_back(it->hwQual());
+  l1Phase2EGTkIso_.EGBx.push_back(bx);
+  if (isHGC) {
+    l1Phase2EGTkIso_.EGHGC.push_back(1);
+    bool quality = it->hwQual() == 2;
+    l1Phase2EGTkIso_.EGPassesLooseTrackID.push_back(quality); 
+    l1Phase2EGTkIso_.EGPassesPhotonID.push_back(quality);
+  } else {
+    l1Phase2EGTkIso_.EGHGC.push_back(0);
+    bool quality = ((it->hwQual() >> 1) & 1) > 0;
+    l1Phase2EGTkIso_.EGPassesLooseTrackID.push_back(quality); 
+    quality = ((it->hwQual() >> 2) & 1) > 0;
+    l1Phase2EGTkIso_.EGPassesPhotonID.push_back(quality);
+  }
+
+  // search matching track
+  double matchedTrackDR = 999.;
+  const auto matchedTrackPtr = findMatchedTrack(it, tttrack, tGeom, matchedTrackDR);
+  int matchedTrackIdx = -1;
+  if (matchedTrackPtr.isNonnull()) {
+    matchedTrackIdx = matchedTrackPtr.key();
+    //std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->getMomentum().eta() << ", phi: " << matchedTrackPtr->getMomentum().phi() << ", dR: " << matchedTrackDR << std::endl;
+    l1Phase2EGTkIso_.matchedTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
+    l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->getMomentum().perp());
+    l1Phase2EGTkIso_.matchedTkEta.push_back(matchedTrackPtr->getMomentum().eta());
+    l1Phase2EGTkIso_.matchedTkPhi.push_back(matchedTrackPtr->getMomentum().phi());
+    l1Phase2EGTkIso_.matchedTkDR.push_back(matchedTrackDR);
+  }
+
+  // find other tracks in cone around EG for isolation calculation
+  setIsoTracks(it, tttrack, tGeom, matchedTrackIdx);
+}
+
+edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1AnalysisPhaseIIEGTkIso::findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR)
+{
+  int iTrack = 0;
+  int iMatchedTrack = -1;
+  for (L1TTTrackCollectionType::const_iterator trkIt = tttrack->begin(); trkIt != tttrack->end(); ++trkIt) {
+    auto trkPt = trkIt->getMomentum().perp();
+    if (useTwoStubsPt_) {
+      trkPt = pTFrom2Stubs::pTFrom2(trkIt, tGeom);
+    }
+
+    if (trkPt > trkPtMin_ and trkIt->getChi2() < trkChi2Max_) {
+      // calculate dR to EG
+      double dPhi = 999.;
+      double dR = 999.;
+      double dEta = 999.;
+      edm::Ptr<L1TTTrackType> trackPtr(tttrack, iTrack);
+      L1TkElectronTrackMatchAlgo::doMatch(egIt, trackPtr, dPhi, dR, dEta);
+      if (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) and
+          dR < getPtScaledCut(trkPt, dRCutoff_) and
+          dR < matchedTrackDR) {
+        matchedTrackDR = dR;
+        iMatchedTrack = iTrack;
+      }
+    }
+    ++iTrack;
+  }
+
+  if (iMatchedTrack >= 0) {
+    edm::Ptr<L1TTTrackType> trackPtr(tttrack, iMatchedTrack);
+    return trackPtr;
+  } else {
+    edm::Ptr<L1TTTrackType> edmNullPtr;
+    return edmNullPtr;
+  }
+}
+
+// method to calculate isolation
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx) {
+  int iTrack = -1;
+  for (L1TTTrackCollectionType::const_iterator trkIt = tttrack->begin(); trkIt != tttrack->end(); ++trkIt) {
+    if (++iTrack != matchedTrackIdx) { // Do not use the matched track in the isolation
+      // track momentum calculation
+      auto trkPt = trkIt->getMomentum().perp();
+      if (useTwoStubsPt_) {
+        trkPt = pTFrom2Stubs::pTFrom2(trkIt, tGeom);
+      }
+
+      // basic track selection
+      if (trkIt->getChi2() > trkChi2MaxIso_ or trkPt < trkPtMinIso_) {
+        continue;
+      }
+
+      // calculate dR to EG
+      double dPhi = 999.;
+      double dR = 999.;
+      double dEta = 999.;
+      edm::Ptr<L1TTTrackType> trackPtr(tttrack, iTrack);
+      L1TkElectronTrackMatchAlgo::doMatch(egIt, trackPtr, dPhi, dR, dEta);
+
+      // store track info if close enough to the EG object
+      if (dR < 999. and dR > dRMinIso_ and dR < dRMaxIso_) {
+        double dPhiTrkTrk = 0.;
+        double dEtaTrkTrk = 0.;
+        double dRTrkTrk =  0.;
+        double dzTrkTrk = 0.;
+        // calculate distance from matched track
+        if (matchedTrackIdx >= 0) {
+          edm::Ptr<L1TTTrackType> matchedTrackPtr(tttrack, matchedTrackIdx);
+          const auto phi1 = static_cast<float>(trkIt->getMomentum().phi());
+          const auto phi2 = static_cast<float>(matchedTrackPtr->getMomentum().phi());
+          dPhiTrkTrk = reco::deltaPhi(phi1, phi2);
+          dEtaTrkTrk = static_cast<float>(trkIt->getMomentum().eta() - matchedTrackPtr->getMomentum().eta());
+          dRTrkTrk = std::sqrt(dPhiTrkTrk * dPhiTrkTrk + dEtaTrkTrk * dEtaTrkTrk);
+          dzTrkTrk = fabs(trkIt->getPOCA().z() - matchedTrackPtr->getPOCA().z());
+        }
+
+        //std::cout << "Iso track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << trkPt << ", eta: " << trkIt->getMomentum().eta() << ", phi: " << trkIt->getMomentum().phi() << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << ", dR tktk: " << dRTrkTrk << ", dEta tktk: " << dEtaTrkTrk << ", dPhi tktk: " << dPhiTrkTrk << ", dz tktk: " << dzTrkTrk << std::endl;
+        l1Phase2EGTkIso_.isoTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
+        l1Phase2EGTkIso_.isoTkPt.push_back(trkPt);
+        l1Phase2EGTkIso_.isoTkEta.push_back(trkIt->getMomentum().eta());
+        l1Phase2EGTkIso_.isoTkPhi.push_back(trkIt->getMomentum().phi());
+        l1Phase2EGTkIso_.isoTkDR.push_back(dR);
+        l1Phase2EGTkIso_.isoTkDEta.push_back(dEta);
+        l1Phase2EGTkIso_.isoTkDPhi.push_back(dPhi);
+        l1Phase2EGTkIso_.isoTkMatchedTkDR.push_back(dRTrkTrk);
+        l1Phase2EGTkIso_.isoTkMatchedTkDEta.push_back(dEtaTrkTrk);
+        l1Phase2EGTkIso_.isoTkMatchedTkDPhi.push_back(dPhiTrkTrk);
+        l1Phase2EGTkIso_.isoTkMatchedTkDz.push_back(dzTrkTrk);
+      }
+    }
+  }
+}
+
+
+double L1Analysis::L1AnalysisPhaseIIEGTkIso::getPtScaledCut(const double pt, const std::vector<double>& parameters)
+{
+  return parameters[0] + parameters[1] * exp(parameters[2] * pt);
+}
