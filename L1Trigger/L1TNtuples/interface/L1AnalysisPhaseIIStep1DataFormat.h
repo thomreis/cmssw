@@ -288,6 +288,33 @@ namespace L1Analysis {
       nnTau2vtxDXY.clear();
       nnTau2vtxZ0.clear();
 
+      // CT L2 EG objects
+      nL2TkEles = 0;
+      l2TkElePt.clear();
+      l2TkEleEnergy.clear();
+      l2TkEleEta.clear();
+      l2TkElePhi.clear();
+      l2TkEleHwQual.clear();
+      l2TkEleTrkIso.clear();
+      l2TkElePfIso.clear();
+      l2TkElePuppiIso.clear();
+      l2TkEleTkChi2.clear();
+      l2TkEleTkPt.clear();
+      l2TkEleTkZ0.clear();
+
+      nL2TkEms = 0;
+      l2TkEmPt.clear();
+      l2TkEmEnergy.clear();
+      l2TkEmEta.clear();
+      l2TkEmPhi.clear();
+      l2TkEmHwQual.clear();
+      l2TkEmTrkIso.clear();
+      l2TkEmTrkIsoPV.clear();
+      l2TkEmPfIso.clear();
+      l2TkEmPfIsoPV.clear();
+      l2TkEmPuppiIso.clear();
+      l2TkEmPuppiIsoPV.clear();
+
       // TkJets
       nTrackerJets = 0;
       trackerJetPt.clear();
@@ -592,6 +619,32 @@ namespace L1Analysis {
     std::vector<unsigned int> nnTau2vtxPassMass;
     std::vector<double> nnTau2vtxDXY;
     std::vector<double> nnTau2vtxZ0;
+
+    unsigned int nL2TkEles;
+    std::vector<double> l2TkElePt;
+    std::vector<double> l2TkEleEnergy;
+    std::vector<double> l2TkEleEta;
+    std::vector<double> l2TkElePhi;
+    std::vector<double> l2TkEleHwQual;
+    std::vector<double> l2TkEleTrkIso;
+    std::vector<double> l2TkElePfIso;
+    std::vector<double> l2TkElePuppiIso;
+    std::vector<double> l2TkEleTkChi2;
+    std::vector<double> l2TkEleTkPt;
+    std::vector<double> l2TkEleTkZ0;
+
+    unsigned int nL2TkEms;
+    std::vector<double> l2TkEmPt;
+    std::vector<double> l2TkEmEnergy;
+    std::vector<double> l2TkEmEta;
+    std::vector<double> l2TkEmPhi;
+    std::vector<double> l2TkEmHwQual;
+    std::vector<double> l2TkEmTrkIso;
+    std::vector<double> l2TkEmTrkIsoPV;
+    std::vector<double> l2TkEmPfIso;
+    std::vector<double> l2TkEmPfIsoPV;
+    std::vector<double> l2TkEmPuppiIso;
+    std::vector<double> l2TkEmPuppiIsoPV;
 
     unsigned int nTrackerJets;
     std::vector<double> trackerJetPt;

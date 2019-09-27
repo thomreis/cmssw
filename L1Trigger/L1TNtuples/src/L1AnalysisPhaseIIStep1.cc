@@ -563,6 +563,50 @@ void L1Analysis::L1AnalysisPhaseIIStep1::SetNNTau2vtxs(const edm::Handle<vector<
   }
 }
 
+// CT L2 Electrons
+void L1Analysis::L1AnalysisPhaseIIStep1::SetL2CtEle(const l1t::TkElectronCollection& l2CtTkEles,
+                                                    unsigned maxL1Extra) {
+  for (const auto& ele : l2CtTkEles) {
+    if (l1extra_.nL2TkEles > maxL1Extra) {
+      break;
+    }
+    l1extra_.l2TkElePt.push_back(ele.pt());
+    l1extra_.l2TkEleEnergy.push_back(ele.energy());
+    l1extra_.l2TkEleEta.push_back(ele.eta());
+    l1extra_.l2TkElePhi.push_back(ele.phi());
+    l1extra_.l2TkEleHwQual.push_back(ele.hwQual());
+    l1extra_.l2TkEleTrkIso.push_back(ele.trkIsol());
+    l1extra_.l2TkElePfIso.push_back(ele.pfIsol());
+    l1extra_.l2TkElePuppiIso.push_back(ele.puppiIsol());
+    l1extra_.l2TkEleTkChi2.push_back(ele.trkPtr()->chi2());
+    l1extra_.l2TkEleTkPt.push_back(ele.trkPtr()->momentum().perp());
+    l1extra_.l2TkEleTkZ0.push_back(ele.trkPtr()->POCA().z());
+    ++l1extra_.nL2TkEles;
+  }
+}
+
+// CT L2 EM objects
+void L1Analysis::L1AnalysisPhaseIIStep1::SetL2CtEm(const l1t::TkEmCollection& l2CtTkEms,
+                                                   unsigned maxL1Extra) {
+  for (const auto& em : l2CtTkEms) {
+    if (l1extra_.nL2TkEms > maxL1Extra) {
+      break;
+    }
+    l1extra_.l2TkEmPt.push_back(em.pt());
+    l1extra_.l2TkEmEnergy.push_back(em.energy());
+    l1extra_.l2TkEmEta.push_back(em.eta());
+    l1extra_.l2TkEmPhi.push_back(em.phi());
+    l1extra_.l2TkEmHwQual.push_back(em.hwQual());
+    l1extra_.l2TkEmTrkIso.push_back(em.trkIsol());
+    l1extra_.l2TkEmTrkIsoPV.push_back(em.trkIsolPV());
+    l1extra_.l2TkEmPfIso.push_back(em.pfIsol());
+    l1extra_.l2TkEmPfIsoPV.push_back(em.pfIsolPV());
+    l1extra_.l2TkEmPuppiIso.push_back(em.puppiIsol());
+    l1extra_.l2TkEmPuppiIsoPV.push_back(em.puppiIsolPV());
+    ++l1extra_.nL2TkEms;
+  }
+}
+
 // TkJet
 void L1Analysis::L1AnalysisPhaseIIStep1::SetTkJet(const edm::Handle<l1t::TkJetWordCollection> trackerJet,
                                                   unsigned maxL1Extra) {

@@ -147,6 +147,12 @@ namespace L1Analysis {
     void SetTkMHT(const edm::Handle<std::vector<l1t::EtSum>> trackerMHT);
     void SetTkMHTDisplaced(const edm::Handle<std::vector<l1t::EtSum>> trackerMHT);
 
+    void SetL2CtEle(const l1t::TkElectronCollection& l2CtTkEles,
+                    unsigned maxL1Extra);
+
+    void SetL2CtEm(const l1t::TkEmCollection& l2CtTkEms,
+                   unsigned maxL1Extra);
+
     L1AnalysisPhaseIIStep1DataFormat* getData() { return &l1extra_; }
 
     static int transverseCoord(double cxa,
