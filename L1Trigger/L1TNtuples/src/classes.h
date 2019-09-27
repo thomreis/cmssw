@@ -35,6 +35,8 @@
 
 //#include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIPFJetDataFormat.h"
 
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIEGTkIsoDataFormat.h"
+
 namespace {
   namespace {
     L1Analysis::L1AnalysisEventDataFormat pL1ev;
