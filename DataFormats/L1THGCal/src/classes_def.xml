@@ -45,7 +45,8 @@
 
   <class name="l1t::HGCalClusterT<l1t::HGCalCluster>" />
 
-  <class name="l1t::HGCalMulticluster" ClassVersion="19">
+  <class name="l1t::HGCalMulticluster" ClassVersion="20">
+   <version ClassVersion="20" checksum="97672133"/>
    <version ClassVersion="19" checksum="3914904215"/>
    <version ClassVersion="18" checksum="1001614855"/>
    <version ClassVersion="17" checksum="460658789"/>
