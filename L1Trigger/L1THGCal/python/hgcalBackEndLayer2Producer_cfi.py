@@ -120,7 +120,7 @@ phase2_hgcalV10.toModify(energy_interpretations_em,
 energy_interpretations = cms.VPSet(energy_interpretations_em)
 
 be_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendLayer2Processor3DClustering'),
-                   C3d_parameters = histoMaxVariableDR_C3d_params.clone()
+                   C3d_parameters = histoMaxVariableDR_C3d_params.clone(),
                    energy_interpretations = energy_interpretations
                    )
 
