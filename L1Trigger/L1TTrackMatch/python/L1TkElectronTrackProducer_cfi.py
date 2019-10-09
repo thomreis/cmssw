@@ -11,9 +11,10 @@ L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
         TrackChi2           = cms.double(1e10), # minimum Chi2 to select tracks
         TrackMinPt          = cms.double(10.0), # minimum Pt to select tracks                                     
 	useTwoStubsPT       = cms.bool( False ),
+        TrackEGammaMatchType = cms.string("StandardCut"),
         TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0), # functional Delta Phi cut parameters to match Track with L1EG objects
         TrackEGammaDeltaR   = cms.vdouble(0.08, 0.0, 0.0), # functional Delta R cut parameters to match Track with L1EG objects
-        TrackEGammaDeltaEta = cms.double(1e10), # Delta Eta cutoff to match Track with L1EG objects
+        TrackEGammaDeltaEta = cms.vdouble(1e10,0,0), # Delta Eta cutoff to match Track with L1EG objects
                                                 # are considered. (unused in default configuration)
 	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
 						# else absolute.
@@ -47,7 +48,7 @@ L1TkElectronsCrystal.L1EGammaInputTag = cms.InputTag("L1EGammaClusterEmuProducer
 L1TkElectronsCrystal.IsoCut = cms.double(-0.1)
 
 L1TkIsoElectronsCrystal=L1TkElectronsCrystal.clone()
-L1TkIsoElectronsCrystal.IsoCut = cms.double(0.12)
+L1TkIsoElectronsCrystal.IsoCut = cms.double(0.1)
 
 L1TkElectronsLooseCrystal = L1TkElectronsCrystal.clone()
 L1TkElectronsLooseCrystal.TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0)
@@ -65,7 +66,7 @@ L1TkIsoElectronsHGC.DRmax = cms.double(0.4)
 L1TkIsoElectronsHGC.DeltaZ = cms.double(1.0)
 L1TkIsoElectronsHGC.maxChi2IsoTracks = cms.double(100)
 L1TkIsoElectronsHGC.minNStubsIsoTracks = cms.int32(4)
-L1TkIsoElectronsHGC.IsoCut = cms.double(0.30)
+L1TkIsoElectronsHGC.IsoCut = cms.double(0.1)
 
 L1TkElectronsLooseHGC = L1TkElectronsHGC.clone()
 L1TkElectronsLooseHGC.TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0)
