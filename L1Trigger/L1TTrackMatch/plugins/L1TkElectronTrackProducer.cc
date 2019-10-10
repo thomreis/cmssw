@@ -361,10 +361,10 @@ bool
     if (fabs(d_phi) < getPtScaledCut(tk_pt, dPhiCutoff) && d_r < getPtScaledCut(tk_pt, dRCutoff)) return true;
   } else {
     double deta_max = dEtaCutoff[0];
-    if (eg_eta < 0.9 ) deta_max = dEtaCutoff[1];
+    if (fabs(eg_eta) < 0.9 ) deta_max = dEtaCutoff[1];
     double dphi_max = dPhiCutoff[0];
 
-    if (sqrt((d_eta/deta_max)*(d_eta/deta_max) + (d_phi/dphi_max)*(d_phi/dphi_max)) < 1) return true;
+    if ((d_eta/deta_max)*(d_eta/deta_max) + (d_phi/dphi_max)*(d_phi/dphi_max) < 1) return true;
   }
   return false;
 }
