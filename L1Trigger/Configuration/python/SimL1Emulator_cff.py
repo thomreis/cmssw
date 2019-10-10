@@ -116,6 +116,13 @@ phase2_SimL1Emulator += l1CaloJetsSequence
 from L1Trigger.L1TTrackMatch.L1TTrackerPlusStubs_cfi import *
 l1KBmtfStubMatchedMuons = l1StubMatchedMuons.clone()
 phase2_SimL1Emulator += l1KBmtfStubMatchedMuons
+
+#  Overlap L1Tk + Stub
+# ########################################################################
+from L1Trigger.L1TMuonBayes.simBayesMuCorrelatorTrackProducer_cfi import *
+l1TkMuonStubOverlap = simBayesMuCorrelatorTrackProducer.clone()
+phase2_SimL1Emulator += l1TkMuonStubOverlap
+
 # EndCap L1Tk + Stub
 # ########################################################################
 from L1Trigger.L1TTrackMatch.L1TkMuonStubProducer_cfi import *
@@ -135,6 +142,7 @@ phase2_SimL1Emulator += L1TkPrimaryVertex
 phase2_SimL1Emulator += L1TkElectronsCrystal
 phase2_SimL1Emulator += L1TkIsoElectronsCrystal
 phase2_SimL1Emulator += L1TkElectronsLooseCrystal
+phase2_SimL1Emulator += L1WP2Electrons
 phase2_SimL1Emulator += L1TkPhotonsCrystal
 phase2_SimL1Emulator += L1TkElectronsHGC
 phase2_SimL1Emulator += L1TkIsoElectronsHGC
@@ -152,7 +160,7 @@ phase2_SimL1Emulator += L1TkMuonsTP
 phase2_SimL1Emulator += L1TkGlbMuons
 phase2_SimL1Emulator += L1TkTauFromCalo
 phase2_SimL1Emulator += L1TrackerTaus
-phase2_SimL1Emulator += L1TkEGTaus
+phase2_SimL1Emulator += L1TkEGTaus 
 phase2_SimL1Emulator += L1TkCaloTaus
 
 
@@ -175,11 +183,25 @@ phase2_SimL1Emulator += l1PFMets
 
 # PFTaus(HPS)
 # ########################################################################
+from L1Trigger.L1CaloTrigger.Phase1L1TJetProducer_cfi import Phase1L1TJetProducer 
+l1pfPhase1L1TJetProducer = Phase1L1TJetProducer.clone()
+phase2_SimL1Emulator += l1pfPhase1L1TJetProducer
+
+# PFTaus(HPS)
+# ########################################################################
 from L1Trigger.Phase2L1Taus.L1PFTauProducer_cff import L1PFTauProducer
 l1pfTauProducer = L1PFTauProducer.clone()
 l1pfTauProducer.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
 l1pfTauProducer.L1Neutrals = cms.InputTag("l1pfCandidates")
 phase2_SimL1Emulator += l1pfTauProducer
+
+from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPF_cff import L1HPSPFTauProducerPF
+l1pfTauProducerv2PF = L1HPSPFTauProducerPF.clone()
+#phase2_SimL1Emulator += l1pfTauProducerv2PF
+
+from L1Trigger.Phase2L1Taus.L1HPSPFTauProducerPuppi_cff import L1HPSPFTauProducerPuppi
+l1pfTauProducerv2Puppi = L1HPSPFTauProducerPuppi.clone()
+#phase2_SimL1Emulator += l1pfTauProducerv2Puppi
 
 # NNTaus
 # ########################################################################
@@ -187,7 +209,7 @@ from L1Trigger.Phase2L1Taus.L1NNTauProducer_cff import *
 l1NNTauProducer = L1NNTauProducer.clone()
 l1NNTauProducer.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
 l1NNTauProducerPuppi = L1NNTauProducerPuppi.clone()
-l1NNTauProducerPuppi.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
+l1NNTauProducerPuppi.L1PFObjects = cms.InputTag("l1pfCandidates","Puppi")
 phase2_SimL1Emulator += l1NNTauProducer
 phase2_SimL1Emulator += l1NNTauProducerPuppi
 
