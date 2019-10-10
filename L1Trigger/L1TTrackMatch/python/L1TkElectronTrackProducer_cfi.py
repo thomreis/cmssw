@@ -7,9 +7,9 @@ L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
         ETmin = cms.double( -1.0 ),             # Only the L1EG objects that have ET > ETmin in GeV
                                                 # are considered. ETmin < 0 means that no cut is applied.
      	L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
-        # Quality cuts on Track and Track L1EG matching criteria                                
+        # Quality cuts on Track and Track L1EG matching criteria
         TrackChi2           = cms.double(1e10), # minimum Chi2 to select tracks
-        TrackMinPt          = cms.double(10.0), # minimum Pt to select tracks                                     
+        TrackMinPt          = cms.double(10.0), # minimum Pt to select tracks
 	useTwoStubsPT       = cms.bool( False ),
         TrackEGammaMatchType = cms.string("PtDependentCut"),
         TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0), # functional Delta Phi cut parameters to match Track with L1EG objects
@@ -55,11 +55,21 @@ L1TkElectronsLooseCrystal.TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0)
 L1TkElectronsLooseCrystal.TrackEGammaDeltaR = cms.vdouble(0.12, 0.0, 0.0)
 L1TkElectronsLooseCrystal.TrackMinPt = cms.double( 3.0 )
 
+L1TkElectronsElMatchCrystal = L1TkElectronsCrystal.clone()
+L1TkElectronsElMatchCrystal.TrackEGammaMatchType = cms.string("EllipticalCut")
+L1TkElectronsElMatchCrystal.TrackEGammaDeltaEta = cms.vdouble(0.015, 0.025,1e10)
+
+
 
 #endcap
 L1TkElectronsHGC=L1TkElectrons.clone()
 L1TkElectronsHGC.L1EGammaInputTag = cms.InputTag("l1EGammaEEProducer","L1EGammaCollectionBXVWithCuts")
 L1TkElectronsHGC.IsoCut = cms.double(-0.1)
+
+
+L1TkElectronsElMatchHGC = L1TkElectronsHGC.clone()
+L1TkElectronsElMatchHGC.TrackEGammaMatchType = cms.string("EllipticalCut")
+L1TkElectronsElMatchHGC.TrackEGammaDeltaEta = cms.vdouble(0.0075, 0.0075,1e10)
 
 L1TkIsoElectronsHGC=L1TkElectronsHGC.clone()
 L1TkIsoElectronsHGC.DRmax = cms.double(0.4)
@@ -72,5 +82,3 @@ L1TkElectronsLooseHGC = L1TkElectronsHGC.clone()
 L1TkElectronsLooseHGC.TrackEGammaDeltaPhi = cms.vdouble(0.07, 0.0, 0.0)
 L1TkElectronsLooseHGC.TrackEGammaDeltaR = cms.vdouble(0.12, 0.0, 0.0)
 L1TkElectronsLooseHGC.TrackMinPt = cms.double( 3.0 )
-
-
