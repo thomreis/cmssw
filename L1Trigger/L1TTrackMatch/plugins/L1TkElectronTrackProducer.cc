@@ -219,14 +219,14 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if ( useTwoStubsPT ) trkPt = trkPt_stubs ;
 
       if ( trkPt > trkQualityPtMin && trackIter->getChi2() < trkQualityChi2) {
-	double dPhi = 99.;
-	double dR = 99.;
-	double dEta = 99.;
-	L1TkElectronTrackMatchAlgo::doMatch(egIter, L1TrackPtr, dPhi, dR, dEta);
-	if (dR < drmin && selectMatchedTrack(dR, dEta, dPhi, trkPt, eta_ele)) {
-	  drmin = dR;
-	  itrack = itr;
-	}
+        double dPhi = 99.;
+        double dR = 99.;
+        double dEta = 99.;
+        L1TkElectronTrackMatchAlgo::doMatch(egIter, L1TrackPtr, dPhi, dR, dEta);
+        if (dR < drmin && selectMatchedTrack(dR, dPhi, dEta, trkPt, eta_ele)) {
+          drmin = dR;
+          itrack = itr;
+        }
       }
       itr++;
     }
@@ -236,7 +236,7 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       const math::XYZTLorentzVector P4 = egIter -> p4() ;
       float trkisol = isolation(L1TTTrackHandle, itrack);
       if (RelativeIsolation && et_ele > 0.0) {   // relative isolation
-	trkisol = trkisol  / et_ele;
+        trkisol = trkisol  / et_ele;
       }
 
       L1TkElectronParticle trkEm( P4,
@@ -356,14 +356,12 @@ L1TkElectronTrackProducer::getPtScaledCut(double pt, std::vector<double>& parame
 }
 bool
   L1TkElectronTrackProducer::selectMatchedTrack(double & d_r, double& d_phi, double& d_eta, double& tk_pt, float& eg_eta) {
-  bool result = false;
   if (matchType == "PtDependentCut") {
     if (fabs(d_phi) < getPtScaledCut(tk_pt, dPhiCutoff) && d_r < getPtScaledCut(tk_pt, dRCutoff)) return true;
   } else {
     double deta_max = dEtaCutoff[0];
     if (fabs(eg_eta) < 0.9 ) deta_max = dEtaCutoff[1];
     double dphi_max = dPhiCutoff[0];
-
     if ((d_eta/deta_max)*(d_eta/deta_max) + (d_phi/dphi_max)*(d_phi/dphi_max) < 1) return true;
   }
   return false;
