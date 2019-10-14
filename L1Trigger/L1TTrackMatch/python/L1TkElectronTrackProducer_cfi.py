@@ -72,6 +72,9 @@ L1TkElectronsEllipticMatchHGC = L1TkElectronsHGC.clone()
 # L1TkElectronsEllipticMatchHGC.L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks")
 L1TkElectronsEllipticMatchHGC.TrackEGammaMatchType = cms.string("EllipticalCut")
 L1TkElectronsEllipticMatchHGC.TrackEGammaDeltaEta = cms.vdouble(0.0075, 0.0075,1e10)
+L1TkElectronsEllipticMatchHGC.maxChi2IsoTracks = cms.double(100)
+L1TkElectronsEllipticMatchHGC.minNStubsIsoTracks = cms.int32(4)
+
 
 L1TkIsoElectronsHGC=L1TkElectronsHGC.clone()
 L1TkIsoElectronsHGC.DRmax = cms.double(0.4)
