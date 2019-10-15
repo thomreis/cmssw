@@ -140,11 +140,13 @@ phase2_SimL1Emulator += L1TkPrimaryVertex
 #phase2_SimL1Emulator += L1TkIsoElectrons # warning this has a PhaseI EG seed!
 #phase2_SimL1Emulator += L1TkPhotons # warning this has a PhaseI EG seed!
 phase2_SimL1Emulator += L1TkElectronsCrystal
+phase2_SimL1Emulator += L1TkElectronsEllipticMatchCrystal
 phase2_SimL1Emulator += L1TkIsoElectronsCrystal
 phase2_SimL1Emulator += L1TkElectronsLooseCrystal
 phase2_SimL1Emulator += L1WP2Electrons
 phase2_SimL1Emulator += L1TkPhotonsCrystal
 phase2_SimL1Emulator += L1TkElectronsHGC
+phase2_SimL1Emulator += L1TkElectronsEllipticMatchHGC
 phase2_SimL1Emulator += L1TkIsoElectronsHGC
 phase2_SimL1Emulator += L1TkElectronsLooseHGC
 phase2_SimL1Emulator += L1TkPhotonsHGC
@@ -160,7 +162,7 @@ phase2_SimL1Emulator += L1TkMuonsTP
 phase2_SimL1Emulator += L1TkGlbMuons
 phase2_SimL1Emulator += L1TkTauFromCalo
 phase2_SimL1Emulator += L1TrackerTaus
-phase2_SimL1Emulator += L1TkEGTaus 
+phase2_SimL1Emulator += L1TkEGTaus
 phase2_SimL1Emulator += L1TkCaloTaus
 
 
@@ -183,7 +185,7 @@ phase2_SimL1Emulator += l1PFMets
 
 # PFTaus(HPS)
 # ########################################################################
-from L1Trigger.L1CaloTrigger.Phase1L1TJetProducer_cfi import Phase1L1TJetProducer 
+from L1Trigger.L1CaloTrigger.Phase1L1TJetProducer_cfi import Phase1L1TJetProducer
 l1pfPhase1L1TJetProducer = Phase1L1TJetProducer.clone()
 phase2_SimL1Emulator += l1pfPhase1L1TJetProducer
 
