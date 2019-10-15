@@ -88,6 +88,13 @@ void L1EGammaEEProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
          eg.setIsoEt(-1); // just temporarily as a dummy value
          l1EgammaBxCollection->push_back(0,eg);
          if (hw_quality == 2) {
+           // we build the EM interpreted EG object
+           l1t::EGamma eg_emint=l1t::EGamma(reco::Candidate::PolarLorentzVector(cl3d->iPt(l1t::HGCalMulticluster::EnergyInterpretation::EM), cl3d->eta(), cl3d->phi(), 0.));
+           eg_emint.setHwQual(4);
+           eg_emint.setHwIso(1);
+           eg_emint.setIsoEt(-1); // just temporarily as a dummy value
+           l1EgammaBxCollection->push_back(0,eg_emint);
+           // we also prepare for the brem recovery procedure
            selected_multiclusters.push_back(&(*cl3d));
            auto eta_phi_bin = get_eta_phi_bin(&(*cl3d));
            auto bucket = etaphi_bins.find(eta_phi_bin);
