@@ -122,6 +122,8 @@ void L1EGammaEEProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       // we drop the Had component of the energy
       if(cl3d->hOverE() != -1) pt = cl3d->pt()/(1+cl3d->hOverE());
       reco::Candidate::PolarLorentzVector mom(pt, cl3d->eta(), cl3d->phi(), 0.);
+      reco::Candidate::PolarLorentzVector mom_eint(cl3d->iPt(l1t::HGCalMulticluster::EnergyInterpretation::EM), cl3d->eta(), cl3d->phi(), 0.);
+
       // cl3d->pt()/(1+cl3d->hOverE())
 
       // this is not yet used
@@ -150,6 +152,7 @@ void L1EGammaEEProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
                     float pt_other = other_cl_ptr->pt();
                     if(other_cl_ptr->hOverE() != -1) pt_other = other_cl_ptr->pt()/(1+other_cl_ptr->hOverE());
                     mom+=reco::Candidate::PolarLorentzVector(pt_other, other_cl_ptr->eta(), other_cl_ptr->phi(), 0.);
+                    mom_eint+=reco::Candidate::PolarLorentzVector(other_cl_ptr->iPt(l1t::HGCalMulticluster::EnergyInterpretation::EM), other_cl_ptr->eta(), other_cl_ptr->phi(), 0.);
                     used_clusters.insert(other_cl_ptr);
                   }
                 }
@@ -165,6 +168,13 @@ void L1EGammaEEProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       eg.setHwQual(3);
       eg.setHwIso(1);
       l1EgammaBxCollection->push_back(0,eg);
+
+      l1t::EGamma eg_emint_brec=l1t::EGamma(reco::Candidate::PolarLorentzVector(mom_eint.pt(), mom_eint.eta(), mom_eint.phi(), 0.));
+      // l1t::EGamma eg(mom);
+      // FIXME: full duplication with HWqual 2
+      eg_emint_brec.setHwQual(5);
+      eg_emint_brec.setHwIso(1);
+      l1EgammaBxCollection->push_back(0,eg_emint_brec);
 
     }
 
