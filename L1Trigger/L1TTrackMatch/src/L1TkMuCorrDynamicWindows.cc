@@ -314,6 +314,12 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match_stub(const EMTFHitCollecti
         // loop on stubs to see which match
         for (auto l1muit = l1mus.begin(); l1muit != l1mus.end(); ++l1muit)
         {
+
+            int hit_type = l1muit->Subsystem();
+            // match to stubs in CSC & RPC 
+            if ( hit_type != EMTFHit::kCSC && hit_type != EMTFHit::kRPC)
+              continue;
+            
             int hit_station = l1muit->Station();
             // match only stubs in the central bx - as the track collection refers anyway to bx 0 only
             if (requireBX0 && l1muit->BX() != 0)
