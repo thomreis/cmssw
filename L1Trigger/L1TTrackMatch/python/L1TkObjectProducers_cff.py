@@ -15,6 +15,9 @@ pL1TkPhotons = cms.Path( L1TkPhotons )
 from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkElectronsCrystal
 pL1TkElectronsCrystal = cms.Path( L1TkElectronsCrystal )
 
+from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkElectronsEllipticMatchCrystal
+pL1TkElectronsEllipticMatchCrystal = cms.Path( L1TkElectronsEllipticMatchCrystal )
+
 from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkElectronsLooseCrystal
 pL1TkElectronsLooseCrystal = cms.Path( L1TkElectronsLooseCrystal )
 
@@ -32,6 +35,9 @@ pL1WP2Electrons = cms.Path( L1WP2Electrons)
 
 from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkElectronsHGC
 pL1TkElectronsHGC = cms.Path( L1TkElectronsHGC )
+
+from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkElectronsEllipticMatchHGC
+pL1TkElectronsEllipticMatchHGC = cms.Path( L1TkElectronsEllipticMatchHGC )
 
 from L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi import L1TkIsoElectronsHGC
 pL1TkIsoElectronsHGC = cms.Path( L1TkIsoElectronsHGC )
@@ -76,7 +82,7 @@ pL1TkTauFromCalo = cms.Path( L1TkTauFromCalo )
 from L1Trigger.Phase2L1Taus.L1TrkTauParticleProducer_cfi import L1TrkTaus
 L1TrackerTaus = L1TrkTaus.clone()
 
-from L1Trigger.Phase2L1Taus.L1TkEGTauParticleProducer_cfi import L1TkEGTaus 
+from L1Trigger.Phase2L1Taus.L1TkEGTauParticleProducer_cfi import L1TkEGTaus
 
-from L1Trigger.Phase2L1Taus.L1CaloTkTauParticleProducer_cfi import L1CaloTkTaus 
+from L1Trigger.Phase2L1Taus.L1CaloTkTauParticleProducer_cfi import L1CaloTkTaus
 L1TkCaloTaus = L1CaloTkTaus.clone()
