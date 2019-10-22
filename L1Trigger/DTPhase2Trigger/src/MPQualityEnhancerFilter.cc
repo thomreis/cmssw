@@ -236,7 +236,7 @@ void MPQualityEnhancerFilter::filterCousins(std::vector<metaPrimitive> &inMPaths
 
 
 } //End filterCousins
-/*
+
 void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inMPaths, 
 				   std::vector<metaPrimitive> &outMPaths) 
 {
@@ -292,8 +292,8 @@ void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inM
     }
 
 
-} */
-
+} 
+/*
 void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inMPaths, 
 				   std::vector<metaPrimitive> &outMPaths) 
 {
@@ -348,7 +348,7 @@ void MPQualityEnhancerFilter::refilteringCousins(std::vector<metaPrimitive> &inM
 
 
 }
-
+*/
 
 
 
