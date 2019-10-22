@@ -69,23 +69,30 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollec
 
   // search matching track
   double matchedTrackDR = 999.;
-  const auto matchedTrackPtr = findMatchedTrack(it, tttrack, tGeom, matchedTrackDR);
+  double matchedTrackDEta = 999.;
+  double matchedTrackDPhi = 999.;
+  const auto matchedTrackPtr = findMatchedTrack(it, tttrack, tGeom, matchedTrackDR, matchedTrackDEta, matchedTrackDPhi);
   int matchedTrackIdx = -1;
   if (matchedTrackPtr.isNonnull()) {
     matchedTrackIdx = matchedTrackPtr.key();
     //std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->getMomentum().eta() << ", phi: " << matchedTrackPtr->getMomentum().phi() << ", dR: " << matchedTrackDR << std::endl;
+    l1Phase2EGTkIso_.EGHasMatchedTrack.push_back(1);
     l1Phase2EGTkIso_.matchedTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
     l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->getMomentum().perp());
     l1Phase2EGTkIso_.matchedTkEta.push_back(matchedTrackPtr->getMomentum().eta());
     l1Phase2EGTkIso_.matchedTkPhi.push_back(matchedTrackPtr->getMomentum().phi());
     l1Phase2EGTkIso_.matchedTkDR.push_back(matchedTrackDR);
+    l1Phase2EGTkIso_.matchedTkDEta.push_back(matchedTrackDEta);
+    l1Phase2EGTkIso_.matchedTkDPhi.push_back(matchedTrackDPhi);
+  } else {
+    l1Phase2EGTkIso_.EGHasMatchedTrack.push_back(0);
   }
 
   // find other tracks in cone around EG for isolation calculation
   setIsoTracks(it, tttrack, tGeom, matchedTrackIdx);
 }
 
-edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1AnalysisPhaseIIEGTkIso::findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR)
+edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1AnalysisPhaseIIEGTkIso::findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR, double& matchedTrackDEta, double& matchedTrackDPhi)
 {
   int iTrack = 0;
   int iMatchedTrack = -1;
@@ -106,6 +113,8 @@ edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1Anal
           dR < getPtScaledCut(trkPt, dRCutoff_) and
           dR < matchedTrackDR) {
         matchedTrackDR = dR;
+        matchedTrackDEta = dEta;
+        matchedTrackDPhi = dPhi;
         iMatchedTrack = iTrack;
       }
     }
