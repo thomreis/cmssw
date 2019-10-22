@@ -22,7 +22,10 @@ l1PhaseIITree = cms.EDAnalyzer("L1PhaseIITreeProducer",
    TkMuonToken = cms.InputTag("L1TkMuons",""),                                            
    TkMuonStubsTokenBMTF = cms.InputTag("l1KBmtfStubMatchedMuons",""),
    TkMuonStubsTokenEMTF = cms.InputTag("l1TkMuonStubEndCapS12",""),
-   TkMuonStubsTokenOMTF = cms.InputTag("l1TkMuonStubOverlap","OMTF"),
+   TkMuonStubsTokenOMTF = cms.InputTag("l1TkMuonStubOverlap","MuonTracks"),
+
+   TkMuonStubsTokenHSCP = cms.InputTag("l1TkMuonStubOverlap","HscpTracks"),
+
 
    tkTrackerJetToken = cms.InputTag("TwoLayerJets", "L1TwoLayerJets"),                                            
    tkCaloJetToken = cms.InputTag("L1TkCaloJets","L1TkCaloJets"),
@@ -55,6 +58,7 @@ l1PhaseIITree = cms.EDAnalyzer("L1PhaseIITreeProducer",
 
    L1PFTauToken = cms.InputTag("l1pfTauProducer","L1PFTaus"),   
    L1NNTauToken = cms.InputTag("l1NNTauProducerPuppi","L1PFTausNN"),
+   L1HPSPFTauToken = cms.InputTag("L1HPSPFTauProducerPuppi",""),
 
    L1TkBsCandsToken = cms.InputTag("l1TkBsCandidates"),
    L1TkBsCandsLooseToken = cms.InputTag("l1TkBsCandidatesLooseWP"),
