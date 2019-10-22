@@ -28,12 +28,15 @@ namespace L1Analysis
       EGHGC.clear();
       EGPassesLooseTrackID.clear();
       EGPassesPhotonID.clear();
+      EGHasMatchedTrack.clear();
 
       matchedTkEGIdx.clear();
       matchedTkPt.clear();
       matchedTkEta.clear();
       matchedTkPhi.clear();
       matchedTkDR.clear();
+      matchedTkDEta.clear();
+      matchedTkDPhi.clear();
 
       isoTkEGIdx.clear();
       isoTkPt.clear();
@@ -59,12 +62,15 @@ namespace L1Analysis
     std::vector<unsigned int> EGHGC;
     std::vector<unsigned int> EGPassesLooseTrackID;
     std::vector<unsigned int> EGPassesPhotonID;
+    std::vector<int> EGHasMatchedTrack;
 
     std::vector<unsigned int> matchedTkEGIdx;
     std::vector<double> matchedTkPt;
     std::vector<double> matchedTkEta;
     std::vector<double> matchedTkPhi;
     std::vector<double> matchedTkDR;
+    std::vector<double> matchedTkDEta;
+    std::vector<double> matchedTkDPhi;
 
     std::vector<unsigned int> isoTkEGIdx;
     std::vector<double> isoTkPt;
