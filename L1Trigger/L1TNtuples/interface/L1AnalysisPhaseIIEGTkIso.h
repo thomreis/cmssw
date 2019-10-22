@@ -32,7 +32,7 @@ namespace L1Analysis {
 
   private:
     void setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int bx, const bool isHGC);
-    edm::Ptr<L1TTTrackType> findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR);
+    edm::Ptr<L1TTTrackType> findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR, double& matchedTrackDEta, double& matchedTrackDPhi);
     void setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx);
     double getPtScaledCut(const double pt, const std::vector<double>& parameters);
 
