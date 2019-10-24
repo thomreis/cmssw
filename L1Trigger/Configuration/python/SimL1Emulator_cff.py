@@ -113,8 +113,18 @@ phase2_SimL1Emulator += l1CaloJetsSequence
 
 # TPS Algorithm L1Tk + Stub
 # ########################################################################
+
 from L1Trigger.L1TMuonTPS.L1TTrackerPlusStubs_cfi import *
-phase2_SimL1Emulator += l1TrackerPlusStubsSequence
+l1TPSMuons = l1StubMatchedMuons.clone()
+phase2_SimL1Emulator += l1TPSMuons
+
+#  Overlap L1Tk + Stub
+# ########################################################################
+from L1Trigger.L1TMuonBayes.simBayesMuCorrelatorTrackProducer_cfi import *
+l1TkMuonStubOverlap = simBayesMuCorrelatorTrackProducer.clone()
+phase2_SimL1Emulator += l1TkMuonStubOverlap
+
+
 # EndCap L1Tk + Stub
 # ########################################################################
 from L1Trigger.L1TTrackMatch.L1TkMuonStubProducer_cfi import *
@@ -132,10 +142,13 @@ phase2_SimL1Emulator += L1TkPrimaryVertex
 #phase2_SimL1Emulator += L1TkIsoElectrons # warning this has a PhaseI EG seed!
 #phase2_SimL1Emulator += L1TkPhotons # warning this has a PhaseI EG seed!
 phase2_SimL1Emulator += L1TkElectronsCrystal
+phase2_SimL1Emulator += L1TkElectronsEllipticMatchCrystal
 phase2_SimL1Emulator += L1TkIsoElectronsCrystal
 phase2_SimL1Emulator += L1TkElectronsLooseCrystal
+phase2_SimL1Emulator += L1WP2Electrons
 phase2_SimL1Emulator += L1TkPhotonsCrystal
 phase2_SimL1Emulator += L1TkElectronsHGC
+phase2_SimL1Emulator += L1TkElectronsEllipticMatchHGC
 phase2_SimL1Emulator += L1TkIsoElectronsHGC
 phase2_SimL1Emulator += L1TkElectronsLooseHGC
 phase2_SimL1Emulator += L1TkPhotonsHGC
@@ -174,11 +187,23 @@ phase2_SimL1Emulator += l1PFMets
 
 # PFTaus(HPS)
 # ########################################################################
+from L1Trigger.L1CaloTrigger.Phase1L1TJetProducer_cfi import Phase1L1TJetProducer
+l1pfPhase1L1TJetProducer = Phase1L1TJetProducer.clone()
+phase2_SimL1Emulator += l1pfPhase1L1TJetProducer
+
+# PFTaus(HPS)
+# ########################################################################
 from L1Trigger.Phase2L1Taus.L1PFTauProducer_cff import L1PFTauProducer
 l1pfTauProducer = L1PFTauProducer.clone()
 l1pfTauProducer.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
 l1pfTauProducer.L1Neutrals = cms.InputTag("l1pfCandidates")
 phase2_SimL1Emulator += l1pfTauProducer
+
+from L1Trigger.Phase2L1Taus.L1HPSPFTausPF_cff import *
+phase2_SimL1Emulator += produceL1HPSPFTausPF
+
+from L1Trigger.Phase2L1Taus.L1HPSPFTausPuppi_cff import *
+phase2_SimL1Emulator += produceL1HPSPFTausPuppi
 
 # NNTaus
 # ########################################################################
@@ -186,7 +211,7 @@ from L1Trigger.Phase2L1Taus.L1NNTauProducer_cff import *
 l1NNTauProducer = L1NNTauProducer.clone()
 l1NNTauProducer.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
 l1NNTauProducerPuppi = L1NNTauProducerPuppi.clone()
-l1NNTauProducerPuppi.L1PFObjects = cms.InputTag("l1pfCandidates","PF")
+l1NNTauProducerPuppi.L1PFObjects = cms.InputTag("l1pfCandidates","Puppi")
 phase2_SimL1Emulator += l1NNTauProducer
 phase2_SimL1Emulator += l1NNTauProducerPuppi
 
