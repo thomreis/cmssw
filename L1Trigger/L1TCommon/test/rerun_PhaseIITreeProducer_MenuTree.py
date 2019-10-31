@@ -8,8 +8,9 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.ProcessModifiers.convertHGCalDigisSim_cff import convertHGCalDigisSim
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('REPR', eras.Phase2C8_trigger)
+#process = cms.Process('REPR', eras.Phase2C8_trigger) # for L1 TDR samples
 #process = cms.Process('REPR',eras.Phase2_trigger,convertHGCalDigisSim)
+process = cms.Process('REPR',eras.Phase2C4_trigger) # for MTD samples
 #process = cms.Process('REPR',eras.Phase2C4_timing_layer_bar)
 
 # import of standard configurations
@@ -18,10 +19,10 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-#process.load('Configuration.Geometry.GeometryExtended2023D35Reco_cff')
-#process.load('Configuration.Geometry.GeometryExtended2023D35_cff')
-process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2023D41_cff')
+process.load('Configuration.Geometry.GeometryExtended2023D35Reco_cff') # for MTD samples
+process.load('Configuration.Geometry.GeometryExtended2023D35_cff') # for MTD samples
+#process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff') # for L1 TDR samples
+#process.load('Configuration.Geometry.GeometryExtended2023D41_cff') # for L1 TDR samples
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -29,8 +30,8 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
-    #input = cms.untracked.int32(100)
+    #input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(30)
 )
 
 # Input source
@@ -77,28 +78,28 @@ process.source = cms.Source("PoolSource",
 #'/store/relval/CMSSW_10_6_0_patch2/RelValNuGun/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2023_realistic_v3_2023D41PU200-v1/10000/EE678F70-58D4-BD41-9E91-669EC57113B7.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValNuGun/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2023_realistic_v3_2023D41PU200-v1/10000/EC0B14ED-D0CF-9A4B-9D75-DEE0D4C29EF9.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValNuGun/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2023_realistic_v3_2023D41PU200-v1/10000/E530BAE3-09BC-CF44-A24F-14245C11CEEE.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FFB3195D-E113-3744-877D-44E21C060358.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FF052B08-416D-FA46-B296-3BE28535CF30.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FEFEFA95-3375-F240-B0B4-E43642689BC1.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FE8164F6-7AC9-D14C-B252-08ABFFB17B10.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FDF53340-E1C6-7044-A7D2-626B29EEC487.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FD7C576A-EC4D-1043-83E1-E6BC98242D62.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FCF0FFF8-67AF-BA40-AB38-03DDB109B751.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FCE5299A-E437-0A49-89E1-CD6E232859DA.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC3F5D1A-F17D-CD49-B0B8-D844E790696F.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC370019-437D-DF4C-AEA8-025580D035B5.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC339EFC-1DC4-9640-821A-FA6AF8F7DB7D.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC1F62F4-C720-3F46-B75C-0E2DF4789C14.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FBB89A73-743C-D146-A99D-10ACACB53EFB.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB5BDBDA-0806-7045-AD3E-CCA6BF782ACC.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB346BAA-DE51-4A4E-96A6-902BC124680B.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB1BEB4A-969E-F646-BD14-6EF16EA29462.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FAFA65F4-B73C-3342-B977-927BBD128BBF.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9BF6F44-3A8C-9342-81AD-E87DFEAA3254.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9698F16-C2B8-1240-842D-860F2AE744C4.root',
-'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F91DF4FA-F2D7-A34A-B91D-9F234D48BE6A.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FFB3195D-E113-3744-877D-44E21C060358.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FF052B08-416D-FA46-B296-3BE28535CF30.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FEFEFA95-3375-F240-B0B4-E43642689BC1.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FE8164F6-7AC9-D14C-B252-08ABFFB17B10.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FDF53340-E1C6-7044-A7D2-626B29EEC487.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FD7C576A-EC4D-1043-83E1-E6BC98242D62.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FCF0FFF8-67AF-BA40-AB38-03DDB109B751.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FCE5299A-E437-0A49-89E1-CD6E232859DA.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC3F5D1A-F17D-CD49-B0B8-D844E790696F.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC370019-437D-DF4C-AEA8-025580D035B5.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC339EFC-1DC4-9640-821A-FA6AF8F7DB7D.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FC1F62F4-C720-3F46-B75C-0E2DF4789C14.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FBB89A73-743C-D146-A99D-10ACACB53EFB.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB5BDBDA-0806-7045-AD3E-CCA6BF782ACC.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB346BAA-DE51-4A4E-96A6-902BC124680B.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FB1BEB4A-969E-F646-BD14-6EF16EA29462.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/FAFA65F4-B73C-3342-B977-927BBD128BBF.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9BF6F44-3A8C-9342-81AD-E87DFEAA3254.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9698F16-C2B8-1240-842D-860F2AE744C4.root',
+#'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F91DF4FA-F2D7-A34A-B91D-9F234D48BE6A.root',
 #'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/70000/FF17CBE6-81E5-8D43-B58B-6DF17222820E.root',
-#'/store/mc/PhaseIIMTDTDRAutumn18DR/NeutrinoGun_E_10GeV/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/280000/EFFCC733-2B7F-C645-929D-505B1E0949D6.root'
+'/store/mc/PhaseIIMTDTDRAutumn18DR/NeutrinoGun_E_10GeV/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/280000/EFFCC733-2B7F-C645-929D-505B1E0949D6.root'
 ),
     secondaryFileNames = cms.untracked.vstring()
 )
@@ -147,14 +148,14 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # run also the TMTT producer
 #--- Load code that produces our L1 tracks and makes corresponding histograms.
-process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_cff')
+#process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_cff')
 #--- Alternative cfg including improvements. Not in firmware.
 #process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff')
 
 # Override defaults
 #process.TMTrackProducer.ParamsProducer.EnableTruncation = cms.bool( True )
 
-process.tmtt = cms.Path(process.TMTrackProducer)
+#process.tmtt = cms.Path(process.TMTrackProducer)
 
 # menu trees
 
@@ -172,20 +173,26 @@ process.evttree = cms.Path(process.l1EventTree)
 process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer","L1EGammaCollectionBXVEmulator"),
     l1EgHGC = cms.InputTag("l1EGammaEEProducer","L1EGammaCollectionBXVWithCuts"),
-    l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    #l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     #l1Tracks = cms.InputTag("TMTrackProducer","TML1Tracks"),
     trackerGeometry = cms.string("idealForDigi"), # tracker geometry record to get for calculating pT from 2 stubs (unused if useTwoStubsPt is False)
     egBarrelMinEt = cms.double(2.), # minimum Et for barrel EG object
     egHGCMinEt = cms.double(2.), # minimum Et for HGC EG object
-    trackMinPt = cms.double(2.), # minimum Pt to select tracks for matching
-    trackMaxChi2 = cms.double(1e10), # maximum Chi2 to select tracks for matching
+    #trackMinPt = cms.double(2.), # minimum Pt to select tracks for matching
+    #trackMaxChi2 = cms.double(1e10), # maximum Chi2 to select tracks for matching
+    trackMinPt = cms.double(10.), # minimum Pt to select tracks for matching
+    trackMaxChi2 = cms.double(100), # maximum Chi2 to select tracks for matching
     useTwoStubsPt = cms.bool(False), # calculate track pT from 2 stubs
+    trackEGammaMatchType = cms.string("PtDependentCut"),
     trackEGammaDeltaPhi = cms.vdouble(0.07, 0., 0.), # functional Delta Phi cut parameters to match Track with L1EG objects
     trackEGammaDeltaR = cms.vdouble(0.08, 0., 0.), # functional Delta R cut parameters to match Track with L1EG objects
+    trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
+         # are considered. (unused in default configuration)
     trackMinPtForIso = cms.double(2.), # minimum Pt to select tracks for the isolation
     trackMaxChi2ForIso = cms.double(1e10), # maximum Chi2 to select tracks for the isolation
     dRMinForIso = cms.double(0.), # minimum dR to select tracks for the isolation
-    dRMaxForIso = cms.double(1.) # maximum dR to select tracks for the isolation
+    dRMaxForIso = cms.double(0.8) # maximum dR to select tracks for the isolation
 )
 process.phase2EGTkIsoTreePath = cms.Path(process.l1PhaseIIEGTkIsoTree)
 
@@ -199,9 +206,8 @@ process.schedule = cms.Schedule(
     process.evttree,
     #process.extraCollectionsMenuTree,
     process.runmenutree,
-    #process.tmtt,
     process.phase2EGTkIsoTreePath,
-    process.calotptree,
+    #process.calotptree,
     process.endjob_step#,
     #process.FEVTDEBUGHLToutput_step
 )
@@ -211,13 +217,17 @@ associatePatAlgosToolsTask(process)
 # Customisation from command line
 
 # Automatic addition of the customisation function from L1Trigger.Configuration.customiseUtils
-from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,L1TrackTriggerTracklet,DropOutputProducts 
+from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,DropOutputProducts 
 
 #call to customisation function DropDepricatedProducts imported from L1Trigger.Configuration.customiseUtils
 process = DropDepricatedProducts(process)
 
-from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
-process = L1TrackTriggerTracklet(process)
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
+#process = L1TrackTriggerTracklet(process)
+from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
+process = L1TrackTriggerHybrid(process)
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTMTT
+#process = L1TrackTriggerTMTT(process)
 
 process.MessageLogger.cout = cms.untracked.PSet(
     threshold = cms.untracked.string('ERROR'),
