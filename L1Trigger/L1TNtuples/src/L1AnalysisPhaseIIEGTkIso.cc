@@ -12,6 +12,8 @@ L1Analysis::L1AnalysisPhaseIIEGTkIso::L1AnalysisPhaseIIEGTkIso(const edm::Parame
   trkPtMin_((float)pSet.getParameter<double>("trackMinPt")),
   trkChi2Max_((float)pSet.getParameter<double>("trackMaxChi2")),
   useTwoStubsPt_(pSet.getParameter<bool>("useTwoStubsPt")),
+  trkEGMatchType_(pSet.getParameter<std::string>("trackEGammaMatchType")),
+  dEtaCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaEta")),
   dPhiCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaPhi")),
   dRCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaR")),
   trkPtMinIso_((float)pSet.getParameter<double>("trackMinPtForIso")),
@@ -109,9 +111,7 @@ edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1Anal
       double dEta = 999.;
       edm::Ptr<L1TTTrackType> trackPtr(tttrack, iTrack);
       L1TkElectronTrackMatchAlgo::doMatch(egIt, trackPtr, dPhi, dR, dEta);
-      if (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) and
-          dR < getPtScaledCut(trkPt, dRCutoff_) and
-          dR < matchedTrackDR) {
+      if (selectMatchedTrack(dR, dPhi, dEta, trkPt, egIt->eta()) and dR < matchedTrackDR) {
         matchedTrackDR = dR;
         matchedTrackDEta = dEta;
         matchedTrackDPhi = dPhi;
@@ -191,4 +191,23 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
 double L1Analysis::L1AnalysisPhaseIIEGTkIso::getPtScaledCut(const double pt, const std::vector<double>& parameters)
 {
   return parameters[0] + parameters[1] * exp(parameters[2] * pt);
+}
+
+bool L1Analysis::L1AnalysisPhaseIIEGTkIso::selectMatchedTrack(const double dR, const double dPhi, const double dEta, const double trkPt, const float egEta) {
+  if (trkEGMatchType_ == "PtDependentCut") {
+    if (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) && dR < getPtScaledCut(trkPt, dRCutoff_)) {
+      return true;
+    }
+  } else { // elliptical matching
+    auto dEtaMax = dEtaCutoff_[0];
+    if (fabs(egEta) < 0.9 ) {
+      dEtaMax = dEtaCutoff_[1];
+    }
+    const auto dEtaRatio = dEta / dEtaMax;
+    const auto dPhiRatio = dPhi / dPhiCutoff_[0];
+    if (dEtaRatio * dEtaRatio + dPhiRatio * dPhiRatio < 1.) {
+      return true;
+    }
+  }
+  return false;
 }
