@@ -35,6 +35,7 @@ namespace L1Analysis {
     edm::Ptr<L1TTTrackType> findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR, double& matchedTrackDEta, double& matchedTrackDPhi);
     void setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx);
     double getPtScaledCut(const double pt, const std::vector<double>& parameters);
+    bool selectMatchedTrack(const double dR, const double dPhi, const double dEta, const double trkPt, const float egEta);
 
     L1AnalysisPhaseIIEGTkIsoDataFormat l1Phase2EGTkIso_;
 
@@ -45,6 +46,8 @@ namespace L1Analysis {
     float trkPtMin_;
     float trkChi2Max_;
     bool useTwoStubsPt_;
+    std::string trkEGMatchType_;
+    std::vector<double> dEtaCutoff_;
     std::vector<double> dPhiCutoff_;
     std::vector<double> dRCutoff_;
 
