@@ -172,8 +172,10 @@ L1PhaseIIEGTkIsoTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& d
   desc.add<double>("trackMinPt", 0.);
   desc.add<double>("trackMaxChi2", 1e10);
   desc.add<bool>("useTwoStubsPt", false);
+  desc.add<std::string>("trackEGammaMatchType", "PtDependentCut");
   desc.add<std::vector<double>>("trackEGammaDeltaPhi", {0.07, 0., 0.});
   desc.add<std::vector<double>>("trackEGammaDeltaR", {0.08, 0., 0.});
+  desc.add<std::vector<double>>("trackEGammaDeltaEta", {1e10, 0., 0.});
   desc.add<double>("trackMinPtForIso", 2.);
   desc.add<double>("trackMaxChi2ForIso", 1e10);
   desc.add<double>("dRMinForIso", 0.);
