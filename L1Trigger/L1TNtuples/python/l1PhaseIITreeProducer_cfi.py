@@ -20,9 +20,11 @@ l1PhaseIITree = cms.EDAnalyzer("L1PhaseIITreeProducer",
 
    TkGlbMuonToken = cms.InputTag("L1TkGlbMuons",""),
    TkMuonToken = cms.InputTag("L1TkMuons",""),                                            
-   TkMuonStubsTokenBMTF = cms.InputTag("l1TPSMuons",""),
+   #TkMuonStubsTokenBMTF = cms.InputTag("l1TPSMuons",""), #Changed to this by Mike, then to 
+   TkMuonStubsTokenBMTF = cms.InputTag("l1StubMatchedMuons",""),  # by Vlad... 
    TkMuonStubsTokenEMTF = cms.InputTag("l1TkMuonStubEndCapS12",""),
    TkMuonStubsTokenOMTF = cms.InputTag("l1TkMuonStubOverlap","MuonTracks"),
+   TkMuonStubsTokenME0 = cms.InputTag("l1TkMuonStubEndCap","ME0Ext"),
 
    TkMuonStubsTokenHSCP = cms.InputTag("l1TkMuonStubOverlap","HscpTracks"),
 
