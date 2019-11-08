@@ -115,8 +115,9 @@ phase2_SimL1Emulator += l1CaloJetsSequence
 # ########################################################################
 
 from L1Trigger.L1TMuonTPS.L1TTrackerPlusStubs_cfi import *
-l1TPSMuons = l1StubMatchedMuons.clone()
-phase2_SimL1Emulator += l1TPSMuons
+#l1TPSMuons = l1StubMatchedMuons.clone()
+#phase2_SimL1Emulator += l1TPSMuons
+phase2_SimL1Emulator += l1TrackerPlusStubsSequence
 
 #  Overlap L1Tk + Stub
 # ########################################################################
