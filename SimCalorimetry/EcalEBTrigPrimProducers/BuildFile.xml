@@ -10,6 +10,7 @@
 <use   name="DataFormats/EcalRecHit"/>
 <use   name="DataFormats/EcalDetId"/>
 <use   name="DataFormats/FEDRawData"/>
+<use   name="CondFormats/EcalObjects"/>
 <use   name="CondFormats/L1TObjects"/>
 <use   name="CalibCalorimetry/EcalTPGTools"/>
 <use   name="CondFormats/DataRecord"/>

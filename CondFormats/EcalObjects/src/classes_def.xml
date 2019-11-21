@@ -283,4 +283,15 @@
    <field name = "time_interval" mapping = "blob"/>
 </class>
 
+<!-- base class -->
+<class name="EcalBcpPayloadParams">
+   <field name="nodes_" mapping="blob"/>
+</class>
+<class name="EcalBcpPayloadParams::Node">
+   <field name="dparams_" mapping="blob"/>
+   <field name="iparams_" mapping="blob"/>
+   <field name="sparams_" mapping="blob"/>
+   <field name="uparams_" mapping="blob"/>
+</class>
+
 </lcgdict>
