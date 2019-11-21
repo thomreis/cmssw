@@ -64,6 +64,7 @@
 #include "CondFormats/EcalObjects/interface/EcalTPGSpike.h"
 #include "CondFormats/EcalObjects/interface/EcalSRSettings.h"
 #include "CondFormats/EcalObjects/interface/EcalSimPulseShape.h"
+#include "CondFormats/EcalObjects/interface/EcalBcpPayloadParams.h"
 #include <cstdint>
 
 namespace CondFormats_EcalObjects {
@@ -221,5 +222,7 @@ namespace CondFormats_EcalObjects {
     EcalCondObjectContainer<EcalPulseSymmCovariance> ecalSPCmap;  //typedef EcalPulseSymmCovariance
 
     EcalSimPulseShape ecal_sim_pulse_shapes;
+
+    EcalBcpPayloadParams ecal_bcp_payload_params;
   };
 }  // namespace CondFormats_EcalObjects
