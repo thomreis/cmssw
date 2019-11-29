@@ -26,6 +26,7 @@
 <use name="L1Trigger/Phase2L1GMT"/>
 <use name="L1Trigger/Phase2L1ParticleFlow"/>
 <use name="L1Trigger/L1TTrackMatch"/>
+<use name="L1Trigger/Phase2L1ParticleFlow"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="MuonAnalysis/MuonAssociators"/>
