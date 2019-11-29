@@ -1,4 +1,4 @@
-#ifndef __L1Analysis_L1AnalysisPhaseIIEGThIso_H__
+#ifndef __L1Analysis_L1AnalysisPhaseIIEGTkIso_H__
 #define __L1Analysis_L1AnalysisPhaseIIEGTkIso_H__
 
 //-------------------------------------------------------------------------------
@@ -10,6 +10,7 @@
 
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
+#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h" 
 
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 
@@ -26,14 +27,15 @@ namespace L1Analysis {
 
     inline void Reset() { l1Phase2EGTkIso_.Reset(); }
 
-    void SetEGWithTracks (const edm::Handle<l1t::EGammaBxCollection>& eg, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom);
+    void SetEGWithTracks (const edm::Handle<l1t::EGammaBxCollection>& eg, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField);
 
     inline L1AnalysisPhaseIIEGTkIsoDataFormat* GetData() { return &l1Phase2EGTkIso_; }
 
   private:
-    void setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int bx, const bool isHGC);
+    void setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField, const int bx, const bool isHGC);
     edm::Ptr<L1TTTrackType> findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR, double& matchedTrackDEta, double& matchedTrackDPhi);
     void setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx);
+    void setIsoPFCands(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField);
     double getPtScaledCut(const double pt, const std::vector<double>& parameters);
     bool selectMatchedTrack(const double dR, const double dPhi, const double dEta, const double trkPt, const float egEta);
 

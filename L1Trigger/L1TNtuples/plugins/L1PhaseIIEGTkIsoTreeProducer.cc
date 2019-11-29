@@ -32,6 +32,11 @@
 // data formats
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
+#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h" 
+
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
@@ -46,7 +51,7 @@
 //
 // class declaration
 //
-class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::WatchRuns, edm::one::SharedResources>  {
   public:
     explicit L1PhaseIIEGTkIsoTreeProducer(const edm::ParameterSet&);
     ~L1PhaseIIEGTkIsoTreeProducer();
@@ -64,6 +69,9 @@ class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::Share
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
 
+    virtual void beginRun(const edm::Run &run, const edm::EventSetup &setup) override;
+    virtual void endRun(edm::Run const&, edm::EventSetup const&) override {};
+
     // ----------member data ---------------------------
 
     // output file
@@ -75,8 +83,12 @@ class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::Share
     edm::EDGetTokenT<l1t::EGammaBxCollection> egToken_;
     edm::EDGetTokenT<l1t::EGammaBxCollection> egTokenHGC_;
     edm::EDGetTokenT<L1TTTrackCollectionType> tttrackToken_;
+    edm::EDGetTokenT<std::vector<l1t::PFCandidate>> pfCandToken_;
 
     std::string trackerGeom_;
+
+    const TrackerGeometry* tGeom_;
+    float bFieldZ_;
 };
 
 //
@@ -88,6 +100,7 @@ L1PhaseIIEGTkIsoTreeProducer::L1PhaseIIEGTkIsoTreeProducer(const edm::ParameterS
   egToken_(consumes<l1t::EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("l1EgBarrel"))),
   egTokenHGC_(consumes<l1t::EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("l1EgHGC"))),
   tttrackToken_(consumes<L1TTTrackCollectionType>(iConfig.getParameter<edm::InputTag>("l1Tracks"))),
+  pfCandToken_(consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PFCandidates"))),
   trackerGeom_(iConfig.getParameter<std::string>("trackerGeometry"))
 {
   l1Phase2EGTkIsoData_ = l1Phase2EGTkIso_->GetData();
@@ -134,18 +147,33 @@ L1PhaseIIEGTkIsoTreeProducer::analyze(const edm::Event& iEvent, const edm::Event
     return;
   }
 
-  // geometry needed to call pTFrom2Stubs
-  edm::ESHandle<TrackerGeometry> geomHandle;
-  iSetup.get<TrackerDigiGeometryRecord>().get(trackerGeom_, geomHandle);
-  const auto tGeom = geomHandle.product();
+  edm::Handle<std::vector<l1t::PFCandidate>> pfCands;
+  iEvent.getByToken(pfCandToken_, pfCands);
+  if (!pfCands.isValid()) {
+    edm::LogWarning("MissingProduct") << "L1 PF candidate collection not found in the event. Branch will not be filled";
+    return;
+  }
 
   // set the branches
-  l1Phase2EGTkIso_->SetEGWithTracks(egBarrel, egHGC, tttrack, tGeom);
+  l1Phase2EGTkIso_->SetEGWithTracks(egBarrel, egHGC, tttrack, tGeom_, pfCands, bFieldZ_);
 
   //fill the tree
   tree_->Fill();
 }
 
+
+void L1PhaseIIEGTkIsoTreeProducer::beginRun(const edm::Run &run, const edm::EventSetup &setup)
+{
+  // geometry needed to call pTFrom2Stubs
+  edm::ESHandle<TrackerGeometry> geomHandle;
+  setup.get<TrackerDigiGeometryRecord>().get(trackerGeom_, geomHandle);
+  tGeom_ = geomHandle.product();
+
+  // magnetic field for particle propagation
+  edm::ESHandle<MagneticField> magneticField;
+  setup.get<IdealMagneticFieldRecord>().get(magneticField);
+  bFieldZ_ = magneticField->inTesla(GlobalPoint(0., 0., 0.)).z();
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void
@@ -166,6 +194,7 @@ L1PhaseIIEGTkIsoTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& d
   desc.add<edm::InputTag>("l1EgBarrel");
   desc.add<edm::InputTag>("l1EgHGC");
   desc.add<edm::InputTag>("l1Tracks");
+  desc.add<edm::InputTag>("l1PFCandidates");
   desc.add<std::string>("trackerGeometry", "idealForDigi");
   desc.add<double>("egBarrelMinEt", 5.);
   desc.add<double>("egHGCMinEt", 10.);
