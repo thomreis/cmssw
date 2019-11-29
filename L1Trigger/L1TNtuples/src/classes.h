@@ -31,6 +31,7 @@
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoElectronDataFormat.h"
 
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIDataFormat.h"
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIEGTkIsoDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIPFJetDataFormat.h"
 
 namespace{
@@ -68,6 +69,7 @@ namespace{
     L1Analysis::L1AnalysisRecoElectronDataFormat   pL1electron;
 
     L1Analysis::L1AnalysisPhaseIIDataFormat        pL1PhaseII;
+    L1Analysis::L1AnalysisPhaseIIEGTkIsoDataFormat pL1PhaseIIEGTkIso;
     L1Analysis::L1AnalysisPhaseIPFJetDataFormat    pL1PhaseIPFJet;
 
 
