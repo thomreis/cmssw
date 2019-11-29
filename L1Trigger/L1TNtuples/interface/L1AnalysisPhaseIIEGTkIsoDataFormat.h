@@ -49,6 +49,17 @@ namespace L1Analysis
       isoTkMatchedTkDEta.clear();
       isoTkMatchedTkDPhi.clear();
       isoTkMatchedTkDz.clear();
+
+      isoPFEGIdx.clear();
+      isoPFId.clear();
+      isoPFEt.clear();
+      isoPFEta.clear();
+      isoPFPhi.clear();
+      isoPFEtaAtCalo.clear();
+      isoPFPhiAtCalo.clear();
+      isoPFDR.clear();
+      isoPFDEta.clear();
+      isoPFDPhi.clear();
     }
  
     unsigned int nEG;
@@ -83,6 +94,17 @@ namespace L1Analysis
     std::vector<double> isoTkMatchedTkDEta;
     std::vector<double> isoTkMatchedTkDPhi;
     std::vector<double> isoTkMatchedTkDz;
+
+    std::vector<unsigned int> isoPFEGIdx;
+    std::vector<unsigned int> isoPFId;
+    std::vector<double> isoPFEt;
+    std::vector<double> isoPFEta;
+    std::vector<double> isoPFPhi;
+    std::vector<double> isoPFEtaAtCalo;
+    std::vector<double> isoPFPhiAtCalo;
+    std::vector<double> isoPFDR;
+    std::vector<double> isoPFDEta;
+    std::vector<double> isoPFDPhi;
   }; 
 }
 #endif

@@ -2,6 +2,8 @@
 #include "L1Trigger/L1TTrackMatch/interface/L1TkElectronTrackMatchAlgo.h"
 #include "L1Trigger/L1TTrackMatch/interface/pTFrom2Stubs.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/Math/interface/deltaR.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/L1TPFUtils.h"
 
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIEGTkIso.h"
 
@@ -23,7 +25,7 @@ L1Analysis::L1AnalysisPhaseIIEGTkIso::L1AnalysisPhaseIIEGTkIso(const edm::Parame
 {
 }
 
-void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t::EGammaBxCollection>& egBarrel, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom)
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t::EGammaBxCollection>& egBarrel, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField)
 {
   //std::cout << "This event contains " << tttrack->size() << " tracks." << std::endl;
 
@@ -31,7 +33,7 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t
   for (auto bx = egBarrel->getFirstBX(); bx <= egBarrel->getLastBX(); ++bx) {
     for (l1t::EGammaBxCollection::const_iterator it = egBarrel->begin(bx); it != egBarrel->end(bx); ++it) {
       if (it->et() > egBarrelEtMin_) {
-        setBranches(it, tttrack, tGeom, bx, false);
+        setBranches(it, tttrack, tGeom, pfCands, bField, bx, false);
       }
     }
   }
@@ -40,15 +42,15 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t
   for (auto bx = egHGC->getFirstBX(); bx <= egHGC->getLastBX(); ++bx) {
     for (l1t::EGammaBxCollection::const_iterator it = egHGC->begin(bx); it != egHGC->end(bx); ++it) {
       if (it->et() > egHGCEtMin_) {
-        setBranches(it, tttrack, tGeom, bx, true);
+        setBranches(it, tttrack, tGeom, pfCands, bField, bx, true);
       }
     }
   }
 }
 
-void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int bx, const bool isHGC)
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField, const int bx, const bool isHGC)
 {
-  //std::cout << "EG " << l1Phase2EGTkIso_.nEG << ": et: " << it->et() << ", eta: " << it->eta() << ", phi: " << it->phi() << std::endl;
+  std::cout << "EG " << l1Phase2EGTkIso_.nEG << ": et: " << it->et() << ", eta: " << it->eta() << ", phi: " << it->phi() << ", Q: " << it->hwQual() << std::endl;
   ++l1Phase2EGTkIso_.nEG;
   l1Phase2EGTkIso_.EGEt.push_back(it->et());
   l1Phase2EGTkIso_.EGEta.push_back(it->eta());
@@ -77,7 +79,7 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollec
   int matchedTrackIdx = -1;
   if (matchedTrackPtr.isNonnull()) {
     matchedTrackIdx = matchedTrackPtr.key();
-    //std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->getMomentum().eta() << ", phi: " << matchedTrackPtr->getMomentum().phi() << ", dR: " << matchedTrackDR << std::endl;
+    std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->getMomentum().eta() << ", phi: " << matchedTrackPtr->getMomentum().phi() << ", dR: " << matchedTrackDR << std::endl;
     l1Phase2EGTkIso_.EGHasMatchedTrack.push_back(1);
     l1Phase2EGTkIso_.matchedTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
     l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->getMomentum().perp());
@@ -92,6 +94,7 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollec
 
   // find other tracks in cone around EG for isolation calculation
   setIsoTracks(it, tttrack, tGeom, matchedTrackIdx);
+  setIsoPFCands(it, pfCands, bField);
 }
 
 edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1AnalysisPhaseIIEGTkIso::findMatchedTrack(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, double& matchedTrackDR, double& matchedTrackDEta, double& matchedTrackDPhi)
@@ -183,6 +186,42 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
         l1Phase2EGTkIso_.isoTkMatchedTkDPhi.push_back(dPhiTrkTrk);
         l1Phase2EGTkIso_.isoTkMatchedTkDz.push_back(dzTrkTrk);
       }
+    }
+  }
+}
+
+
+// method to calculate isolation
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoPFCands(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField) {
+  auto egPos = L1TkElectronTrackMatchAlgo::calorimeterPosition(egIt->phi(), egIt->eta(), egIt->energy());
+  for (size_t i = 0; i < pfCands->size(); ++i) {
+    const auto pfCand = pfCands->at(i);
+    const auto vtx = math::XYZTLorentzVector(pfCand.vx(), pfCand.vy(), pfCand.vz(), 0.);
+    const auto charge = pfCand.charge();
+    const auto etaPhiAtCalo = l1tpf::propagateToCalo(pfCand.p4(), vtx, charge, bField);
+
+    // calculate dR to EG
+    double dPhi = 999.;
+    double dR = 999.;
+    double dEta = 999.;
+
+    dPhi = reco::deltaPhi(egPos.phi(), etaPhiAtCalo.second);
+    dEta = egPos.eta() - etaPhiAtCalo.first;
+    dR = reco::deltaR(egPos.eta(), egPos.phi(), etaPhiAtCalo.first, etaPhiAtCalo.second);
+
+    // store PF cand info if close enough to the EG object
+    if (dR < 999. and dR > dRMinIso_ and dR < dRMaxIso_) {
+      std::cout << "Iso PF cand: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", ID: " << pfCand.id() << ", Et: " << pfCand.pt() << ", eta: " << pfCand.eta() << ", phi: " << pfCand.phi() << ", eta at calo: " << etaPhiAtCalo.first << ", phi at calo: " << etaPhiAtCalo.second << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << std::endl;
+      l1Phase2EGTkIso_.isoPFEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
+      l1Phase2EGTkIso_.isoPFId.push_back(pfCand.id());
+      l1Phase2EGTkIso_.isoPFEt.push_back(pfCand.pt());
+      l1Phase2EGTkIso_.isoPFEta.push_back(pfCand.eta());
+      l1Phase2EGTkIso_.isoPFPhi.push_back(pfCand.phi());
+      l1Phase2EGTkIso_.isoPFEtaAtCalo.push_back(etaPhiAtCalo.first);
+      l1Phase2EGTkIso_.isoPFPhiAtCalo.push_back(etaPhiAtCalo.second);
+      l1Phase2EGTkIso_.isoPFDR.push_back(dR);
+      l1Phase2EGTkIso_.isoPFDEta.push_back(dEta);
+      l1Phase2EGTkIso_.isoPFDPhi.push_back(dPhi);
     }
   }
 }

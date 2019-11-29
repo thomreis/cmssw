@@ -31,7 +31,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
     #input = cms.untracked.int32(-1)
-    input = cms.untracked.int32(30)
+    input = cms.untracked.int32(50)
 )
 
 # Input source
@@ -98,8 +98,8 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9BF6F44-3A8C-9342-81AD-E87DFEAA3254.root',
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9698F16-C2B8-1240-842D-860F2AE744C4.root',
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F91DF4FA-F2D7-A34A-B91D-9F234D48BE6A.root',
-#'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/70000/FF17CBE6-81E5-8D43-B58B-6DF17222820E.root',
-'/store/mc/PhaseIIMTDTDRAutumn18DR/NeutrinoGun_E_10GeV/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/280000/EFFCC733-2B7F-C645-929D-505B1E0949D6.root'
+'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/70000/FF17CBE6-81E5-8D43-B58B-6DF17222820E.root',
+#'/store/mc/PhaseIIMTDTDRAutumn18DR/NeutrinoGun_E_10GeV/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/280000/EFFCC733-2B7F-C645-929D-505B1E0949D6.root'
 ),
     secondaryFileNames = cms.untracked.vstring()
 )
@@ -173,9 +173,10 @@ process.evttree = cms.Path(process.l1EventTree)
 process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer","L1EGammaCollectionBXVEmulator"),
     l1EgHGC = cms.InputTag("l1EGammaEEProducer","L1EGammaCollectionBXVWithCuts"),
-    #l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
-    l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
+    l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    #l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     #l1Tracks = cms.InputTag("TMTrackProducer","TML1Tracks"),
+    l1PFCandidates = cms.InputTag("l1pfCandidates","Puppi"),
     trackerGeometry = cms.string("idealForDigi"), # tracker geometry record to get for calculating pT from 2 stubs (unused if useTwoStubsPt is False)
     egBarrelMinEt = cms.double(2.), # minimum Et for barrel EG object
     egHGCMinEt = cms.double(2.), # minimum Et for HGC EG object
@@ -222,10 +223,10 @@ from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,DropOu
 #call to customisation function DropDepricatedProducts imported from L1Trigger.Configuration.customiseUtils
 process = DropDepricatedProducts(process)
 
-#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
-#process = L1TrackTriggerTracklet(process)
-from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
-process = L1TrackTriggerHybrid(process)
+from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
+process = L1TrackTriggerTracklet(process)
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
+#process = L1TrackTriggerHybrid(process)
 #from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTMTT
 #process = L1TrackTriggerTMTT(process)
 
@@ -238,5 +239,6 @@ process.MessageLogger.cout = cms.untracked.PSet(
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
+process.l1CaloJetsSequence = cms.Sequence(process.L1EGammaClusterEmuProducer+process.L1TowerCalibrationProducer)
 process = customiseEarlyDelete(process)
 # End adding early deletion
