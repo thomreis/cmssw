@@ -186,9 +186,11 @@ process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     trackMaxChi2 = cms.double(100), # maximum Chi2 to select tracks for matching
     useTwoStubsPt = cms.bool(False), # calculate track pT from 2 stubs
     trackEGammaMatchType = cms.string("PtDependentCut"),
+    #trackEGammaMatchType = cms.string("EllipticalCut"),
     trackEGammaDeltaPhi = cms.vdouble(0.07, 0., 0.), # functional Delta Phi cut parameters to match Track with L1EG objects
     trackEGammaDeltaR = cms.vdouble(0.08, 0., 0.), # functional Delta R cut parameters to match Track with L1EG objects
     trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
+    #trackEGammaDeltaEta = cms.vdouble(0.015, 0.025, 1e10), # Delta Eta cutoff to match Track with L1EG objects
          # are considered. (unused in default configuration)
     trackMinPtForIso = cms.double(2.), # minimum Pt to select tracks for the isolation
     trackMaxChi2ForIso = cms.double(1e10), # maximum Chi2 to select tracks for the isolation
@@ -239,6 +241,5 @@ process.MessageLogger.cout = cms.untracked.PSet(
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
-process.l1CaloJetsSequence = cms.Sequence(process.L1EGammaClusterEmuProducer+process.L1TowerCalibrationProducer)
 process = customiseEarlyDelete(process)
 # End adding early deletion
