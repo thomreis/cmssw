@@ -234,9 +234,7 @@ double L1Analysis::L1AnalysisPhaseIIEGTkIso::getPtScaledCut(const double pt, con
 
 bool L1Analysis::L1AnalysisPhaseIIEGTkIso::selectMatchedTrack(const double dR, const double dPhi, const double dEta, const double trkPt, const float egEta) {
   if (trkEGMatchType_ == "PtDependentCut") {
-    if (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) && dR < getPtScaledCut(trkPt, dRCutoff_)) {
-      return true;
-    }
+    return (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) && dR < getPtScaledCut(trkPt, dRCutoff_));
   } else { // elliptical matching
     auto dEtaMax = dEtaCutoff_[0];
     if (fabs(egEta) < 0.9) {
@@ -244,9 +242,7 @@ bool L1Analysis::L1AnalysisPhaseIIEGTkIso::selectMatchedTrack(const double dR, c
     }
     const auto dEtaRatio = dEta / dEtaMax;
     const auto dPhiRatio = dPhi / dPhiCutoff_[0];
-    if (dEtaRatio * dEtaRatio + dPhiRatio * dPhiRatio < 1.) {
-      return true;
-    }
+    return (dEtaRatio * dEtaRatio + dPhiRatio * dPhiRatio < 1.);
   }
   return false;
 }
