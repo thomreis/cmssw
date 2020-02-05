@@ -45,6 +45,7 @@ PFParticle & PFAlgoBase::addCaloToPF(std::vector<PFParticle> &pfs, const CaloClu
     pf.hwVtxEta = calo.hwEta; 
     pf.hwVtxPhi = calo.hwPhi; 
     pf.track.hwPt = 0;
+    pf.track.hwZ0 = 0;
     pf.track.src = nullptr;
     pf.cluster = calo;
     pf.muonsrc = nullptr;
