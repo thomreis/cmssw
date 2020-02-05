@@ -50,7 +50,9 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t
 
 void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField, const int bx, const bool isHGC)
 {
-  //std::cout << "EG " << l1Phase2EGTkIso_.nEG << ": et: " << it->et() << ", eta: " << it->eta() << ", phi: " << it->phi() << ", Q: " << it->hwQual() << std::endl;
+  //if (it->hwQual() == 5) {
+  //  std::cout << "EG " << l1Phase2EGTkIso_.nEG << ": et: " << it->et() << ", eta: " << it->eta() << ", phi: " << it->phi() << ", Q: " << it->hwQual() << std::endl;
+  //}
   ++l1Phase2EGTkIso_.nEG;
   l1Phase2EGTkIso_.EGEt.push_back(it->et());
   l1Phase2EGTkIso_.EGEta.push_back(it->eta());
@@ -85,6 +87,8 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollec
     l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->getMomentum().perp());
     l1Phase2EGTkIso_.matchedTkEta.push_back(matchedTrackPtr->getMomentum().eta());
     l1Phase2EGTkIso_.matchedTkPhi.push_back(matchedTrackPtr->getMomentum().phi());
+    l1Phase2EGTkIso_.matchedTkRInv.push_back(matchedTrackPtr->getRInv());
+    l1Phase2EGTkIso_.matchedTkChi2.push_back(matchedTrackPtr->getChi2());
     l1Phase2EGTkIso_.matchedTkDR.push_back(matchedTrackDR);
     l1Phase2EGTkIso_.matchedTkDEta.push_back(matchedTrackDEta);
     l1Phase2EGTkIso_.matchedTkDPhi.push_back(matchedTrackDPhi);
@@ -178,6 +182,8 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
         l1Phase2EGTkIso_.isoTkPt.push_back(trkPt);
         l1Phase2EGTkIso_.isoTkEta.push_back(trkIt->getMomentum().eta());
         l1Phase2EGTkIso_.isoTkPhi.push_back(trkIt->getMomentum().phi());
+        l1Phase2EGTkIso_.isoTkRInv.push_back(trkIt->getRInv());
+        l1Phase2EGTkIso_.isoTkChi2.push_back(trkIt->getChi2());
         l1Phase2EGTkIso_.isoTkDR.push_back(dR);
         l1Phase2EGTkIso_.isoTkDEta.push_back(dEta);
         l1Phase2EGTkIso_.isoTkDPhi.push_back(dPhi);
@@ -210,13 +216,18 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoPFCands(const l1t::EGammaBxColl
     dR = reco::deltaR(egPos.eta(), egPos.phi(), etaPhiAtCalo.first, etaPhiAtCalo.second);
 
     // store PF cand info if close enough to the EG object
-    if (dR < 999. and dR > dRMinIso_ and dR < dRMaxIso_) {
-      //std::cout << "Iso PF cand: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", ID: " << pfCand.id() << ", Et: " << pfCand.pt() << ", eta: " << pfCand.eta() << ", phi: " << pfCand.phi() << ", eta at calo: " << etaPhiAtCalo.first << ", phi at calo: " << etaPhiAtCalo.second << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << std::endl;
+    if (dR < 999. and dR >= dRMinIso_ and dR < dRMaxIso_) {
+      //const auto pfCluster = pfCand.pfCluster();
+      //const auto pfTrack = pfCand.pfTrack();
+      //if (egIt->hwQual() == 5) {
+      //  std::cout << "Iso PF cand: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", ID: " << pfCand.id() << ", Et: " << pfCand.pt() << ", eta: " << pfCand.eta() << ", phi: " << pfCand.phi() << ", eta at calo: " << etaPhiAtCalo.first << ", phi at calo: " << etaPhiAtCalo.second << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << ", charge: " << pfCand.charge() << ", vtx pos: " << pfCand.vx() << "," << pfCand.vy() << "," << pfCand.vz() << std::endl;
+      //}
       l1Phase2EGTkIso_.isoPFEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
       l1Phase2EGTkIso_.isoPFId.push_back(pfCand.id());
       l1Phase2EGTkIso_.isoPFEt.push_back(pfCand.pt());
       l1Phase2EGTkIso_.isoPFEta.push_back(pfCand.eta());
       l1Phase2EGTkIso_.isoPFPhi.push_back(pfCand.phi());
+      l1Phase2EGTkIso_.isoPFPuppiWeight.push_back(pfCand.puppiWeight());
       l1Phase2EGTkIso_.isoPFEtaAtCalo.push_back(etaPhiAtCalo.first);
       l1Phase2EGTkIso_.isoPFPhiAtCalo.push_back(etaPhiAtCalo.second);
       l1Phase2EGTkIso_.isoPFDR.push_back(dR);
