@@ -34,6 +34,8 @@ namespace L1Analysis
       matchedTkPt.clear();
       matchedTkEta.clear();
       matchedTkPhi.clear();
+      matchedTkRInv.clear();
+      matchedTkChi2.clear();
       matchedTkDR.clear();
       matchedTkDEta.clear();
       matchedTkDPhi.clear();
@@ -42,6 +44,8 @@ namespace L1Analysis
       isoTkPt.clear();
       isoTkEta.clear();
       isoTkPhi.clear();
+      isoTkRInv.clear();
+      isoTkChi2.clear();
       isoTkDR.clear();
       isoTkDEta.clear();
       isoTkDPhi.clear();
@@ -55,6 +59,7 @@ namespace L1Analysis
       isoPFEt.clear();
       isoPFEta.clear();
       isoPFPhi.clear();
+      isoPFPuppiWeight.clear();
       isoPFEtaAtCalo.clear();
       isoPFPhiAtCalo.clear();
       isoPFDR.clear();
@@ -79,6 +84,8 @@ namespace L1Analysis
     std::vector<double> matchedTkPt;
     std::vector<double> matchedTkEta;
     std::vector<double> matchedTkPhi;
+    std::vector<double> matchedTkRInv;
+    std::vector<double> matchedTkChi2;
     std::vector<double> matchedTkDR;
     std::vector<double> matchedTkDEta;
     std::vector<double> matchedTkDPhi;
@@ -87,6 +94,8 @@ namespace L1Analysis
     std::vector<double> isoTkPt;
     std::vector<double> isoTkEta;
     std::vector<double> isoTkPhi;
+    std::vector<double> isoTkRInv;
+    std::vector<double> isoTkChi2;
     std::vector<double> isoTkDR;
     std::vector<double> isoTkDEta;
     std::vector<double> isoTkDPhi;
@@ -100,6 +109,7 @@ namespace L1Analysis
     std::vector<double> isoPFEt;
     std::vector<double> isoPFEta;
     std::vector<double> isoPFPhi;
+    std::vector<double> isoPFPuppiWeight;
     std::vector<double> isoPFEtaAtCalo;
     std::vector<double> isoPFPhiAtCalo;
     std::vector<double> isoPFDR;
