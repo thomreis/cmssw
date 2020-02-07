@@ -161,7 +161,7 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
       L1TkElectronTrackMatchAlgo::doMatch(egIt, trackPtr, dPhi, dR, dEta);
 
       // store track info if close enough to the EG object
-      if (dR < 999. and dR > dRMinIso_ and dR < dRMaxIso_) {
+      if (dR < 999. and dR >= dRMinIso_ and dR < dRMaxIso_) {
         double dPhiTrkTrk = 0.;
         double dEtaTrkTrk = 0.;
         double dRTrkTrk =  0.;
