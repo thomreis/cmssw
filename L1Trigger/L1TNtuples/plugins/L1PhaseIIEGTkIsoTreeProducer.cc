@@ -205,8 +205,12 @@ L1PhaseIIEGTkIsoTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& d
   desc.add<std::vector<double>>("trackEGammaDeltaPhi", {0.07, 0., 0.});
   desc.add<std::vector<double>>("trackEGammaDeltaR", {0.08, 0., 0.});
   desc.add<std::vector<double>>("trackEGammaDeltaEta", {1e10, 0., 0.});
-  desc.add<double>("trackMinPtForIso", 2.);
-  desc.add<double>("trackMaxChi2ForIso", 1e10);
+  desc.add<double>("trackMinPtForIsoEB", 2.);
+  desc.add<double>("trackMinPtForIsoHGC", 2.);
+  desc.add<double>("trackMaxChi2ForIsoEB", 1e10);
+  desc.add<double>("trackMaxChi2ForIsoHGC", 1e10);
+  desc.add<unsigned int>("trackMinNStubsForIsoEB", 0);
+  desc.add<unsigned int>("trackMinNStubsForIsoHGC", 0);
   desc.add<double>("dRMinForIso", 0.);
   desc.add<double>("dRMaxForIso", 1.);
   descriptions.addDefault(desc);
