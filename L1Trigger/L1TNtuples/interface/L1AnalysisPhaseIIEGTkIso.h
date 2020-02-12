@@ -53,8 +53,12 @@ namespace L1Analysis {
     std::vector<double> dPhiCutoff_;
     std::vector<double> dRCutoff_;
 
-    float trkPtMinIso_;
-    float trkChi2MaxIso_;
+    float trkPtMinIsoEB_;
+    float trkPtMinIsoHGC_;
+    float trkChi2MaxIsoEB_;
+    float trkChi2MaxIsoHGC_;
+    unsigned int trkNStubMinIsoEB_;
+    unsigned int trkNStubMinIsoHGC_;
     float dRMinIso_;
     float dRMaxIso_;
   }; 

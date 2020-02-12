@@ -18,8 +18,12 @@ L1Analysis::L1AnalysisPhaseIIEGTkIso::L1AnalysisPhaseIIEGTkIso(const edm::Parame
   dEtaCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaEta")),
   dPhiCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaPhi")),
   dRCutoff_(pSet.getParameter<std::vector<double>>("trackEGammaDeltaR")),
-  trkPtMinIso_((float)pSet.getParameter<double>("trackMinPtForIso")),
-  trkChi2MaxIso_((float)pSet.getParameter<double>("trackMaxChi2ForIso")),
+  trkPtMinIsoEB_((float)pSet.getParameter<double>("trackMinPtForIsoEB")),
+  trkPtMinIsoHGC_((float)pSet.getParameter<double>("trackMinPtForIsoHGC")),
+  trkChi2MaxIsoEB_((float)pSet.getParameter<double>("trackMaxChi2ForIsoEB")),
+  trkChi2MaxIsoHGC_((float)pSet.getParameter<double>("trackMaxChi2ForIsoHGC")),
+  trkNStubMinIsoEB_((unsigned int)pSet.getParameter<unsigned int>("trackMinNStubsForIsoEB")),
+  trkNStubMinIsoHGC_((unsigned int)pSet.getParameter<unsigned int>("trackMinNStubsForIsoHGC")),
   dRMinIso_((float)pSet.getParameter<double>("dRMinForIso")),
   dRMaxIso_((float)pSet.getParameter<double>("dRMaxForIso"))
 {
@@ -138,7 +142,17 @@ edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1Anal
 }
 
 // method to calculate isolation
-void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx) {
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxCollection::const_iterator& egIt, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const int matchedTrackIdx)
+{
+  auto trkPtMinIso = trkPtMinIsoEB_;
+  auto trkChi2MaxIso = trkChi2MaxIsoEB_;
+  auto trkNStubMinIso = trkNStubMinIsoEB_;
+  if (fabs(egIt->eta()) > 1.479) {
+    trkPtMinIso = trkPtMinIsoHGC_;
+    trkChi2MaxIso = trkChi2MaxIsoHGC_;
+    trkNStubMinIso = trkNStubMinIsoHGC_;
+  }
+
   int iTrack = -1;
   for (L1TTTrackCollectionType::const_iterator trkIt = tttrack->begin(); trkIt != tttrack->end(); ++trkIt) {
     if (++iTrack != matchedTrackIdx) { // Do not use the matched track in the isolation
@@ -149,7 +163,9 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
       }
 
       // basic track selection
-      if (trkIt->getChi2() > trkChi2MaxIso_ or trkPt < trkPtMinIso_) {
+      if (trkIt->getChi2() > trkChi2MaxIso
+          or trkIt->getStubRefs().size() < trkNStubMinIso
+          or trkPt < trkPtMinIso) {
         continue;
       }
 
@@ -247,9 +263,11 @@ bool L1Analysis::L1AnalysisPhaseIIEGTkIso::selectMatchedTrack(const double dR, c
   if (trkEGMatchType_ == "PtDependentCut") {
     return (fabs(dPhi) < getPtScaledCut(trkPt, dPhiCutoff_) && dR < getPtScaledCut(trkPt, dRCutoff_));
   } else { // elliptical matching
-    auto dEtaMax = dEtaCutoff_[0];
-    if (fabs(egEta) < 0.9) {
-      dEtaMax = dEtaCutoff_[1];
+    auto dEtaMax = dEtaCutoff_[0]; // EB high eta
+    if (fabs(egEta) <= 0.9) {
+      dEtaMax = dEtaCutoff_[1]; // EB low eta
+    } else if (fabs(egEta) > 1.479) { // HGCal
+      dEtaMax = dEtaCutoff_[2];
     }
     const auto dEtaRatio = dEta / dEtaMax;
     const auto dPhiRatio = dPhi / dPhiCutoff_[0];
