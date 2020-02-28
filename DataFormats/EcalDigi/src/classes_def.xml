@@ -35,6 +35,9 @@
    <class name="EcalEBPhase2TriggerPrimitiveDigi" ClassVersion="3">
     <version ClassVersion="3" checksum="553470717"/>
    </class>
+   <class name="EcalEBTriggerPrimitiveCluster" ClassVersion="3">
+    <version ClassVersion="3" checksum="1690078582"/>
+   </class>
 
    <class name="EcalPseudoStripInputSample" ClassVersion="3">
     <version ClassVersion="3" checksum="2913557465"/>
@@ -73,6 +76,7 @@
    <class name="std::vector<io_v1::EESrFlag>"/>
    <class name="std::vector<io_v1::EcalTriggerPrimitiveDigi>"/>
    <class name="std::vector<io_v1::EcalEBTriggerPrimitiveDigi>"/>
+   <class name="std::vector<EcalTriggerPrimitiveCluster>"/>
    <class name="std::vector<EcalEBPhase2TriggerPrimitiveDigi>"/>
    <class name="std::vector<io_v1::EcalPseudoStripInputDigi>"/>
    <class name="std::vector<io_v1::EcalPnDiodeDigi>"/>
