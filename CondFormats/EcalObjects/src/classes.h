@@ -224,5 +224,10 @@ namespace CondFormats_EcalObjects {
     EcalSimPulseShape ecal_sim_pulse_shapes;
 
     EcalBcpPayloadParams ecal_bcp_payload_params;
+    EcalBcpPayloadParams::Node ecal_bcp_payload_params_node;
+    std::vector<EcalBcpPayloadParams::Node> v_ecal_bcp_payload_params_node;
+    EcalContainer<EBDetId, std::vector<EcalBcpPayloadParams::Node>> ec_ebDetId_ecal_bcp_payload_params_node;
+    EcalContainer<EEDetId, std::vector<EcalBcpPayloadParams::Node>> ec_eeDetId_ecal_bcp_payload_params_node;
+    EcalCondObjectContainer<std::vector<EcalBcpPayloadParams::Node>> ecal_bcp_payload_params_node_map;
   };
 }  // namespace CondFormats_EcalObjects
