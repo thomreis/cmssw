@@ -13,6 +13,8 @@
 <use   name="FWCore/Utilities"/>
 <use   name="SimCalorimetry/EcalTrigPrimAlgos"/>
 <use   name="clhep"/>
+<use   name="hls"/>
+<use   name="EbSpikeTaggerHLS"/>
 <export>
   <use   name="CondFormats/EcalObjects"/>
   <lib   name="1"/>
