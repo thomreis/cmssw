@@ -17,10 +17,10 @@ BayesMuCorrelatorTrack::BayesMuCorrelatorTrack(const LorentzVector& p4): L1Candi
 }
 
 BayesMuCorrelatorTrack::BayesMuCorrelatorTrack(const edm::Ptr< L1TTTrackType > ttTrackPtr):
-    L1Candidate(LorentzVector(ttTrackPtr->getMomentum().x(),
-                              ttTrackPtr->getMomentum().y(),
-                              ttTrackPtr->getMomentum().z(),
-                              ttTrackPtr->getMomentum().mag()) ),
+    L1Candidate(LorentzVector(ttTrackPtr->momentum().x(),
+                              ttTrackPtr->momentum().y(),
+                              ttTrackPtr->momentum().z(),
+                              ttTrackPtr->momentum().mag()) ),
     ttTrackPtr(ttTrackPtr)
 {
 

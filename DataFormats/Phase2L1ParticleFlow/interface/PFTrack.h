@@ -55,8 +55,8 @@ namespace l1t
 
           unsigned int nPar() const { return nPar_; }
           unsigned int nStubs() const { return track()->getStubRefs().size(); }
-          float normalizedChi2() const { return track()->getChi2Red(nPar()); }
-          float chi2() const { return track()->getChi2(nPar()); }
+          float normalizedChi2() const { return track()->chi2Red(); }
+          float chi2() const { return track()->chi2(); }
 
       private:
           TrackRef trackRef_;

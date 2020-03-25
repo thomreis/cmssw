@@ -22,9 +22,9 @@ double L1TkPhiCandidate::dRTrkPair() const {
   const edm::Ptr<L1TTTrackType>& jtrk = getTrkPtr(1);
 
   math::PtEtaPhiMLorentzVector itrkP4(
-      itrk->getMomentum().perp(), itrk->getMomentum().eta(), itrk->getMomentum().phi(), kmass);
+      itrk->momentum().perp(), itrk->momentum().eta(), itrk->momentum().phi(), kmass);
   math::PtEtaPhiMLorentzVector jtrkP4(
-      jtrk->getMomentum().perp(), jtrk->getMomentum().eta(), jtrk->getMomentum().phi(), kmass);
+      jtrk->momentum().perp(), jtrk->momentum().eta(), jtrk->momentum().phi(), kmass);
   return reco::deltaR(itrkP4, jtrkP4);
 }
 
@@ -35,10 +35,10 @@ double L1TkPhiCandidate::dxyTrkPair() const {
   const edm::Ptr<L1TTTrackType>& itrk = getTrkPtr(0);
   const edm::Ptr<L1TTTrackType>& jtrk = getTrkPtr(1);
 
-  return std::sqrt(std::pow(itrk->getPOCA(5).x() - jtrk->getPOCA(5).x(), 2) +
-                   std::pow(itrk->getPOCA(5).y() - jtrk->getPOCA(5).y(), 2));
+  return std::sqrt(std::pow(itrk->POCA().x() - jtrk->POCA().x(), 2) +
+                   std::pow(itrk->POCA().y() - jtrk->POCA().y(), 2));
 }
-double L1TkPhiCandidate::dzTrkPair() const { return (getTrkPtr(0)->getPOCA(5).z() - getTrkPtr(1)->getPOCA(5).z()); }
-double L1TkPhiCandidate::vx() const { return 0.5 * (getTrkPtr(0)->getPOCA(5).x() + getTrkPtr(1)->getPOCA(5).x()); }
-double L1TkPhiCandidate::vy() const { return 0.5 * (getTrkPtr(0)->getPOCA(5).y() + getTrkPtr(1)->getPOCA(5).y()); }
-double L1TkPhiCandidate::vz() const { return 0.5 * (getTrkPtr(0)->getPOCA(5).z() + getTrkPtr(1)->getPOCA(5).z()); }
+double L1TkPhiCandidate::dzTrkPair() const { return (getTrkPtr(0)->POCA().z() - getTrkPtr(1)->POCA().z()); }
+double L1TkPhiCandidate::vx() const { return 0.5 * (getTrkPtr(0)->POCA().x() + getTrkPtr(1)->POCA().x()); }
+double L1TkPhiCandidate::vy() const { return 0.5 * (getTrkPtr(0)->POCA().y() + getTrkPtr(1)->POCA().y()); }
+double L1TkPhiCandidate::vz() const { return 0.5 * (getTrkPtr(0)->POCA().z() + getTrkPtr(1)->POCA().z()); }

@@ -19,7 +19,7 @@ L1TkElectronParticle::L1TkElectronParticle(const LorentzVector& p4,
 
 {
   if (trkPtr_.isNonnull()) {
-    float z = getTrkPtr()->getPOCA().z();
+    float z = getTrkPtr()->POCA().z();
     setTrkzVtx(z);
   }
 }

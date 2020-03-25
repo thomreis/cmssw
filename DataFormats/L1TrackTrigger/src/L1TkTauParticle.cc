@@ -25,7 +25,7 @@ L1TkTauParticle::L1TkTauParticle(const LorentzVector& p4,
 
 {
   if (trkPtr_.isNonnull()) {
-    float z = getTrkPtr()->getPOCA().z();
+    float z = getTrkPtr()->POCA().z();
     setTrkzVtx(z);
   }
 }
