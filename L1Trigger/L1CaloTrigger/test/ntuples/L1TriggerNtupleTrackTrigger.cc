@@ -123,27 +123,27 @@ L1TriggerNtupleTrackTrigger::fill(const edm::Event& ev, const edm::EventSetup& e
   for (auto trackIter = l1TTTrackHandle->begin(); trackIter != l1TTTrackHandle->end(); ++trackIter) {
     l1track_n_++;
     // NOTE: filter on fabs(eta) in EE to reduce the size of the collection
-    if(fabs(trackIter->getMomentum().eta()) < 1.3) continue;
+    if(fabs(trackIter->momentum().eta()) < 1.3) continue;
     // physical values
 
-    l1track_pt_.emplace_back(trackIter->getMomentum().perp());
+    l1track_pt_.emplace_back(trackIter->momentum().perp());
     l1track_pt2stubs_.emplace_back(pTFrom2Stubs::pTFrom2(trackIter, tGeom));
 
     // l1track_energy_.emplace_back(trackIter->energy());
-    l1track_eta_.emplace_back(trackIter->getMomentum().eta());
-    l1track_phi_.emplace_back(trackIter->getMomentum().phi());
-    l1track_curv_.emplace_back(trackIter->getRInv());
-    l1track_chi2_.emplace_back(trackIter->getChi2());
-    l1track_chi2Red_.emplace_back(trackIter->getChi2Red());
+    l1track_eta_.emplace_back(trackIter->momentum().eta());
+    l1track_phi_.emplace_back(trackIter->momentum().phi());
+    l1track_curv_.emplace_back(trackIter->rInv());
+    l1track_chi2_.emplace_back(trackIter->chi2());
+    l1track_chi2Red_.emplace_back(trackIter->chi2Red());
     l1track_nStubs_.emplace_back(trackIter->getStubRefs().size());
     // FIXME: need to be configuratble?
     int nParam_ = 4;
-    float z0   = trackIter->getPOCA(nParam_).z(); //cm
-    int charge = trackIter->getRInv() > 0 ? +1 : -1;
+    float z0   = trackIter->POCA().z(); //cm
+    int charge = trackIter->rInv() > 0 ? +1 : -1;
 
-    reco::Candidate::PolarLorentzVector p4p(trackIter->getMomentum().perp(),
-                                            trackIter->getMomentum().eta(),
-                                            trackIter->getMomentum().phi(), 0); // no mass ?
+    reco::Candidate::PolarLorentzVector p4p(trackIter->momentum().perp(),
+                                            trackIter->momentum().eta(),
+                                            trackIter->momentum().phi(), 0); // no mass ?
     reco::Particle::LorentzVector p4(p4p.X(), p4p.Y(), p4p.Z(), p4p.E());
     reco::Particle::Point vtx(0.,0.,z0);
 

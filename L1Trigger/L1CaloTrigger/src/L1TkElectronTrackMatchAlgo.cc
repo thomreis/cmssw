@@ -22,6 +22,7 @@
 
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "L1Trigger/L1CaloTrigger/interface/L1TkElectronTrackMatchAlgo.h"
+
 namespace L1TkElectronTrackMatchAlgo {
   // ------------ match EGamma and Track
   void doMatch(l1extra::L1EmParticleCollection::const_iterator egIter, const edm::Ptr< L1TkTrackType > & pTrk, double& dph, double&  dr, double& deta) {
@@ -39,17 +40,17 @@ namespace L1TkElectronTrackMatchAlgo {
   // --------------- calculate deltaR between Track and EGamma object
   double deltaPhi(const GlobalPoint& epos, const edm::Ptr< L1TkTrackType > & pTrk){
     double er = epos.perp();
-    double curv = pTrk->getRInv();
+    double curv = pTrk->rInv();
 
     double dphi_curv= (asin(er*curv/(2.0)));
-    double trk_phi_ecal = reco::deltaPhi(pTrk->getMomentum().phi(),dphi_curv);
+    double trk_phi_ecal = reco::deltaPhi(pTrk->momentum().phi(),dphi_curv);
 
     double dphi = reco::deltaPhi(trk_phi_ecal,epos.phi());
     return dphi;
   }
 // --------------- calculate deltaPhi between Track and EGamma object                 
   double deltaR(const GlobalPoint& epos, const edm::Ptr< L1TkTrackType > & pTrk){
-    //double dPhi = fabs(reco::deltaPhi(epos.phi(), pTrk->getMomentum().phi()));
+    //double dPhi = fabs(reco::deltaPhi(epos.phi(), pTrk->momentum().phi()));
     double dPhi = L1TkElectronTrackMatchAlgo::deltaPhi(epos, pTrk);
     double dEta = deltaEta(epos, pTrk);
     return sqrt(dPhi*dPhi + dEta*dEta);
@@ -59,12 +60,12 @@ namespace L1TkElectronTrackMatchAlgo {
     double corr_eta = 999.0;
     double er = epos.perp();
     double ez = epos.z();
-    double z0 = pTrk->getPOCA().z()  ;
+    double z0 = pTrk->POCA().z()  ;
     double theta = 0.0;
     if (ez >= 0) theta = atan(er/fabs(ez-z0));
     else theta = M_PI - atan(er/fabs(ez-z0));
     corr_eta = -1.0 * log(tan(theta/2.0));
-    double deleta = (corr_eta - pTrk->getMomentum().eta());
+    double deleta = (corr_eta - pTrk->momentum().eta());
     return deleta;
   }
   // -------------- get Calorimeter position
