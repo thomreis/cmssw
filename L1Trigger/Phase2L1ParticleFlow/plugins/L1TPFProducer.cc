@@ -281,7 +281,7 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         double ptsum = 0;
         for (const l1t::Vertex & vtx : *vtxHandle) {
             double myptsum = 0; 
-            for (const auto & tkptr : vtx.tracks()) { myptsum += std::min(tkptr->getMomentum(4).perp(), 50.f); }
+            for (const auto & tkptr : vtx.tracks()) { myptsum += std::min(tkptr->momentum().perp(), 50.f); }
             if (myptsum > ptsum) { z0 = vtx.z0(); ptsum = myptsum; }
         }
     }

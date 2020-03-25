@@ -59,11 +59,11 @@ l1tpf::PFTrackProducerFromL1Tracks::produce(edm::Event & iEvent, const edm::Even
   for (unsigned int i = 0, n = tracks.size(); i < n; ++i) {
       const auto & tk = tracks[i]; 
 
-      float pt   = tk.getMomentum(nParam_).perp();
-      float eta  = tk.getMomentum(nParam_).eta();
-      float phi  = tk.getMomentum(nParam_).phi();
-      float z0   = tk.getPOCA(nParam_).z(); //cm
-      int charge = tk.getRInv() > 0 ? +1 : -1;
+      float pt   = tk.momentum().perp();
+      float eta  = tk.momentum().eta();
+      float phi  = tk.momentum().phi();
+      float z0   = tk.POCA().z(); //cm
+      int charge = tk.rInv() > 0 ? +1 : -1;
 
       reco::Candidate::PolarLorentzVector p4p(pt, eta, phi, 0.137); // pion mass
       reco::Particle::LorentzVector p4(p4p.X(), p4p.Y(), p4p.Z(), p4p.E());
