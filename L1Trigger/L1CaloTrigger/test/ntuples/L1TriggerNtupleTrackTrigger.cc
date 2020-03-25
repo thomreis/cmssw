@@ -137,7 +137,7 @@ L1TriggerNtupleTrackTrigger::fill(const edm::Event& ev, const edm::EventSetup& e
     l1track_chi2Red_.emplace_back(trackIter->chi2Red());
     l1track_nStubs_.emplace_back(trackIter->getStubRefs().size());
     // FIXME: need to be configuratble?
-    int nParam_ = 4;
+    // int nParam_ = 4;
     float z0   = trackIter->POCA().z(); //cm
     int charge = trackIter->rInv() > 0 ? +1 : -1;
 
