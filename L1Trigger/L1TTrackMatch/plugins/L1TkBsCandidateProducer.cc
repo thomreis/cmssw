@@ -229,9 +229,9 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
     edm::Ptr<L1TTTrackType> trkPtr1(trkHandle, itrk);
 
     if (!selectTrack(it, tTopo)) continue;
-    math::PtEtaPhiMLorentzVector trkv1(it->getMomentum().perp(), 
-				       it->getMomentum().eta(), 
-				       it->getMomentum().phi(), 
+    math::PtEtaPhiMLorentzVector trkv1(it->momentum().perp(), 
+				       it->momentum().eta(), 
+				       it->momentum().phi(), 
 				       L1TkPhiCandidate::kmass);
 
     size_t jtrk = 0;
@@ -243,7 +243,7 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
       if (!selectTrack(jt, tTopo)) continue;
 
       // Oppositely charged tracks
-      if (std::signbit(it->getRInv(5)) == std::signbit(jt->getRInv(5))) continue;
+      if (std::signbit(it->rInv()) == std::signbit(jt->rInv())) continue;
 
       // Track pair must come from the same vertex
       double dxy, dz;
@@ -251,9 +251,9 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
 
       // Apply |dz| and dxy cuts in the given order
       if (std::fabs(dz) > trkPairDzMax_ || std::fabs(dxy) > trkPairDxyMax_) continue;
-      math::PtEtaPhiMLorentzVector trkv2(jt->getMomentum().perp(), 
-					 jt->getMomentum().eta(), 
-					 jt->getMomentum().phi(), 
+      math::PtEtaPhiMLorentzVector trkv2(jt->momentum().perp(), 
+					 jt->momentum().eta(), 
+					 jt->momentum().phi(), 
 					 L1TkPhiCandidate::kmass);
 
       // Select mass window
@@ -273,13 +273,13 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
 bool L1TkBsCandidateProducer::selectTrack(L1TTTrackCollectionType::const_iterator itrk, 
 					  const TrackerTopology* tTopo) const 
 {
-  if (std::fabs(itrk->getMomentum(5).eta()) > trkEtaMax_ ||
-      itrk->getMomentum(5).perp() < trkPtMin_) return false;
+  if (std::fabs(itrk->momentum().eta()) > trkEtaMax_ ||
+      itrk->momentum().perp() < trkPtMin_) return false;
   
   if (applyTrkQuality_) {
     int nStub, nStub_SS, nStub_PS;
     stubInfo(itrk, tTopo, nStub, nStub_SS, nStub_PS);
-    if (itrk->getChi2Red(5) > trkChi2Max_ || 
+    if (itrk->chi2Red() > trkChi2Max_ || 
 	nStub < trkLayersMin_ ||
 	nStub_PS < trkPSLayersMin_) return false;
   }
@@ -310,9 +310,9 @@ void L1TkBsCandidateProducer::deltaPos(L1TTTrackCollectionType::const_iterator i
 				       L1TTTrackCollectionType::const_iterator jtrk, 
 				       double& dxy, double& dz) 
 {
-  dxy = std::sqrt(std::pow(itrk->getPOCA(5).x() - jtrk->getPOCA(5).x(), 2) 
-		+ std::pow(itrk->getPOCA(5).y() - jtrk->getPOCA(5).y(), 2));
-  dz  = itrk->getPOCA(5).z() - jtrk->getPOCA(5).z();
+  dxy = std::sqrt(std::pow(itrk->POCA().x() - jtrk->POCA().x(), 2) 
+		+ std::pow(itrk->POCA().y() - jtrk->POCA().y(), 2));
+  dz  = itrk->POCA().z() - jtrk->POCA().z();
 }
 void L1TkBsCandidateProducer::deltaPos(const L1TkPhiCandidate& phia, 
 				       const L1TkPhiCandidate& phib, 

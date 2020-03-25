@@ -125,15 +125,15 @@ L1TkTauFromL1TrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
 
     std::vector<L1TTStubRef> theStubs = trackIter ->getStubRefs();
 
-    z[ntrack]=trackIter->getPOCA().z();
-    double px=trackIter->getMomentum().x();
-    double py=trackIter->getMomentum().y();
-    double pz=trackIter->getMomentum().z();
+    z[ntrack]=trackIter->POCA().z();
+    double px=trackIter->momentum().x();
+    double py=trackIter->momentum().y();
+    double pz=trackIter->momentum().z();
     double e=sqrt(px*px+py*py+pz*pz+0.14*0.14);
 
 
     nstub[ntrack]=theStubs.size();
-    chi2[ntrack]=trackIter->getChi2();
+    chi2[ntrack]=trackIter->chi2();
     if (chi2[ntrack]>100) continue;
     
 

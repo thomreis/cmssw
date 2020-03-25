@@ -409,22 +409,22 @@ L1TkMuonProducer::runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxColl
     for (const auto& l1tk : l1tks ){
       il1tk++;
 
-      unsigned int nPars = 4;
-      if (use5ParameterFit_) nPars = 5;
-      float l1tk_pt = l1tk.getMomentum(nPars).perp();
+      // unsigned int nPars = 4;
+      // if (use5ParameterFit_) nPars = 5;
+      float l1tk_pt = l1tk.momentum().perp();
       if (l1tk_pt < PTMINTRA_) continue;
 
-      float l1tk_z  = l1tk.getPOCA(nPars).z();
+      float l1tk_z  = l1tk.POCA().z();
       if (fabs(l1tk_z) > ZMAX_) continue;
 
-      float l1tk_chi2 = l1tk.getChi2(nPars);
+      float l1tk_chi2 = l1tk.chi2();
       if (l1tk_chi2 > CHI2MAX_) continue;
 
       int l1tk_nstubs = l1tk.getStubRefs().size();
       if ( l1tk_nstubs < nStubsmin_) continue;
 
-      float l1tk_eta = l1tk.getMomentum(nPars).eta();
-      float l1tk_phi = l1tk.getMomentum(nPars).phi();
+      float l1tk_eta = l1tk.momentum().eta();
+      float l1tk_phi = l1tk.momentum().phi();
 
       float dr2 = deltaR2(l1mu_eta, l1mu_phi, l1tk_eta, l1tk_phi);
       if (dr2 > 0.3) continue;
@@ -465,22 +465,22 @@ L1TkMuonProducer::runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxColl
       if (matchCondition){
         edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, match_idx);
 
-        unsigned int nPars = 4;
-        if (use5ParameterFit_) nPars = 5;
-        const auto& p3 = matchTk.getMomentum(nPars);
+        // unsigned int nPars = 4;
+        // if (use5ParameterFit_) nPars = 5;
+        const auto& p3 = matchTk.momentum();
         float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
 
         math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 
-        const auto& tkv3=matchTk.getPOCA(nPars);
+        const auto& tkv3=matchTk.POCA();
         math::XYZPoint v3(tkv3.x(), tkv3.y(), tkv3.z());  // why is this defined?
 
         float trkisol = -999;
 
         L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
 
-//        std::cout<<"carga?"<<matchTk.getRInv(nPars)<<std::endl;
-        l1tkmu.setTrackCurvature(matchTk.getRInv(nPars));
+//        std::cout<<"carga?"<<matchTk.rInv(nPars)<<std::endl;
+        l1tkmu.setTrackCurvature(matchTk.rInv());
         l1tkmu.setTrkzVtx( (float)tkv3.z() );
         l1tkmu.setdR(drmin);
         l1tkmu.setNTracksMatched(nTracksMatch);
@@ -515,8 +515,8 @@ L1TkMuonProducer::runOnMTFCollection_v2(const edm::Handle<EMTFTrackCollection>& 
       continue;
 
     const L1TTTrackType& matchTk = l1trks[il1ttrack];
-    const auto& p3 = matchTk.getMomentum(dwcorr_->get_n_trk_par());
-    const auto& tkv3 = matchTk.getPOCA(dwcorr_->get_n_trk_par());
+    const auto& p3 = matchTk.momentum();
+    const auto& tkv3 = matchTk.POCA();
     float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
     math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 
@@ -524,7 +524,7 @@ L1TkMuonProducer::runOnMTFCollection_v2(const edm::Handle<EMTFTrackCollection>& 
     edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, il1ttrack);
     float trkisol = -999; // FIXME: now doing as in the TP algo
     L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
-    l1tkmu.setTrackCurvature(matchTk.getRInv( dwcorr_->get_n_trk_par() ));
+    l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(3);
     tkMuons.push_back(l1tkmu);
@@ -548,14 +548,14 @@ L1TkMuonProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 
 L1TkMuonProducer::PropState L1TkMuonProducer::propagateToGMT(const L1TkMuonProducer::L1TTTrackType& tk) const
 {
-  auto p3 = tk.getMomentum();
+  auto p3 = tk.momentum();
   float tk_pt = p3.perp();
   float tk_p = p3.mag();
   float tk_eta = p3.eta();
   float tk_aeta = std::abs(tk_eta);
   float tk_phi = p3.phi();
-  float tk_q = tk.getRInv()>0? 1.: -1.;
-  float tk_z  = tk.getPOCA().z();
+  float tk_q = tk.rInv()>0? 1.: -1.;
+  float tk_z  = tk.POCA().z();
   if (!correctGMTPropForTkZ_) tk_z = 0;
 
   L1TkMuonProducer::PropState dest;
@@ -619,13 +619,13 @@ std::vector<L1TkMuMantraDF::track_df> L1TkMuonProducer::product_to_trkvec(const 
   {
     auto& trk = l1tks.at(itrk);
 
-    result.at(itrk).pt      =  trk.getMomentum(mantra_n_trk_par_).perp();
-    result.at(itrk).eta     =  trk.getMomentum(mantra_n_trk_par_).eta();
-    result.at(itrk).theta   =  L1TkMuMantra::to_mpio2_pio2(L1TkMuMantra::eta_to_theta(trk.getMomentum(mantra_n_trk_par_).eta()));
-    result.at(itrk).phi     =  trk.getMomentum(mantra_n_trk_par_).phi();
+    result.at(itrk).pt      =  trk.momentum().perp();
+    result.at(itrk).eta     =  trk.momentum().eta();
+    result.at(itrk).theta   =  L1TkMuMantra::to_mpio2_pio2(L1TkMuMantra::eta_to_theta(trk.momentum().eta()));
+    result.at(itrk).phi     =  trk.momentum().phi();
     result.at(itrk).nstubs  =  trk.getStubRefs().size();
-    result.at(itrk).chi2    =  trk.getChi2(mantra_n_trk_par_);
-    result.at(itrk).charge  =  (trk.getRInv(mantra_n_trk_par_) > 0 ? 1 : -1);
+    result.at(itrk).chi2    =  trk.chi2();
+    result.at(itrk).charge  =  (trk.rInv() > 0 ? 1 : -1);
   }
 
   return result;
@@ -676,8 +676,8 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
 
     // take properties of the track
     const L1TTTrackType& matchTk = (*l1tksH.product())[match_trk_idx];
-    const auto& p3 = matchTk.getMomentum(mantra_n_trk_par_);
-    const auto& tkv3 = matchTk.getPOCA(mantra_n_trk_par_);
+    const auto& p3 = matchTk.momentum();
+    const auto& tkv3 = matchTk.POCA();
     float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
     math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 
@@ -687,7 +687,7 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
 
     float trkisol = -999; // FIXME
     L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
-    l1tkmu.setTrackCurvature(matchTk.getRInv( mantra_n_trk_par_ ));
+    l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(detector);
     tkMuons.push_back(l1tkmu);
@@ -708,8 +708,8 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
 
     // take properties of the track
     const L1TTTrackType& matchTk = (*l1tksH.product())[match_trk_idx];
-    const auto& p3 = matchTk.getMomentum(mantra_n_trk_par_);
-    const auto& tkv3 = matchTk.getPOCA(mantra_n_trk_par_);
+    const auto& p3 = matchTk.momentum();
+    const auto& tkv3 = matchTk.POCA();
     float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
     math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 
@@ -718,7 +718,7 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
 
     float trkisol = -999; // FIXME
     L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
-    l1tkmu.setTrackCurvature(matchTk.getRInv( mantra_n_trk_par_ ));
+    l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(detector);
     tkMuons.push_back(l1tkmu);

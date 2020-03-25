@@ -22,9 +22,9 @@ namespace pTFrom2Stubs{
 
 			edm::Ref<edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > stubRef =vecStubRefs.at(j) ;
 			const TTStub<Ref_Phase2TrackerDigi_>* stub=&(*stubRef) ;
-			MeasurementPoint localPos = stub->getClusterRef(0)->findAverageLocalCoordinates();
+			MeasurementPoint localPos = stub->clusterRef(0)->findAverageLocalCoordinates();
 
-                        DetId detid = stub->getClusterRef(0)->getDetId();  
+                        DetId detid = stub->clusterRef(0)->getDetId();  
 
 			if (detid.det() != DetId::Detector::Tracker) continue;
       			if (detid.subdetId() != StripSubdetector::TOB && detid.subdetId() != StripSubdetector::TID) continue;

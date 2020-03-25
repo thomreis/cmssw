@@ -62,7 +62,7 @@ public:
   public:
     TrackPtComparator(unsigned int nFitParams){ nFitParams_ = nFitParams;}
     bool operator() (const L1TTTrackRefPtr trackA, L1TTTrackRefPtr trackB ) const {
-      return ( trackA->getMomentum(nFitParams_).perp() > trackB->getMomentum(nFitParams_).perp() );
+      return ( trackA->momentum().perp() > trackB->momentum().perp() );
     }
   };
   
@@ -208,10 +208,10 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     /// Declare for-loop variables
     std::vector< L1TTStubRef > track_Stubs = trackIter-> getStubRefs();
     unsigned int track_NStubs              = track_Stubs.size();
-    double track_Pt                        = trackIter->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-    double track_Eta                       = trackIter->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-    double track_POCAz                     = trackIter->getPOCA(cfg_L1TTTracks_NFitParameters).z();
-    double track_RedChiSq                  = trackIter->getChi2Red(cfg_L1TTTracks_NFitParameters);
+    double track_Pt                        = trackIter->momentum().perp();
+    double track_Eta                       = trackIter->momentum().eta();
+    double track_POCAz                     = trackIter->POCA().z();
+    double track_RedChiSq                  = trackIter->chi2Red();
     bool track_HasEndcapStub = false;
     bool track_HasBarrelStub = false;
 
@@ -263,7 +263,7 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   std::sort( c_L1TTTracks.begin(), c_L1TTTracks.end(), TrackPtComparator(cfg_L1TTTracks_NFitParameters) );
 
 #ifdef DEBUG
-  for (unsigned int i = 0; i < c_L1TTTracks.size(); i++) { std::cout << "c_L1TTTracks.at(" << i << ").pt() = " << c_L1TTTracks.at(i)->getMomentum(cfg_L1TTTracks_NFitParameters).perp() << std::endl;}
+  for (unsigned int i = 0; i < c_L1TTTracks.size(); i++) { std::cout << "c_L1TTTracks.at(" << i << ").pt() = " << c_L1TTTracks.at(i)->momentum().perp() << std::endl;}
   std::cout << "\n" << std::endl; 
 #endif
 
@@ -303,9 +303,9 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     for ( unsigned int i=0; i < c_L1TTTracks.size(); i++ ){
 
       L1TTTrackRefPtr iTk       = c_L1TTTracks.at(i);
-      double MatchingTkCand_Pt  = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-      double MatchingTkCand_Eta = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-      double MatchingTkCand_Phi = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).phi();
+      double MatchingTkCand_Pt  = iTk->momentum().perp();
+      double MatchingTkCand_Eta = iTk->momentum().eta();
+      double MatchingTkCand_Phi = iTk->momentum().phi();
       
       // Apply pT cut for matching L1TTTracks
       const bool bPassPtCut = (MatchingTkCand_Pt >= cfg_L1TkTau_MatchingTk_PtMin);
@@ -346,8 +346,8 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     usedSigTks_index.insert(usedSigTks_index.end(), sigTks_index.begin(), sigTks_index.end());
 
 #ifdef DEBUG
-    for (unsigned int i = 0; i < sigTks_index.size(); i++) { std::cout << "s) c_L1TTTracks.at(" << sigTks_index.at(i) << ").pt() = " << c_L1TTTracks.at(sigTks_index.at(i))->getMomentum(cfg_L1TTTracks_NFitParameters).perp() << std::endl;}
-    for (unsigned int i = 0; i < isoTks_index.size(); i++) { std::cout << "iso) c_L1TTTracks.at(" << isoTks_index.at(i) << ").pt() = " << c_L1TTTracks.at(isoTks_index.at(i))->getMomentum(cfg_L1TTTracks_NFitParameters).perp() << std::endl;}
+    for (unsigned int i = 0; i < sigTks_index.size(); i++) { std::cout << "s) c_L1TTTracks.at(" << sigTks_index.at(i) << ").pt() = " << c_L1TTTracks.at(sigTks_index.at(i))->momentum().perp() << std::endl;}
+    for (unsigned int i = 0; i < isoTks_index.size(); i++) { std::cout << "iso) c_L1TTTracks.at(" << isoTks_index.at(i) << ").pt() = " << c_L1TTTracks.at(isoTks_index.at(i))->momentum().perp() << std::endl;}
     std::cout << "\n" << std::endl; 
 #endif
 
@@ -400,11 +400,11 @@ void L1TkTauFromCaloProducer::GetTracksInSignalCone(const L1TTTrackRefPtr_Collec
 
   // Get matchingTk properties
   L1TTTrackRefPtr matchingTk    = c_L1Tks.at(matchingTk_index);
-  const double matchingTk_Pt    = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-  const double matchingTk_Eta   = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-  const double matchingTk_Phi   = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).phi();
+  const double matchingTk_Pt    = matchingTk->momentum().perp();
+  const double matchingTk_Eta   = matchingTk->momentum().eta();
+  const double matchingTk_Phi   = matchingTk->momentum().phi();
   const double matchingTk_Mass  = 0.13957018; // assume charged pion
-  const double matchingTk_POCAz = matchingTk->getPOCA(cfg_L1TTTracks_NFitParameters).z();
+  const double matchingTk_POCAz = matchingTk->POCA().z();
   TLorentzVector tau_p4;
   tau_p4.SetPtEtaPhiM(matchingTk_Pt, matchingTk_Eta, matchingTk_Phi, matchingTk_Mass);
 
@@ -419,11 +419,11 @@ void L1TkTauFromCaloProducer::GetTracksInSignalCone(const L1TTTrackRefPtr_Collec
 
     // Is this track within the signal cone?
     L1TTTrackRefPtr iTk   = c_L1Tks.at(i);
-    const double tk_Pt    = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-    const double tk_Eta   = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-    const double tk_Phi   = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).phi();
+    const double tk_Pt    = iTk->momentum().perp();
+    const double tk_Eta   = iTk->momentum().eta();
+    const double tk_Phi   = iTk->momentum().phi();
     const double tk_Mass  = 0.13957018; // assume charged pion
-    const double tk_POCAz = iTk->getPOCA(cfg_L1TTTracks_NFitParameters).z();
+    const double tk_POCAz = iTk->POCA().z();
     double deltaR = reco::deltaR(matchingTk_Eta, matchingTk_Phi, tk_Eta, tk_Phi);
 
     TLorentzVector tmp_p4;
@@ -471,8 +471,8 @@ void L1TkTauFromCaloProducer::GetTracksInIsolationCone(const L1TTTrackRefPtr_Col
   for ( unsigned int j=0; j < c_L1Tks.size(); j++){
     
     L1TTTrackRefPtr matchingTk = c_L1Tks.at(matchingTk_index);
-    double matchingTk_Eta      = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-    double matchingTk_Phi      = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).phi();
+    double matchingTk_Eta      = matchingTk->momentum().eta();
+    double matchingTk_Phi      = matchingTk->momentum().phi();
     
     bool bIsOwnSigTk  = std::find(sigTks_Index.begin(), sigTks_Index.end(), j) != sigTks_Index.end();
     bool bIsUsedIsoTk = std::find(isoTks_Index.begin(), isoTks_Index.end(), j) != isoTks_Index.end();
@@ -481,8 +481,8 @@ void L1TkTauFromCaloProducer::GetTracksInIsolationCone(const L1TTTrackRefPtr_Col
     
     // Is tk within a signal cone (or annulus)?
     L1TTTrackRefPtr iTk = c_L1Tks.at(j);
-    double tk_Eta       = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).eta();
-    double tk_Phi       = iTk->getMomentum(cfg_L1TTTracks_NFitParameters).phi();      
+    double tk_Eta       = iTk->momentum().eta();
+    double tk_Phi       = iTk->momentum().phi();      
     double deltaR       = reco::deltaR(tk_Eta, tk_Phi, matchingTk_Eta, matchingTk_Phi);
     bool bIsInsideCone  = (deltaR <= deltaR_max) && (deltaR >= deltaR_min);
     if (!bIsInsideCone) continue;
@@ -518,16 +518,16 @@ bool L1TkTauFromCaloProducer::GetTkTauFromCaloIsolation(const L1TTTrackRefPtr_Co
   // Get L1CaloTau matching track properties
   const int matchingTk_index    = sigTks_index.at(0);
   L1TTTrackRefPtr matchingTk    = c_L1Tks.at(matchingTk_index);
-  const double matchingTk_Pt    = matchingTk->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-  const double matchingTk_POCAz = matchingTk->getPOCA(cfg_L1TTTracks_NFitParameters).z();
+  const double matchingTk_Pt    = matchingTk->momentum().perp();
+  const double matchingTk_POCAz = matchingTk->POCA().z();
   
   // For-loop: IsoTks
   for (Size_t iTk = 0; iTk < isoTks_index.size(); iTk++) { 
     
     int isoTk_Index       = isoTks_index.at(iTk);
     L1TTTrackRefPtr isoTk = c_L1Tks.at(isoTk_Index);
-    double isoTk_Pt       = isoTk->getMomentum(cfg_L1TTTracks_NFitParameters).perp();
-    double isoTk_POCAz    = isoTk->getPOCA(cfg_L1TTTracks_NFitParameters).z();    
+    double isoTk_Pt       = isoTk->momentum().perp();
+    double isoTk_POCAz    = isoTk->POCA().z();    
 
     // Calculate isolation variables: VtxIso (no isoTks within X cm of POCAz of matchingTk)
     double deltaPOCAz     = matchingTk_POCAz - isoTk_POCAz;

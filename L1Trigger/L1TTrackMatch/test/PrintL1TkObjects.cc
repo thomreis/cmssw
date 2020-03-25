@@ -278,8 +278,8 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::cout << "      Tracks associated with the jet : " << std::endl;
         for (int it=0; it < (int)trkPtrs.size(); it++) {
             edm::Ptr< L1TTTrackType > aTrack = trkPtrs.at( it );
-            std::cout << "             a track PT " << aTrack -> getMomentum().perp() << " eta " << 
-		   aTrack -> getMomentum().eta() << " phi " << aTrack -> getMomentum().phi() << std::endl;
+            std::cout << "             a track PT " << aTrack -> momentum().perp() << " eta " << 
+		   aTrack -> momentum().eta() << " phi " << aTrack -> momentum().phi() << std::endl;
         }
 
     }
@@ -370,10 +370,10 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         const edm::Ptr< L1TTTrackType > TrkRef = eleIter -> getTrkPtr();
 	if ( TrkRef.isNonnull() ) {
-            float pt_track = TrkRef -> getMomentum().perp();
-            float phi_track = TrkRef -> getMomentum().phi();
-            float eta_track = TrkRef -> getMomentum().eta();
-            float ztrack = TrkRef -> getPOCA().z();
+            float pt_track = TrkRef -> momentum().perp();
+            float phi_track = TrkRef -> momentum().phi();
+            float eta_track = TrkRef -> momentum().eta();
+            float ztrack = TrkRef -> POCA().z();
             std::cout << "                Track PT eta phi ztr " << pt_track << " " << eta_track << " " << phi_track << " " << ztrack << std::endl;
 	}
 	else {

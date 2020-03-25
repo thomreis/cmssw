@@ -219,13 +219,13 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	if (DeltaZConstrain) {
 	// first loop over the tracks to find the leading one in DR < DRmax
 	for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
-	float Pt = trackIter->getMomentum().perp();
-	float Eta = trackIter->getMomentum().eta();
-	float Phi = trackIter->getMomentum().phi();
-	float z  = trackIter->getPOCA().z();
+	float Pt = trackIter->momentum().perp();
+	float Eta = trackIter->momentum().eta();
+	float Phi = trackIter->momentum().phi();
+	float z  = trackIter->POCA().z();
 	if (fabs(z) > ZMAX) continue;
 	if (Pt < PTMINTRA) continue;
-	float chi2 = trackIter->getChi2();
+	float chi2 = trackIter->chi2();
 	if (chi2 > CHI2MAX) continue;
 	float dr = deltaR(Eta, eta, Phi,phi);
 	if (dr < DRmax) {
@@ -240,13 +240,13 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       
       for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
 	
-	float Pt = trackIter->getMomentum().perp();
-	float Eta = trackIter->getMomentum().eta();
-	float Phi = trackIter->getMomentum().phi();
-	float z  = trackIter->getPOCA().z();
+	float Pt = trackIter->momentum().perp();
+	float Eta = trackIter->momentum().eta();
+	float Phi = trackIter->momentum().phi();
+	float z  = trackIter->POCA().z();
 	if (fabs(z) > ZMAX) continue;
 	if (Pt < PTMINTRA) continue;
-	float chi2 = trackIter->getChi2();
+	float chi2 = trackIter->chi2();
 	if (chi2 > CHI2MAX) continue;
 	
 	float dr = deltaR(Eta, eta, Phi,phi);

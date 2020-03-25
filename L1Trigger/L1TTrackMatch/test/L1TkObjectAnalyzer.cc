@@ -369,9 +369,9 @@ void L1TkObjectAnalyzer::checkTrackEfficiency(edm::Handle<L1TTTrackCollectionTyp
   L1TTTrackCollectionType::const_iterator trackIter;
   for (trackIter = tkHandle->begin(); trackIter != tkHandle->end(); 
        ++trackIter) {
-    float eta = trackIter->getMomentum().eta(); 
-    float phi = trackIter->getMomentum().phi();
-    float pt  = trackIter->getMomentum().perp(); 
+    float eta = trackIter->momentum().eta(); 
+    float phi = trackIter->momentum().phi();
+    float pt  = trackIter->momentum().perp(); 
     if (fabs(eta) < etaCutoff_ && pt > 0) {
       float dPhi = reco::deltaPhi(phi, genPhi);
       float dEta = (eta - genEta);
@@ -424,7 +424,7 @@ void L1TkObjectAnalyzer::checkEfficiency(const T1 & objCollection, const T2 & tk
   float etTkObj  = -1.0;
   for (auto tkObjIter = tkObjCollection.begin(); tkObjIter != tkObjCollection.end(); ++tkObjIter) {
     if (fabs(tkObjIter->eta()) < etaCutoff_ && tkObjIter->pt() > 0) {
-      //      if ( tkObjIter->getTrkPtr().isNonnull() && tkObjIter->getTrkPtr()->getMomentum().perp() <= trkPtCutoff_) continue;
+      //      if ( tkObjIter->getTrkPtr().isNonnull() && tkObjIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
       float dPhi = reco::deltaPhi(tkObjIter->phi(), genPhi);
       float dEta = (tkObjIter->eta() - genEta);
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);

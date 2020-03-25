@@ -124,16 +124,16 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   float zVTX = L1VertexHandle->begin()->z0();
 
   for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
-    float pt = trackIter->getMomentum().perp();
-    float phi = trackIter->getMomentum().phi();
-    float eta = trackIter->getMomentum().eta();
+    float pt = trackIter->momentum().perp();
+    float phi = trackIter->momentum().phi();
+    float eta = trackIter->momentum().eta();
     std::vector< edm::Ref< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > >  theStubs = trackIter -> getStubRefs() ;
     int nstubs = (int) theStubs.size();
 
-    float chi2 = trackIter->getChi2();
+    float chi2 = trackIter->chi2();
     float chi2dof = chi2 / (2*nstubs-4);
-    float bendchi2 = trackIter->getStubPtConsistency();
-    float z0  = trackIter->getPOCA().z();
+    float bendchi2 = trackIter->stubPtConsistency();
+    float z0  = trackIter->POCA().z();
 
     if (pt < minPt) continue;
     if (fabs(z0) > maxZ0) continue;

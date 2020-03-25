@@ -178,12 +178,12 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match(const EMTFTrackCollection&
     std::vector<int> out (l1trks.size());
     for (auto l1trkit = l1trks.begin(); l1trkit != l1trks.end(); ++l1trkit)
     {
-        float trk_pt      = l1trkit->getMomentum(nTrkPars_).perp();
-        float trk_p       = l1trkit->getMomentum(nTrkPars_).mag();
-        float trk_aeta    = std::abs(l1trkit->getMomentum(nTrkPars_).eta());
-        float trk_theta   = to_mpio2_pio2(eta_to_theta(l1trkit->getMomentum(nTrkPars_).eta()));
-        float trk_phi     = l1trkit->getMomentum(nTrkPars_).phi();
-        int   trk_charge  = (l1trkit->getRInv(nTrkPars_) > 0 ? 1 : -1);
+        float trk_pt      = l1trkit->momentum().perp();
+        float trk_p       = l1trkit->momentum().mag();
+        float trk_aeta    = std::abs(l1trkit->momentum().eta());
+        float trk_theta   = to_mpio2_pio2(eta_to_theta(l1trkit->momentum().eta()));
+        float trk_phi     = l1trkit->momentum().phi();
+        int   trk_charge  = (l1trkit->rInv() > 0 ? 1 : -1);
 
         // porting some selections from the MuonTrackCorr finder
         // https://github.com/cms-l1t-offline/cmssw/blob/l1t-phase2-932-v1.6/L1Trigger/L1TTrackMatch/plugins/L1TkMuonProducer.cc#L264
@@ -193,7 +193,7 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match(const EMTFTrackCollection&
         if (trk_aeta > max_trk_aeta_) reject_trk = true;
         if (track_qual_presel_)
         {
-            float l1tk_chi2 = l1trkit->getChi2(nTrkPars_);
+            float l1tk_chi2 = l1trkit->chi2();
             int l1tk_nstubs = l1trkit->getStubRefs().size();
             if (l1tk_chi2 >= max_trk_chi2_)    reject_trk = true;
             if (l1tk_nstubs < min_trk_nstubs_) reject_trk = true;
@@ -287,12 +287,12 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match_stub(const EMTFHitCollecti
     std::vector<int> out (l1trks.size());
     for (auto l1trkit = l1trks.begin(); l1trkit != l1trks.end(); ++l1trkit)
     {
-        float trk_pt      = l1trkit->getMomentum(nTrkPars_).perp();
-        float trk_p       = l1trkit->getMomentum(nTrkPars_).mag();
-        float trk_aeta    = std::abs(l1trkit->getMomentum(nTrkPars_).eta());
-        float trk_theta   = to_mpio2_pio2(eta_to_theta(l1trkit->getMomentum(nTrkPars_).eta()));
-        float trk_phi     = l1trkit->getMomentum(nTrkPars_).phi();
-        int   trk_charge  = (l1trkit->getRInv(nTrkPars_) > 0 ? 1 : -1);
+        float trk_pt      = l1trkit->momentum().perp();
+        float trk_p       = l1trkit->momentum().mag();
+        float trk_aeta    = std::abs(l1trkit->momentum().eta());
+        float trk_theta   = to_mpio2_pio2(eta_to_theta(l1trkit->momentum().eta()));
+        float trk_phi     = l1trkit->momentum().phi();
+        int   trk_charge  = (l1trkit->rInv() > 0 ? 1 : -1);
 
         // porting some selections from the MuonTrackCorr finder
         // https://github.com/cms-l1t-offline/cmssw/blob/l1t-phase2-932-v1.6/L1Trigger/L1TTrackMatch/plugins/L1TkMuonProducer.cc#L264
@@ -302,7 +302,7 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match_stub(const EMTFHitCollecti
         if (trk_aeta > max_trk_aeta_) reject_trk = true;
         if (track_qual_presel_)
         {
-            float l1tk_chi2 = l1trkit->getChi2(nTrkPars_);
+            float l1tk_chi2 = l1trkit->chi2();
             int l1tk_nstubs = l1trkit->getStubRefs().size();
             if (l1tk_chi2 >= max_trk_chi2_)    reject_trk = true;
             if (l1tk_nstubs < min_trk_nstubs_) reject_trk = true;
@@ -315,9 +315,10 @@ std::vector<int> L1TkMuCorrDynamicWindows::find_match_stub(const EMTFHitCollecti
         for (auto l1muit = l1mus.begin(); l1muit != l1mus.end(); ++l1muit)
         {
 
-            int hit_type = l1muit->Subsystem();
-            // match to stubs in CSC & RPC 
-            if ( hit_type != EMTFHit::kCSC && hit_type != EMTFHit::kRPC)
+            // int hit_type = l1muit->Subsystem();
+            // // match to stubs in CSC & RPC 
+            // if ( hit_type != EMTFHit::kCSC && hit_type != EMTFHit::kRPC)
+            if (  ! (l1muit->Is_CSC() ||  l1muit->Is_RPC() ) )
               continue;
             
             int hit_station = l1muit->Station();
@@ -452,8 +453,8 @@ std::vector<int> L1TkMuCorrDynamicWindows::make_unique_coll(const unsigned int &
 
     std::function<bool(int, int, const L1TTTrackCollectionType&, int)> track_less_than_proto = [](int idx1, int idx2, const L1TTTrackCollectionType& l1trkcoll, int nTrackParams)
     {
-        float pt1 = l1trkcoll.at(idx1).getMomentum(nTrackParams).perp();
-        float pt2 = l1trkcoll.at(idx2).getMomentum(nTrackParams).perp();
+        float pt1 = l1trkcoll.at(idx1).momentum().perp();
+        float pt2 = l1trkcoll.at(idx2).momentum().perp();
         return (pt1 < pt2);
     };
 

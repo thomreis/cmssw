@@ -225,12 +225,12 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
     for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
       edm::Ptr< L1TTTrackType > L1TrackPtr( L1TTTrackHandle, itr) ;
-      double trkPt_fit = trackIter->getMomentum().perp();
+      double trkPt_fit = trackIter->momentum().perp();
       double trkPt_stubs = pTFrom2Stubs::pTFrom2( trackIter, tGeom);
       double trkPt = trkPt_fit;
       if ( useTwoStubsPT ) trkPt = trkPt_stubs ;
 
-      if ( trkPt > trkQualityPtMin && trackIter->getChi2() < trkQualityChi2) {
+      if ( trkPt > trkQualityPtMin && trackIter->chi2() < trkQualityChi2) {
 	double dPhi = 99.;
 	double dR = 99.;
 	double dEta = 99.;   
@@ -344,16 +344,16 @@ L1WP2ElectronProducer::isolationTk(const edm::Handle<L1TTTrackCollectionType> & 
   int itr = 0;
   for (trackIter = trkHandle->begin(); trackIter != trkHandle->end(); ++trackIter) {
     if (itr != match_index) {   
-      float dZ = fabs(trackIter->getPOCA().z() - matchedTrkPtr->getPOCA().z() );
+      float dZ = fabs(trackIter->POCA().z() - matchedTrkPtr->POCA().z() );
     
-      float phi1 = trackIter->getMomentum().phi();
-      float phi2 = matchedTrkPtr->getMomentum().phi();
+      float phi1 = trackIter->momentum().phi();
+      float phi2 = matchedTrkPtr->momentum().phi();
       float dPhi = reco::deltaPhi(phi1, phi2);
-      float dEta = (trackIter->getMomentum().eta() - matchedTrkPtr->getMomentum().eta());
+      float dEta = (trackIter->momentum().eta() - matchedTrkPtr->momentum().eta());
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);
       
-      if (dR > DRmin && dR < DRmax && dZ < DeltaZ && trackIter->getMomentum().perp() > PTMINTRA) {
-	sumPt += trackIter->getMomentum().perp();
+      if (dR > DRmin && dR < DRmax && dZ < DeltaZ && trackIter->momentum().perp() > PTMINTRA) {
+	sumPt += trackIter->momentum().perp();
       }
     }
     itr++;
@@ -368,15 +368,15 @@ L1WP2ElectronProducer::isolationVtx(const edm::Handle<L1TTTrackCollectionType> &
   float sumPt = 0.0;
   int itr = 0;
   for (trackIter = trkHandle->begin(); trackIter != trkHandle->end(); ++trackIter) {
-    float dZ = fabs(trackIter->getPOCA().z() - zvtx);
-    float phi1 = trackIter->getMomentum().phi();
+    float dZ = fabs(trackIter->POCA().z() - zvtx);
+    float phi1 = trackIter->momentum().phi();
     float phi2 = phi;
     float dPhi = reco::deltaPhi(phi1, phi2);
-    float dEta = (trackIter->getMomentum().eta() - eta);
+    float dEta = (trackIter->momentum().eta() - eta);
     float dR =  sqrt(dPhi*dPhi + dEta*dEta);
 
-    if (dR < DRmax && dZ < DeltaZ && trackIter->getMomentum().perp() > PTMINTRA) {
-      sumPt += trackIter->getMomentum().perp();
+    if (dR < DRmax && dZ < DeltaZ && trackIter->momentum().perp() > PTMINTRA) {
+      sumPt += trackIter->momentum().perp();
     }
     itr++;
   }

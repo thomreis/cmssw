@@ -242,9 +242,9 @@ float L1TkPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TTTrackCollecti
 
   for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
 
-    float pt = trackIter->getMomentum().perp();
-    float chi2 = trackIter->getChi2();
-    float ztr  = trackIter->getPOCA().z();
+    float pt = trackIter->momentum().perp();
+    float chi2 = trackIter->chi2();
+    float ztr  = trackIter->POCA().z();
 
     if (pt < ptmin) continue;
     if (fabs(ztr) > ZMAX ) continue;

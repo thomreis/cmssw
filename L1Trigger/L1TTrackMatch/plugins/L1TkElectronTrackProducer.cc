@@ -213,12 +213,12 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     int itrack = -1;
     for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
       edm::Ptr< L1TTTrackType > L1TrackPtr( L1TTTrackHandle, itr) ;
-      double trkPt_fit = trackIter->getMomentum().perp();
+      double trkPt_fit = trackIter->momentum().perp();
       double trkPt_stubs = pTFrom2Stubs::pTFrom2( trackIter, tGeom);
       double trkPt = trkPt_fit;
       if ( useTwoStubsPT ) trkPt = trkPt_stubs ;
 
-      if ( trkPt > trkQualityPtMin && trackIter->getChi2() < trkQualityChi2) {
+      if ( trkPt > trkQualityPtMin && trackIter->chi2() < trkQualityChi2) {
         double dPhi = 99.;
         double dR = 99.;
         double dEta = 99.;
@@ -244,9 +244,9 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				  matchedL1TrackPtr,
 				  trkisol );
 
-      trkEm.setTrackCurvature(matchedL1TrackPtr->getRInv());   // should this have npars? 4? 5?
+      trkEm.setTrackCurvature(matchedL1TrackPtr->rInv());   // should this have npars? 4? 5?
 
-      //std::cout<<matchedL1TrackPtr->getRInv()<<"  "<<matchedL1TrackPtr->getRInv(4)<<"   "<<matchedL1TrackPtr->getRInv(5)<<std::endl;
+      //std::cout<<matchedL1TrackPtr->rInv()<<"  "<<matchedL1TrackPtr->rInv(4)<<"   "<<matchedL1TrackPtr->rInv()<<std::endl;
 
       if (IsoCut <= 0) {
 	// write the L1TkEm particle to the collection,
@@ -328,22 +328,22 @@ L1TkElectronTrackProducer::isolation(const edm::Handle<L1TTTrackCollectionType> 
   int itr = 0;
   for (trackIter = trkHandle->begin(); trackIter != trkHandle->end(); ++trackIter) {
     if (itr++ != match_index) {
-      if (trackIter->getChi2() > maxChi2IsoTracks ||
-          trackIter->getMomentum().perp() <= PTMINTRA ||
+      if (trackIter->chi2() > maxChi2IsoTracks ||
+          trackIter->momentum().perp() <= PTMINTRA ||
           trackIter->getStubRefs().size() < minNStubsIsoTracks) {
             continue;
           }
 
-      float dZ = fabs(trackIter->getPOCA().z() - matchedTrkPtr->getPOCA().z() );
+      float dZ = fabs(trackIter->POCA().z() - matchedTrkPtr->POCA().z() );
 
-      float phi1 = trackIter->getMomentum().phi();
-      float phi2 = matchedTrkPtr->getMomentum().phi();
+      float phi1 = trackIter->momentum().phi();
+      float phi2 = matchedTrkPtr->momentum().phi();
       float dPhi = reco::deltaPhi(phi1, phi2);
-      float dEta = (trackIter->getMomentum().eta() - matchedTrkPtr->getMomentum().eta());
+      float dEta = (trackIter->momentum().eta() - matchedTrkPtr->momentum().eta());
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);
 
-      if (dR > DRmin && dR < DRmax && dZ < DeltaZ && trackIter->getMomentum().perp() > PTMINTRA) {
-	       sumPt += trackIter->getMomentum().perp();
+      if (dR > DRmin && dR < DRmax && dZ < DeltaZ && trackIter->momentum().perp() > PTMINTRA) {
+	       sumPt += trackIter->momentum().perp();
       }
     }
   }

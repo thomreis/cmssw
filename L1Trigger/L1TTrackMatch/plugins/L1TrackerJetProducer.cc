@@ -19,7 +19,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-#include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
+#include "Geometry/CommonDetUnit/interface/PixelGeomDetUnit.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
@@ -163,15 +163,15 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   unsigned int this_l1track = 0;
   for ( iterL1Track = TTTrackHandle->begin(); iterL1Track != TTTrackHandle->end(); iterL1Track++ ) {
     ++this_l1track;
-    if(fabs(iterL1Track->getPOCA(L1Tk_nPar).z())>TRK_ZMAX)continue;
-    if(fabs(iterL1Track->getMomentum(L1Tk_nPar).eta())>TRK_ETAMAX)continue;
-    if(iterL1Track->getMomentum(L1Tk_nPar).perp()<TRK_PTMIN)continue;
+    if(fabs(iterL1Track->POCA().z())>TRK_ZMAX)continue;
+    if(fabs(iterL1Track->momentum().eta())>TRK_ETAMAX)continue;
+    if(iterL1Track->momentum().perp()<TRK_PTMIN)continue;
     std::vector< edm::Ref< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > >  theStubs = iterL1Track -> getStubRefs() ;	    if(theStubs.size()<TRK_NSTUBMIN)continue;
-    float chi2ndof=(iterL1Track->getChi2()/(2*theStubs.size() - L1Tk_nPar));
+    float chi2ndof=(iterL1Track->chi2()/(2*theStubs.size() - L1Tk_nPar));
     if(chi2ndof>TRK_CHI2MAX)continue;
     float trk_bstubPt=StubPtConsistency::getConsistency(TTTrackHandle->at(this_l1track-1), theTrackerGeom, tTopo,mMagneticFieldStrength,4);//trkPtr->getStubPtConsis
     if(trk_bstubPt>BendConsistency)continue;
-    if(doTightChi2 && (iterL1Track->getMomentum(L1Tk_nPar).perp()>20 && chi2ndof>5))continue;
+    if(doTightChi2 && (iterL1Track->momentum().perp()>20 && chi2ndof>5))continue;
     int tmp_trk_nstubPS = 0;
     for (unsigned int istub=0; istub<(unsigned int)theStubs.size(); istub++) {
       DetId detId( theStubs.at(istub)->getDetId() );
@@ -183,10 +183,10 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (tmp_isPS) tmp_trk_nstubPS++;
     }
     if(tmp_trk_nstubPS<TRK_NSTUBPSMIN)continue;
-    double DeltaZtoVtx=fabs(L1TkPrimaryVertexHandle->begin()->z0()-iterL1Track->getPOCA(L1Tk_nPar).z());
+    double DeltaZtoVtx=fabs(L1TkPrimaryVertexHandle->begin()->z0()-iterL1Track->POCA().z());
     if(DeltaZtoVtx>DeltaZ0Cut)continue;
 
-    fastjet::PseudoJet psuedoJet(iterL1Track->getMomentum().x(), iterL1Track->getMomentum().y(), iterL1Track->getMomentum().z(), iterL1Track->getMomentum().mag());
+    fastjet::PseudoJet psuedoJet(iterL1Track->momentum().x(), iterL1Track->momentum().y(), iterL1Track->momentum().z(), iterL1Track->momentum().mag());
     JetInputs.push_back(psuedoJet);	//input tracks for clustering
     JetInputs.back().set_user_index(this_l1track-1);//save track index in the collection
   }
@@ -204,8 +204,8 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       auto index =fjConstituents[i].user_index();
       edm::Ptr< L1TTTrackType > trkPtr(TTTrackHandle, index) ;
       L1TrackPtrs.push_back(trkPtr); //L1Tracks in the jet
-      sumpt=sumpt+trkPtr->getMomentum().perp();
-      avgZ=avgZ+trkPtr->getMomentum().perp()*trkPtr->getPOCA(L1Tk_nPar).z();
+      sumpt=sumpt+trkPtr->momentum().perp();
+      avgZ=avgZ+trkPtr->momentum().perp()*trkPtr->POCA().z();
     }
     avgZ=avgZ/sumpt;
     edm::Ref< JetBxCollection > jetRef ;

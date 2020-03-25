@@ -223,7 +223,8 @@ L1TkMuonStubProducer::makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>&
 
   for (auto muStub : cleanedStubs) {
 
-    if(muStub.Subsystem() != EMTFHit::kME0) continue;
+    //if(muStub.Subsystem() != EMTFHit::kME0) continue;
+    continue;
 
     
     float stubBend = muStub.Bend();
@@ -294,9 +295,9 @@ L1TkMuonStubProducer::runOnMuonHitCollection(const edm::Handle<EMTFHitCollection
       continue;
 
     const L1TTTrackType& matchTk = l1trks[il1ttrack];
-    const auto& p3 = matchTk.getMomentum(dwcorr_->get_n_trk_par());
-    const auto& tkv3 = matchTk.getPOCA(dwcorr_->get_n_trk_par());
-    const auto& curve = matchTk.getRInv( dwcorr_->get_n_trk_par());
+    const auto& p3 = matchTk.momentum();
+    const auto& tkv3 = matchTk.POCA();
+    const auto& curve = matchTk.rInv();
     float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
     math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 

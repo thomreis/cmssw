@@ -211,11 +211,11 @@ void L1TkCaloJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
         itrk++;
 
-        float tmp_trk_pt   = trackIter->getMomentum().perp();
-        float tmp_trk_eta  = trackIter->getMomentum().eta();
-        float tmp_trk_phi  = trackIter->getMomentum().phi();
-        float tmp_trk_z0   = trackIter->getPOCA().z();
-        float tmp_trk_chi2 = trackIter->getChi2();
+        float tmp_trk_pt   = trackIter->momentum().perp();
+        float tmp_trk_eta  = trackIter->momentum().eta();
+        float tmp_trk_phi  = trackIter->momentum().phi();
+        float tmp_trk_z0   = trackIter->POCA().z();
+        float tmp_trk_chi2 = trackIter->chi2();
 
         // get pointers to stubs associated to the L1 track
         std::vector< edm::Ref< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > >  theStubs = trackIter -> getStubRefs() ;
@@ -245,7 +245,7 @@ void L1TkCaloJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
         // more track selection
         if (tmp_trk_nstubPS < TRK_NSTUBPSMIN) continue;
 
-        float tmp_trk_consistency = trackIter ->getStubPtConsistency();
+        float tmp_trk_consistency = trackIter ->stubPtConsistency();
         float chi2dof = tmp_trk_chi2 / (2*tmp_trk_nstub-4);
 
         if(doPtComp) {

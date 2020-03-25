@@ -215,8 +215,8 @@ L1TkElectronAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); 
        ++trackIter) {
-    ptTrack_->Fill(trackIter->getMomentum().perp());
-    etaTrack_->Fill(trackIter->getMomentum().eta());
+    ptTrack_->Fill(trackIter->momentum().perp());
+    etaTrack_->Fill(trackIter->momentum().eta());
   }
 
   if (analysisOption_ == "Efficiency") {
@@ -249,7 +249,7 @@ void L1TkElectronAnalyzer::checkEfficiency(const edm::Handle<reco::GenParticleCo
   std::vector<L1TkElectronParticle>::const_iterator egTrkIter ;
   for (egTrkIter = l1TkElectronCollection_.begin(); egTrkIter != l1TkElectronCollection_.end(); ++egTrkIter) {
     if (fabs(egTrkIter->eta()) < etaCutoff_ && egTrkIter->pt() > 0) {
-      if ( egTrkIter->getTrkPtr().isNonnull() && egTrkIter->getTrkPtr()->getMomentum().perp() <= trkPtCutoff_) continue;
+      if ( egTrkIter->getTrkPtr().isNonnull() && egTrkIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
       float dPhi = reco::deltaPhi(egTrkIter->phi(), genPhi);
       float dEta = (egTrkIter->eta() - genEta);
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);
@@ -299,7 +299,7 @@ void L1TkElectronAnalyzer::checkRate() {
       if ( !egTrkIter->getTrkPtr().isNonnull()) continue;
 
       if (fabs(egTrkIter->eta()) < etaCutoff_ && egTrkIter->et() > 0) {
-	if ( egTrkIter->getTrkPtr()->getMomentum().perp() <= trkPtCutoff_) continue;
+	if ( egTrkIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
 									     
 	float dPhi = reco::deltaPhi(phi_ele, egTrkIter->getEGRef()->phi());
 	float dEta = (eta_ele - egTrkIter->getEGRef()->eta());

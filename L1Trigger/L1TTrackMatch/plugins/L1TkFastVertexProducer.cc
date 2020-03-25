@@ -296,10 +296,10 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
   L1TTTrackCollectionType::const_iterator trackIter;
   for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
 
-    float z  = trackIter->getPOCA().z();
-    float chi2 = trackIter->getChi2();
-    float pt = trackIter->getMomentum().perp();
-    float eta  = trackIter ->getMomentum().eta();
+    float z  = trackIter->POCA().z();
+    float chi2 = trackIter->chi2();
+    float pt = trackIter->momentum().perp();
+    float eta  = trackIter ->momentum().eta();
 
     //..............................................................    
     float wt = pow(pt,WEIGHT); // calculating the weight for tks in as pt^0,pt^1 or pt^2 based on WEIGHT
@@ -351,7 +351,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    float chi2dof = chi2 / (2*trk_nstub-4);
    
    if (doPtComp) {
-     float trk_consistency = trackIter ->getStubPtConsistency();
+     float trk_consistency = trackIter ->stubPtConsistency();
      //if (trk_nstub < 4) continue;	// done earlier
      //if (chi2 > 100.0) continue;	// done earlier
      if (trk_nstub == 4) {

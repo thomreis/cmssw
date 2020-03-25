@@ -166,22 +166,22 @@ L1TkGlbMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for (const auto& l1tk : l1tks ){
       il1tk++;
 
-      unsigned int nPars = 4;
-      if (use5ParameterFit_) nPars = 5;
-      float l1tk_pt = l1tk.getMomentum(nPars).perp();
+      // unsigned int nPars = 4;
+      // if (use5ParameterFit_) nPars = 5;
+      float l1tk_pt = l1tk.momentum().perp();
       if (l1tk_pt < PTMINTRA_) continue;
 
-      float l1tk_z  = l1tk.getPOCA(nPars).z();
+      float l1tk_z  = l1tk.POCA().z();
       if (fabs(l1tk_z) > ZMAX_) continue;
 
-      float l1tk_chi2 = l1tk.getChi2(nPars);
+      float l1tk_chi2 = l1tk.chi2();
       if (l1tk_chi2 > CHI2MAX_) continue;
 
       int l1tk_nstubs = l1tk.getStubRefs().size();
       if ( l1tk_nstubs < nStubsmin_) continue;
 
-      float l1tk_eta = l1tk.getMomentum(nPars).eta();
-      float l1tk_phi = l1tk.getMomentum(nPars).phi();
+      float l1tk_eta = l1tk.momentum().eta();
+      float l1tk_phi = l1tk.momentum().phi();
 
       float dr2 = deltaR2(l1mu_eta, l1mu_phi, l1tk_eta, l1tk_phi);
 
@@ -227,14 +227,14 @@ L1TkGlbMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (dEta < etaCut && dPhi < phiCut){
         edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, match_idx);
 
-        unsigned int nPars = 4;
-        if (use5ParameterFit_) nPars = 5;
-        auto p3 = matchTk.getMomentum(nPars);
+        // unsigned int nPars = 4;
+        // if (use5ParameterFit_) nPars = 5;
+        auto p3 = matchTk.momentum();
         float p4e = sqrt(0.105658369*0.105658369 + p3.mag2() );
 
         math::XYZTLorentzVector l1tkp4(p3.x(), p3.y(), p3.z(), p4e);
 
-        auto tkv3=matchTk.getPOCA(nPars);
+        auto tkv3=matchTk.POCA();
         math::XYZPoint v3(tkv3.x(), tkv3.y(), tkv3.z());
         float trkisol = -999;
 
@@ -269,14 +269,14 @@ L1TkGlbMuonProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 
 
 L1TkGlbMuonProducer::PropState L1TkGlbMuonProducer::propagateToGMT(const L1TkGlbMuonProducer::L1TTTrackType& tk) const {
-  auto p3 = tk.getMomentum();
+  auto p3 = tk.momentum();
   float tk_pt = p3.perp();
   float tk_p = p3.mag();
   float tk_eta = p3.eta();
   float tk_aeta = std::abs(tk_eta);
   float tk_phi = p3.phi();
-  float tk_q = tk.getRInv()>0? 1.: -1.;
-  float tk_z  = tk.getPOCA().z();
+  float tk_q = tk.rInv()>0? 1.: -1.;
+  float tk_z  = tk.POCA().z();
   if (!correctGMTPropForTkZ_) tk_z = 0;
 
   L1TkGlbMuonProducer::PropState dest;
