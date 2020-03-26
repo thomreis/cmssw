@@ -54,8 +54,8 @@ pL1TkPhotonsHGC = cms.Path( L1TkPhotonsHGC )
 from L1Trigger.L1TTrackMatch.L1TrackerJetProducer_cfi import L1TrackerJets
 pL1TrackerJets = cms.Path( L1TrackerJets)
 
-from L1Trigger.TwoLayerJets.TwoLayerJets_cfi import TwoLayerJets
-pL1TwoLayerJets = cms.Path( TwoLayerJets)
+# from L1Trigger.TwoLayerJets.TwoLayerJets_cfi import TwoLayerJets
+# pL1TwoLayerJets = cms.Path( TwoLayerJets)
 
 from L1Trigger.L1TTrackMatch.L1TkCaloJetProducer_cfi import L1TkCaloJets
 pL1TkCaloJets = cms.Path( L1TkCaloJets)
@@ -63,12 +63,12 @@ pL1TkCaloJets = cms.Path( L1TkCaloJets)
 from L1Trigger.L1TTrackMatch.L1TkPrimaryVertexProducer_cfi import L1TkPrimaryVertex
 pL1TkPrimaryVertex = cms.Path( L1TkPrimaryVertex )
 
-from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import L1TrackerEtMiss
-pL1TrkMET = cms.Path( L1TrackerEtMiss )
+# from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import L1TrackerEtMiss
+# pL1TrkMET = cms.Path( L1TrackerEtMiss )
 
-from L1Trigger.L1TTrackMatch.L1TkHTMissProducer_cfi import L1TkCaloHTMissVtx, L1TrackerHTMiss
-pL1TkCaloHTMissVtx = cms.Path( L1TkCaloHTMissVtx )
-pL1TrackerHTMiss = cms.Path( L1TrackerHTMiss )
+# from L1Trigger.L1TTrackMatch.L1TkHTMissProducer_cfi import L1TkCaloHTMissVtx, L1TrackerHTMiss
+# pL1TkCaloHTMissVtx = cms.Path( L1TkCaloHTMissVtx )
+# pL1TrackerHTMiss = cms.Path( L1TrackerHTMiss )
 
 from L1Trigger.L1TTrackMatch.L1TkMuonProducer_cfi import L1TkMuons, L1TkMuonsTP
 pL1TkMuon = cms.Path( L1TkMuons * L1TkMuonsTP )
@@ -79,10 +79,10 @@ pL1TkGlbMuon = cms.Path( L1TkGlbMuons )
 from L1Trigger.L1TTrackMatch.L1TkTauFromCaloProducer_cfi import L1TkTauFromCalo
 pL1TkTauFromCalo = cms.Path( L1TkTauFromCalo )
 
-from L1Trigger.Phase2L1Taus.L1TrkTauParticleProducer_cfi import L1TrkTaus
-L1TrackerTaus = L1TrkTaus.clone()
+# from L1Trigger.Phase2L1Taus.L1TrkTauParticleProducer_cfi import L1TrkTaus
+# L1TrackerTaus = L1TrkTaus.clone()
 
-from L1Trigger.Phase2L1Taus.L1TkEGTauParticleProducer_cfi import L1TkEGTaus
+# from L1Trigger.Phase2L1Taus.L1TkEGTauParticleProducer_cfi import L1TkEGTaus
 
-from L1Trigger.Phase2L1Taus.L1CaloTkTauParticleProducer_cfi import L1CaloTkTaus
-L1TkCaloTaus = L1CaloTkTaus.clone()
+# from L1Trigger.Phase2L1Taus.L1CaloTkTauParticleProducer_cfi import L1CaloTkTaus
+# L1TkCaloTaus = L1CaloTkTaus.clone()
