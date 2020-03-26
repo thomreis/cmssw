@@ -123,7 +123,6 @@
   <class name="edm::Wrapper<l1t::L1TkHTMissParticle>"/>
   <class name="edm::Wrapper<std::vector<l1t::L1TkHTMissParticle> >"/>
 
-  <!--
   <class name="l1t::L1TkMuonParticle" ClassVersion="20">
    <version ClassVersion="20" checksum="2252639058"/>
    <version ClassVersion="19" checksum="1627050265"/>
@@ -136,7 +135,6 @@
   <class name="std::vector<l1t::L1TkMuonParticle>"/>
   <class name="edm::Wrapper<std::vector<l1t::L1TkMuonParticle> >"/>
   <class name="edm::Ref<std::vector<l1t::L1TkMuonParticle>,l1t::L1TkMuonParticle,edm::refhelper::FindUsingAdvance<std::vector<l1t::L1TkMuonParticle>,l1t::L1TkMuonParticle> >"/>
-  -->
 
   <class name="l1t::L1TkGlbMuonParticle" ClassVersion="0">
    <version ClassVersion="0"  checksum="1258760671"/>

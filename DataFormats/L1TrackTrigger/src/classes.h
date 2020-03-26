@@ -36,8 +36,8 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticleFwd.h"
 
-//#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"
-//#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h"
 
 #include "DataFormats/L1TrackTrigger/interface/L1TkGlbMuonParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkGlbMuonParticleFwd.h"
@@ -179,12 +179,10 @@ namespace {
     edm::Wrapper<l1t::L1TkHTMissParticle> w_TkHTMiss;
     edm::Wrapper<l1t::L1TkHTMissParticleCollection> w_TkHTMissColl;
 
-    /*
     // L1TkMuonParticle
     l1t::L1TkMuonParticleCollection trkmuColl ;
     edm::Wrapper<l1t::L1TkMuonParticleCollection> w_trkmuColl;
     l1t::L1TkMuonParticleRef reftrkMu ;
-    */
 
     // L1TkGlbMuonParticle
     l1t::L1TkGlbMuonParticleCollection trkglbmuColl;
