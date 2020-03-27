@@ -1,7 +1,7 @@
 #ifndef L1TkTauEtComparator_HH
 #define L1TkTauEtComparator_HH
-#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticleFwd.h"
 
 namespace L1TkTau{
   class EtComparator {

@@ -37,12 +37,12 @@
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
 
 
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"

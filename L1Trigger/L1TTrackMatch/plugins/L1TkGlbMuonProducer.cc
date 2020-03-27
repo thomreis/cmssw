@@ -5,8 +5,8 @@
 // eventually, this should be made modular and allow to swap out different algorithms
 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkGlbMuonParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkGlbMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkGlbMuonParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkGlbMuonParticleFwd.h"
 
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"

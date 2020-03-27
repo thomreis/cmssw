@@ -36,8 +36,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 

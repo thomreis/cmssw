@@ -1,8 +1,8 @@
 #include "L1Trigger/L1THGCalUtilities/interface/HGCalTriggerNtupleBase.h"
 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
 
 class L1TriggerNtupleTkElectrons : public HGCalTriggerNtupleBase
 {

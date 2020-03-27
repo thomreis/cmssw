@@ -43,7 +43,7 @@
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
 
 using namespace l1t ;
 

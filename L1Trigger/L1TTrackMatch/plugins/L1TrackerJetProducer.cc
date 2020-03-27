@@ -25,8 +25,8 @@
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "L1Trigger/TrackTrigger/interface/StubPtConsistency.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 

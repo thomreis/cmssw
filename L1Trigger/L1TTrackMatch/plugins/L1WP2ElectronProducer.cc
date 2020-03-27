@@ -36,10 +36,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -54,7 +54,7 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
 
 #include <string>
 #include "TMath.h"

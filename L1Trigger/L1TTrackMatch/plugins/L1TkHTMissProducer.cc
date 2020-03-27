@@ -13,8 +13,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticleFwd.h"
 
 
 using namespace l1t;

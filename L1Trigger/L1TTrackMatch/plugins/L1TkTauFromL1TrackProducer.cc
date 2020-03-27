@@ -22,8 +22,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticleFwd.h"
 
 
 

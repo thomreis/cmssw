@@ -7,8 +7,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"    
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h" 
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"    
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h" 
 
 #include <unordered_map>
 

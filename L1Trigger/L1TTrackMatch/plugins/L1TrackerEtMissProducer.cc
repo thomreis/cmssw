@@ -15,8 +15,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticleFwd.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
 
 // detector geometry

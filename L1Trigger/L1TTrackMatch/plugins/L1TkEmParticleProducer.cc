@@ -21,10 +21,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 

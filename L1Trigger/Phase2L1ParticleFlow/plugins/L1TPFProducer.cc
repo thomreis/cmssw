@@ -26,8 +26,8 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"    
-#include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h" 
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"    
+#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h" 
 
 //--------------------------------------------------------------------------------------------------
 class L1TPFProducer : public edm::stream::EDProducer<> {

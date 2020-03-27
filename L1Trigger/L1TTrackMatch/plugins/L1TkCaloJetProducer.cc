@@ -19,8 +19,8 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
