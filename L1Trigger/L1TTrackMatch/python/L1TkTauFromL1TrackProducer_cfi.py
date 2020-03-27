@@ -7,6 +7,6 @@ from Configuration.StandardSequences.Reconstruction_cff import *
 
 
 L1TkTauFromL1Track = cms.EDProducer( 'L1TkTauFromL1Track' ,
-                                  L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks")
+                                  L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks")
 )
 

@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 # Candidates with Medium WP (default)
 L1TkBsCandidates = cms.EDProducer("L1TkBsCandidateProducer", 
   verbose           = cms.bool(False),
-  L1TrackInputTag   = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+  L1TrackInputTag   = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
   TrackEtaMax       = cms.double(2.5),
   TrackPtMin        = cms.double(2.0), # GeV
   ApplyTrackQuality = cms.bool(False),

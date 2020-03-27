@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 # Setup the L1TkTauFromCalo producer:
 L1TkTauFromCalo = cms.EDProducer("L1TkTauFromCaloProducer",
       L1CaloTaus_InputTag                = cms.InputTag("simCaloStage2Digis",""),
-      L1TkTracks_InputTag                = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+      L1TkTracks_InputTag                = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
       L1TkPV_InputTag                    = cms.InputTag("L1TkPrimaryVertex"),
       L1TTTracks_NFitParameters          = cms.uint32(  4    ),  # Number of fit parameters: 4 or 5? (pT, eta, phi, z0, d0)
       L1TTTracks_PtMin                   = cms.double(  2.0  ),  # Min pT applied on all L1TkTracks [GeV]

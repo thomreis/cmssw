@@ -188,15 +188,15 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 # ----  "electrons" from L1Tracks. Inclusive electrons :
 
 process.load("L1Trigger.L1TTrackMatch.L1TkElectronTrackProducer_cfi")
-process.L1TkElectrons.L1TrackInputTag = cms.InputTag("TTTracksFromTracklet","Level1TTTracks" )
-process.L1TkIsoElectrons.L1TrackInputTag = cms.InputTag("TTTracksFromTracklet","Level1TTTracks" )
+process.L1TkElectrons.L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation","Level1TTTracks" )
+process.L1TkIsoElectrons.L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation","Level1TTTracks" )
 
 process.pElectrons = cms.Path( process.L1TkElectrons + process.L1TkIsoElectrons)
 
 process.L1TrkAna = cms.EDAnalyzer( 'L1TkElectronAnalyzer' ,
     L1EGammaInputTag = cms.InputTag("simCaloStage2Digis",""),
     L1TkElectronInputTag = cms.InputTag("L1TkElectrons","EG"),
-    L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     GenParticleInputTag = cms.InputTag("genParticles",""),
     AnalysisOption   = cms.string("Efficiency"),
     EtaCutOff   = cms.double(2.5),

@@ -55,12 +55,13 @@ phase2_hgcalV10.toModify(pfClustersFromCombinedCaloHF,
 # Calorimeter part: hgcal
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromHGC3DClusters_cfi import pfClustersFromHGC3DClusters
 
-l1ParticleFlow_calo = cms.Sequence(
-    pfClustersFromL1EGClusters +
-    pfClustersFromCombinedCaloHCal +
-    pfClustersFromCombinedCaloHF +
+l1ParticleFlow_calo_Task = cms.Task(
+    pfClustersFromL1EGClusters ,
+    pfClustersFromCombinedCaloHCal ,
+    pfClustersFromCombinedCaloHF ,
     pfClustersFromHGC3DClusters
 )
+l1ParticleFlow_calo = cms.Sequence(l1ParticleFlow_calo_Task)
 
 
 # PF in the barrel
@@ -104,10 +105,11 @@ l1pfProducerBarrel = l1pfProducer.clone(
         ),
     ),
 )
-l1ParticleFlow_pf_barrel = cms.Sequence(
-    pfTracksFromL1TracksBarrel +   
+l1ParticleFlow_pf_barrel_Task = cms.Task(
+    pfTracksFromL1TracksBarrel ,   
     l1pfProducerBarrel
 )
+l1ParticleFlow_pf_barrel = cms.Sequence(l1ParticleFlow_pf_barrel_Task)
 
 
 
@@ -179,11 +181,12 @@ l1pfProducerHGCalNoTK = l1pfProducerHGCal.clone(regions = cms.VPSet(
     ),
 ))
 
-l1ParticleFlow_pf_hgcal = cms.Sequence(
-    pfTracksFromL1TracksHGCal +   
-    l1pfProducerHGCal +
+l1ParticleFlow_pf_hgcal_Task = cms.Task(
+    pfTracksFromL1TracksHGCal ,   
+    l1pfProducerHGCal ,
     l1pfProducerHGCalNoTK
 )
+l1ParticleFlow_pf_hgcal = cms.Sequence(l1ParticleFlow_pf_hgcal_Task)
 
 
 
@@ -234,9 +237,10 @@ l1pfProducerHF = l1pfProducer.clone(
         ),
     )
 )
-l1ParticleFlow_pf_hf = cms.Sequence(
+l1ParticleFlow_pf_hf_Task = cms.Task(
     l1pfProducerHF
 )
+l1ParticleFlow_pf_hf = cms.Sequence(l1ParticleFlow_pf_hf_Task)
 
 
 # PF in the TSA Region
@@ -276,3 +280,11 @@ l1ParticleFlow_proper = cms.Sequence(
 )
 
 l1ParticleFlow = cms.Sequence(l1ParticleFlow_proper)
+
+l1ParticleFlowTask = cms.Task(
+    l1ParticleFlow_calo_Task,
+    l1ParticleFlow_pf_barrel_Task,
+    l1ParticleFlow_pf_hgcal_Task,
+    l1ParticleFlow_pf_hf_Task,
+    cms.Task(l1pfCandidates)
+)

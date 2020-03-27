@@ -5,7 +5,7 @@ L1TkMuonStub = cms.EDProducer("L1TkMuonStubProducer",
     ############################################### common stuff    
     L1EMTFTrackCollectionInputTag = cms.InputTag("simEmtfDigis"),
     L1EMTFHitCollectionInputTag = cms.InputTag("simEmtfDigis"),
-    L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     ###############################################
     ############################################### TP algo
     emtfMatchAlgoVersion = cms.string( 'DynamicWindows' ), # version of matching with Trackes (string ID) :  DynamicWindows

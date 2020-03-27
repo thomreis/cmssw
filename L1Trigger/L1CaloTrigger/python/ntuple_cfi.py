@@ -7,7 +7,7 @@ ntuple_egammaEE = cms.PSet(
 
 ntuple_TTTracks = cms.PSet(
     NtupleName = cms.string('L1TriggerNtupleTrackTrigger'),
-    TTTracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks")
+    TTTracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks")
 )
 
 ntuple_tkEle = cms.PSet(

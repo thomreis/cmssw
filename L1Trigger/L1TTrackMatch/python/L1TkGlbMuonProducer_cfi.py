@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 L1TkGlbMuons = cms.EDProducer("L1TkGlbMuonProducer",
     L1MuonInputTag        = cms.InputTag("simGmtStage2Digis",""),
-    L1TrackInputTag       = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    L1TrackInputTag       = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     ETAMIN = cms.double(0),
     ETAMAX = cms.double(5.),        # no cut
     ZMAX = cms.double( 25. ),       # in cm

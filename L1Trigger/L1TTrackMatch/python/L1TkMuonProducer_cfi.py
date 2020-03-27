@@ -11,7 +11,7 @@ L1TkMuons = cms.EDProducer("L1TkMuonProducer",
     L1OMTFInputTag  = cms.InputTag("simOmtfDigis","OMTF"),
     L1EMTFInputTag  = cms.InputTag("simEmtfDigis","EMTF"),
     L1EMTFTrackCollectionInputTag = cms.InputTag("simEmtfDigis"),
-    L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     ###############################################
     ############################################### TP algo
     ETAMIN = cms.double(0),
