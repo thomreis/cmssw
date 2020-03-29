@@ -11,7 +11,7 @@ L1TkHTMissParticle::L1TkHTMissParticle(const LorentzVector& p4,
                                        int bx)
     : L1Candidate(p4), EtTot_(etTotal), jetCollectionRef_(jetCollRef), vtxRef_(avtxRef), bx_(bx) {
   if (vtxRef_.isNonnull()) {
-    float z = getVtxRef()->getZvertex();
+    float z = vtxRef()->zvertex();
     setVtx(z);
   }
 }

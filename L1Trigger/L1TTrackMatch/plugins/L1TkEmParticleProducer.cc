@@ -162,7 +162,7 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
        std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
        // by convention, the first vertex in the collection is the one that should
        // be used by default
-       zvtxL1tk = vtxIter -> getZvertex();
+       zvtxL1tk = vtxIter -> zvertex();
      }
    //}
    

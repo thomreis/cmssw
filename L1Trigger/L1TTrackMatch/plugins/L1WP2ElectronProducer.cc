@@ -204,7 +204,7 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   }
   else {
     std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
-    zvtxL1tk = vtxIter -> getZvertex();
+    zvtxL1tk = vtxIter -> zvertex();
   }
 
   int ieg = 0;

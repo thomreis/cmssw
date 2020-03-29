@@ -34,12 +34,12 @@ namespace l1t {
 
     virtual ~L1TkGlbMuonParticle() {}
 
-    const edm::Ptr<L1TTTrackType>& getTrkPtr() const { return trkPtr_; }
+    const edm::Ptr<L1TTTrackType>& trkPtr() const { return trkPtr_; }
 
-    const edm::Ref<MuonBxCollection>& getMuRef() const { return muRef_; }
+    const edm::Ref<MuonBxCollection>& muRef() const { return muRef_; }
 
-    float getTrkIsol() const { return theIsolation; }
-    float getTrkzVtx() const { return TrkzVtx_; }
+    float trkIsol() const { return theIsolation; }
+    float trkzVtx() const { return TrkzVtx_; }
 
     float dR() const { return dR_; }
     int nTracksMatched() const { return nTracksMatch_; }

@@ -37,15 +37,15 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const edm::Ref<TauBxCollection>& gettauCaloRef() const { return tauCaloRef_; }
+    const edm::Ref<TauBxCollection>& tauCaloRef() const { return tauCaloRef_; }
 
-    const edm::Ptr<L1TTTrackType>& getTrkPtr() const { return trkPtr_; }
+    const edm::Ptr<L1TTTrackType>& trkPtr() const { return trkPtr_; }
 
-    const edm::Ptr<L1TTTrackType>& getTrkPtr2() const { return trkPtr2_; }
-    const edm::Ptr<L1TTTrackType>& getTrkPtr3() const { return trkPtr3_; }
+    const edm::Ptr<L1TTTrackType>& trkPtr2() const { return trkPtr2_; }
+    const edm::Ptr<L1TTTrackType>& trkPtr3() const { return trkPtr3_; }
 
-    float getTrkzVtx() const { return TrkzVtx_; }
-    float getTrkIsol() const { return TrkIsol_; }
+    float trkzVtx() const { return TrkzVtx_; }
+    float trkIsol() const { return TrkIsol_; }
 
     // ---------- member functions ---------------------------
 

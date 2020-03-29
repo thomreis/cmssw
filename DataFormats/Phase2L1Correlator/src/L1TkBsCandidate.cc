@@ -18,14 +18,14 @@ L1TkBsCandidate::L1TkBsCandidate(const LorentzVector& p4, L1TkPhiCandidate cand1
 }
 // deltaR between the Phi pair
 double L1TkBsCandidate::dRPhiPair() const {
-  const LorentzVector& lva = getPhiCandidate(0).p4();
-  const LorentzVector& lvb = getPhiCandidate(1).p4();
+  const LorentzVector& lva = phiCandidate(0).p4();
+  const LorentzVector& lvb = phiCandidate(1).p4();
   return reco::deltaR(lva, lvb);
 }
 // position difference between track pair
 double L1TkBsCandidate::dxyPhiPair() const {
-  const L1TkPhiCandidate& phia = getPhiCandidate(0);
-  const L1TkPhiCandidate& phib = getPhiCandidate(1);
+  const L1TkPhiCandidate& phia = phiCandidate(0);
+  const L1TkPhiCandidate& phib = phiCandidate(1);
   return std::sqrt(std::pow(phia.vx() - phib.vx(), 2) + std::pow(phia.vy() - phib.vy(), 2));
 }
-double L1TkBsCandidate::dzPhiPair() const { return (getPhiCandidate(0).vz() - getPhiCandidate(1).vz()); }
+double L1TkBsCandidate::dzPhiPair() const { return (phiCandidate(0).vz() - phiCandidate(1).vz()); }

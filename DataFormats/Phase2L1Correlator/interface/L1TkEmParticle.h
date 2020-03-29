@@ -31,7 +31,7 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const edm::Ref<EGammaBxCollection>& getEGRef() const { return egRef_; }
+    const edm::Ref<EGammaBxCollection>& EGRef() const { return egRef_; }
 
     const double l1RefEta() const { return egRef_->eta(); }
 
@@ -39,9 +39,9 @@ namespace l1t {
 
     const double l1RefEt() const { return egRef_->et(); }
 
-    float getTrkIsol() const { return TrkIsol_; }  // not constrained to the PV, just track ptSum
+    float trkIsol() const { return TrkIsol_; }  // not constrained to the PV, just track ptSum
 
-    float getTrkIsolPV() const { return TrkIsolPV_; }  // constrained to the PV by DZ
+    float trkIsolPV() const { return TrkIsolPV_; }  // constrained to the PV by DZ
 
     // ---------- member functions ---------------------------
 

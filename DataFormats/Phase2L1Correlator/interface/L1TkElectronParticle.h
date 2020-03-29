@@ -35,9 +35,9 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const edm::Ptr<L1TTTrackType>& getTrkPtr() const { return trkPtr_; }
+    const edm::Ptr<L1TTTrackType>& trkPtr() const { return trkPtr_; }
 
-    float getTrkzVtx() const { return TrkzVtx_; }
+    float trkzVtx() const { return TrkzVtx_; }
     double trackCurvature() const { return trackCurvature_; }
 
     // ---------- member functions ---------------------------

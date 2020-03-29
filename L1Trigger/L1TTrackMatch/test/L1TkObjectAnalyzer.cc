@@ -96,7 +96,7 @@ private:
   void checkRate(const T1 & objCollection, const T2 & tkObjCollection);
   int findGenParticle(const edm::Handle<reco::GenParticleCollection>& genH, 
 			     float& pt, float&  eta, float& phi);
-  int getMotherParticleId(const reco::Candidate& gp);
+  int motherParticleId(const reco::Candidate& gp);
 
   int selectedL1ObjTot_;
   int selectedL1TkObjTot_;
@@ -424,7 +424,7 @@ void L1TkObjectAnalyzer::checkEfficiency(const T1 & objCollection, const T2 & tk
   float etTkObj  = -1.0;
   for (auto tkObjIter = tkObjCollection.begin(); tkObjIter != tkObjCollection.end(); ++tkObjIter) {
     if (fabs(tkObjIter->eta()) < etaCutoff_ && tkObjIter->pt() > 0) {
-      //      if ( tkObjIter->getTrkPtr().isNonnull() && tkObjIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
+      //      if ( tkObjIter->trkPtr().isNonnull() && tkObjIter->trkPtr()->momentum().perp() <= trkPtCutoff_) continue;
       float dPhi = reco::deltaPhi(tkObjIter->phi(), genPhi);
       float dEta = (tkObjIter->eta() - genEta);
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);
@@ -523,7 +523,7 @@ int L1TkObjectAnalyzer::findGenParticle(const edm::Handle<reco::GenParticleColle
     const reco::Candidate & p = (*genH)[i];
     if (abs(p.pdgId()) == pId && p.status() == 1) {
       indx=i;
-      //      if (abs(getMotherParticleId(p)) == 24) indx = i;
+      //      if (abs(motherParticleId(p)) == 24) indx = i;
       break;
     }
   }
@@ -541,7 +541,7 @@ int L1TkObjectAnalyzer::findGenParticle(const edm::Handle<reco::GenParticleColle
   }
   return indx;
 }
-int L1TkObjectAnalyzer::getMotherParticleId(const reco::Candidate& gp) {
+int L1TkObjectAnalyzer::motherParticleId(const reco::Candidate& gp) {
   int mid = -1;
   if (gp.numberOfMothers() == 0) return mid;
   const reco::Candidate* m0 = gp.mother(0);

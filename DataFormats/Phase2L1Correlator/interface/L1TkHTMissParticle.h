@@ -35,9 +35,9 @@ namespace l1t {
     double EtMissPU() const { return EtMissPU_; }
     double EtTotalPU() const { return EtTotalPU_; }
     int bx() const { return bx_; }
-    float getVtx() const { return zvtx_; }
-    const edm::RefProd<L1TkJetParticleCollection>& getjetCollectionRef() const { return jetCollectionRef_; }
-    const edm::Ref<L1TkPrimaryVertexCollection>& getVtxRef() const { return vtxRef_; }
+    float vtx() const { return zvtx_; }
+    const edm::RefProd<L1TkJetParticleCollection>& jetCollectionRef() const { return jetCollectionRef_; }
+    const edm::Ref<L1TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
 
     // ---------- member functions ---------------------------
     void setEtTotal(const double& EtTotal) { EtTot_ = EtTotal; }

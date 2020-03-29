@@ -41,7 +41,7 @@ namespace l1t {
     double etMissPU() const { return etMissPU_; }
     double etTotalPU() const { return etTotalPU_; }
     int bx() const { return bx_; }
-    const edm::Ref<L1TkPrimaryVertexCollection>& getVtxRef() const { return vtxRef_; }
+    const edm::Ref<L1TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
 
     // ---------- member functions ---------------------------
     void setEtTotal(const double& etTotal) { etTot_ = etTotal; }

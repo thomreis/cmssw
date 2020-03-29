@@ -37,16 +37,16 @@ namespace l1t
       virtual ~L1TkMuonParticle() {}
 
 
-      const edm::Ptr< L1TTTrackType >& getTrkPtr() const
+      const edm::Ptr< L1TTTrackType >& trkPtr() const
       { return trkPtr_ ; }
 
-      const edm::Ref< l1t::RegionalMuonCandBxCollection >& getMuRef() const
+      const edm::Ref< l1t::RegionalMuonCandBxCollection >& muRef() const
       { return muRef_ ; }
 
-      float getTrkIsol() const { return theIsolation; }
-      float getTrkzVtx() const { return TrkzVtx_ ; }
+      float trkIsol() const { return theIsolation; }
+      float trkzVtx() const { return TrkzVtx_ ; }
 
-      const L1MuCorrelatorHitRefVector getMatchedStubs() const { return matchedStubs_; }
+      const L1MuCorrelatorHitRefVector matchedStubs() const { return matchedStubs_; }
       float dR()  const { return dR_;}
       int nTracksMatched() const { return nTracksMatch_;}
       double trackCurvature()  const { return trackCurvature_;}

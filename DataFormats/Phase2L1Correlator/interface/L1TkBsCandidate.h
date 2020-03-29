@@ -24,7 +24,7 @@ namespace l1t {
     virtual ~L1TkBsCandidate() {}
 
     // ---------- const member functions ---------------------
-    const L1TkPhiCandidate& getPhiCandidate(size_t i) const { return phiCandList_.at(i); }
+    const L1TkPhiCandidate& phiCandidate(size_t i) const { return phiCandList_.at(i); }
 
     // ---------- member functions ---------------------------
 

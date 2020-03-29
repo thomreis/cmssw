@@ -107,7 +107,7 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
       // by convention, the first vertex in the collection is the one that should
       // be used by default
-      evt_zvtx = vtxIter->getZvertex();
+      evt_zvtx = vtxIter->zvertex();
       found_vtx = true;
       int ivtx = 0;
       edm::Ref< L1TkPrimaryVertexCollection > vtxRef( L1VertexHandle, ivtx );
@@ -126,7 +126,7 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       int ibx = jetIter->bx(); // only consider jets from the central BX
       if (ibx != 0) continue;
 
-      float tmp_jet_vtx = jetIter->getJetVtx();
+      float tmp_jet_vtx = jetIter->jetVtx();
       float tmp_jet_pt  = jetIter->pt();
       float tmp_jet_eta = jetIter->eta();
       if (tmp_jet_pt < jet_minPt) continue;
@@ -157,7 +157,7 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       float px = jetIter->px();
       float py = jetIter->py();
       float et = jetIter->et();
-      float tmp_jet_vtx = jetIter->getJetVtx();
+      float tmp_jet_vtx = jetIter->jetVtx();
       float tmp_jet_pt  = jetIter->pt();
       float tmp_jet_eta = jetIter->eta();
       if (tmp_jet_pt < jet_minPt) continue;
@@ -208,8 +208,8 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       float tmp_jet_eta = jetIter->eta();
       if (tmp_jet_pt < jet_minPt) continue;
       if (fabs(tmp_jet_eta) > jet_maxEta) continue;
-      if(jetIter->getNtracks()<minNtracksLowPt && et>50)continue;
-      if(jetIter->getNtracks()<minNtracksHighPt && et>100)continue;
+      if(jetIter->ntracks()<minNtracksLowPt && et>50)continue;
+      if(jetIter->ntracks()<minNtracksHighPt && et>100)continue;
       sumPx += px;
       sumPy += py;
       HT += tmp_jet_pt;

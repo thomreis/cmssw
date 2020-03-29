@@ -31,7 +31,7 @@ namespace l1t {
     virtual ~L1TkPhiCandidate() {}
 
     // ---------- const member functions ---------------------
-    const edm::Ptr<L1TTTrackType>& getTrkPtr(size_t i) const { return trkPtrList_.at(i); }
+    const edm::Ptr<L1TTTrackType>& trkPtr(size_t i) const { return trkPtrList_.at(i); }
 
     // ---------- member functions ---------------------------
 

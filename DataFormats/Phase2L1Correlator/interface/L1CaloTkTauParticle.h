@@ -46,15 +46,15 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const L1TTTrackRefPtr getSeedTrk() const { return clustTracks_.at(0); }
+    const L1TTTrackRefPtr seedTrk() const { return clustTracks_.at(0); }
 
-    float getVtxIso() const { return vtxIso_; }
+    float vtxIso() const { return vtxIso_; }
 
-    LorentzVector getTrackBasedP4() const { return tracksP4_; }
+    LorentzVector trackBasedP4() const { return tracksP4_; }
 
-    float getTrackBasedEt() const { return tracksP4_.Et(); }
+    float trackBasedEt() const { return tracksP4_.Et(); }
 
-    Tau getCaloTau() const { return caloTau_; }
+    Tau caloTau() const { return caloTau_; }
 
     // ---------- member functions ---------------------------
 

@@ -46,13 +46,13 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const L1TTTrackRefPtr getSeedTrk() const { return clustTracks_.at(0); }
+    const L1TTTrackRefPtr seedTrk() const { return clustTracks_.at(0); }
 
-    const std::vector<L1TTTrackRefPtr> getTrks() const { return clustTracks_; }
+    const std::vector<L1TTTrackRefPtr> trks() const { return clustTracks_; }
 
-    const std::vector<EGammaRef> getEGs() const { return clustEGs_; }
+    const std::vector<EGammaRef> EGs() const { return clustEGs_; }
 
-    float getIso() const { return iso_; }
+    float iso() const { return iso_; }
 
     // ---------- member functions ---------------------------
 

@@ -44,7 +44,7 @@ int L1TkJetParticle::bx() const {
   /*
     int dummy = -999;
     if ( jetRef_.isNonnull() ) {
-    return (getJetRef() -> bx()) ;
+    return (jetRef() -> bx()) ;
     }
     else {
     return dummy;

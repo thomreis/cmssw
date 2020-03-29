@@ -182,8 +182,8 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   /// For-loop: PVs (size should be one)
   for ( std::vector< L1TkPrimaryVertex >::const_iterator PV = h_L1TkPVs->begin();  PV != h_L1TkPVs->end(); PV++){
     
-    // PV_SumPt   = PV->getSum();
-    PV_ZVertex = PV->getZvertex();
+    // PV_SumPt   = PV->sum();
+    PV_ZVertex = PV->zvertex();
     break;
 
   } // For-Loop: PVs

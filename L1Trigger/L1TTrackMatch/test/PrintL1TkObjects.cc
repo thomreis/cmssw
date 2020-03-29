@@ -228,8 +228,8 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
      std::cout << " -----  L1TkPrimaryVertex objects   ----- " << std::endl;
      vtxIter = L1VertexHandle->begin();     // only one algorithm is run in the L1TkPrimaryVertexProducer
 					    // (in contrast to earlier, under-dev, versions of the code)
-        float z = vtxIter -> getZvertex();
-        float sum = vtxIter -> getSum();
+        float z = vtxIter -> zvertex();
+        float sum = vtxIter -> sum();
         std::cout << " a vertex with  zvtx " << z << " (cm) and SumPT " << sum << " (GeV) " << std::endl;
  }
 
@@ -246,8 +246,8 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     std::cout << " -----  L1TkEtMiss objects  -----  " << std::endl; 
     etmIter = L1TkEtMissHandle -> begin();	// idem: only one TrkMET now.
 	float etmis = etmIter -> et();
-	const edm::Ref< L1TkPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
-	float zvtx = vtxRef -> getZvertex();
+	const edm::Ref< L1TkPrimaryVertexCollection > vtxRef = etmIter -> vtxRef();
+	float zvtx = vtxRef -> zvertex();
         float etMissPU = etmIter -> etMissPU();
 	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << " and ETmiss from PU = " << etMissPU << std::endl;
  }
@@ -268,10 +268,10 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         float et = jetIter -> pt();
         float phi = jetIter -> phi();
         float eta = jetIter -> eta();
-	float jetvtx = jetIter -> getJetVtx();
-        const edm::Ref< JetBxCollection > Jetref = jetIter -> getJetRef();
+	float jetvtx = jetIter -> jetVtx();
+        const edm::Ref< JetBxCollection > Jetref = jetIter -> jetRef();
         float et_L1Jet = Jetref -> et();
-	const std::vector< edm::Ptr< L1TTTrackType > > trkPtrs = jetIter -> getTrkPtrs() ;
+	const std::vector< edm::Ptr< L1TTTrackType > > trkPtrs = jetIter -> trkPtrs() ;
 
         std::cout << " a Jet candidate ET eta phi zvertex " << et << " " << eta << " " << phi << " " << jetvtx  << std::endl;
         std::cout << "                Calo  ET, typ " << et_L1Jet << std::endl;
@@ -305,7 +305,7 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::cout << " HTT = " << HTT << " HTM = " << HTM << " " << "phi(HTM) = " << phi << std::endl;
 	 
 	// access the L1TkJets used to build HT and HTM :
-	const edm::RefProd< L1TkJetParticleCollection > jetCollRef = HTMIter -> getjetCollectionRef();
+	const edm::RefProd< L1TkJetParticleCollection > jetCollRef = HTMIter -> jetCollectionRef();
  	std::vector<L1TkJetParticle>::const_iterator jet = jetCollRef -> begin();
 	std::cout << " ET of the first L1TkJet = " << jet -> et() << std::endl;
  }
@@ -326,8 +326,8 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	float et = phoIter -> pt();
 	float phi = phoIter -> phi();
 	float eta = phoIter -> eta();
-        float trkisol = phoIter -> getTrkIsol() ;
-	const edm::Ref< EGammaBxCollection > EGref = phoIter -> getEGRef();
+        float trkisol = phoIter -> trkIsol() ;
+	const edm::Ref< EGammaBxCollection > EGref = phoIter -> EGRef();
 	float et_L1Calo = EGref -> et();
 	float eta_calo = EGref -> eta();
 	float phi_calo = EGref -> phi();
@@ -353,11 +353,11 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         float et = eleIter -> pt();
         float phi = eleIter -> phi();
         float eta = eleIter -> eta();
-    	float trkisol = eleIter -> getTrkIsol() ;
-	float ztr = eleIter -> getTrkzVtx() ;
+    	float trkisol = eleIter -> trkIsol() ;
+	float ztr = eleIter -> trkzVtx() ;
         std::cout << "an electron candidate ET eta phi trkisol ztr " << et << " " << eta << " " << phi <<  " " << trkisol << " " << ztr << std::endl;
 
-        const edm::Ref< EGammaBxCollection > EGref = eleIter -> getEGRef();
+        const edm::Ref< EGammaBxCollection > EGref = eleIter -> EGRef();
         if ( EGref.isNonnull() ) {
            float et_L1Calo = EGref -> et();
            float eta_calo = EGref -> eta();
@@ -368,7 +368,7 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    std::cout << " .... edm::Ref to EGamma is unvalid !! ?  " << std::endl;
 	}
 
-        const edm::Ptr< L1TTTrackType > TrkRef = eleIter -> getTrkPtr();
+        const edm::Ptr< L1TTTrackType > TrkRef = eleIter -> trkPtr();
 	if ( TrkRef.isNonnull() ) {
             float pt_track = TrkRef -> momentum().perp();
             float phi_track = TrkRef -> momentum().phi();
@@ -397,7 +397,7 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         float pt = muIter -> pt();
         float eta = muIter -> eta();
         float phi = muIter -> phi();
-        float zvtx = muIter -> getTrkzVtx();
+        float zvtx = muIter -> trkzVtx();
         std::cout << " a muon candidate pt eta phi " << pt << " " << eta << " " << phi << " zvertex = " << zvtx << std::endl;
     }
  }
@@ -417,7 +417,7 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         float pt = tauIter -> pt();
         float eta = tauIter -> eta();
         float phi = tauIter -> phi();
-        float zvtx = tauIter -> getTrkzVtx();
+        float zvtx = tauIter -> trkzVtx();
         std::cout << " a tai candidate pt eta phi " << pt << " " << eta << " " << phi << " zvertex = " << zvtx << std::endl;
 
     }

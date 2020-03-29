@@ -173,14 +173,14 @@ void L1TkBsCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup&
       int icounters[] { 0, 0, 0, 0, 0 };
       for (size_t i = 0; i < phiColl.size(); ++i) {
 	const auto& phia = phiColl[i]; 
-	const auto& trka_1 = phia.getTrkPtr(0);
-	const auto& trka_2 = phia.getTrkPtr(1);
+	const auto& trka_1 = phia.trkPtr(0);
+	const auto& trka_2 = phia.trkPtr(1);
 	double drTrkPhia = phia.dRTrkPair();
 	
 	for (size_t j = i+1; j < phiColl.size(); ++j) {
 	  const auto& phib = phiColl[j]; 
-	  const auto& trkb_1 = phib.getTrkPtr(0);
-	  const auto& trkb_2 = phib.getTrkPtr(1);
+	  const auto& trkb_1 = phib.trkPtr(0);
+	  const auto& trkb_2 = phib.trkPtr(1);
 	  
 	  // The same track should not end up in both the Phi's under consideration
 	  if (trka_1 == trkb_1 || trka_1 == trkb_2 || trka_2 == trkb_1 || trka_2 == trkb_2) continue;

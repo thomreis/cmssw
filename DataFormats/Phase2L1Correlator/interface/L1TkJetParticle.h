@@ -39,19 +39,19 @@ namespace l1t {
 
     // ---------- const member functions ---------------------
 
-    const edm::Ref<JetBxCollection>& getJetRef() const { return jetRef_; }
+    const edm::Ref<JetBxCollection>& jetRef() const { return jetRef_; }
 
-    const std::vector<edm::Ptr<L1TTTrackType> >& getTrkPtrs() const { return trkPtrs_; }
+    const std::vector<edm::Ptr<L1TTTrackType> >& trkPtrs() const { return trkPtrs_; }
 
-    float getJetVtx() const { return JetVtx_; }
-    unsigned int getNtracks() const { return ntracks_; }
-    unsigned int getNTighttracks() const { return tighttracks_; }
-    unsigned int getNDisptracks() const { return displacedtracks_; }
-    unsigned int getNTightDisptracks() const { return tightdisplacedtracks_; }
+    float jetVtx() const { return JetVtx_; }
+    unsigned int ntracks() const { return ntracks_; }
+    unsigned int nTighttracks() const { return tighttracks_; }
+    unsigned int nDisptracks() const { return displacedtracks_; }
+    unsigned int nTightDisptracks() const { return tightdisplacedtracks_; }
 
     // ---------- member functions ---------------------------
     //     void setDispCounters(L1TkJetParticleDisp counters){ counters_=counters;};
-    //   L1TkJetParticleDisp getDispCounters() const { return counters_;};
+    //   L1TkJetParticleDisp dispCounters() const { return counters_;};
     void setJetVtx(float JetVtx) { JetVtx_ = JetVtx; }
 
     int bx() const;

@@ -78,8 +78,8 @@ fill(const edm::Event& e, const edm::EventSetup& es)
     tkEle_energy_.emplace_back(tkele_itr.energy());
     tkEle_eta_.emplace_back(tkele_itr.eta());
     tkEle_phi_.emplace_back(tkele_itr.phi());
-    tkEle_hwQual_.emplace_back(tkele_itr.getEGRef()->hwQual());
-    tkEle_tkIso_.emplace_back(tkele_itr.getTrkIsol());
+    tkEle_hwQual_.emplace_back(tkele_itr.EGRef()->hwQual());
+    tkEle_tkIso_.emplace_back(tkele_itr.trkIsol());
   }
 }
 

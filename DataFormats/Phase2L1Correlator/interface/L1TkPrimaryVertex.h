@@ -8,18 +8,18 @@ namespace l1t {
 
   class L1TkPrimaryVertex {
   public:
-    L1TkPrimaryVertex() : zvertex(-999), sum(-999) {}
+    L1TkPrimaryVertex() : zvertex_(-999), sum_(-999) {}
 
     ~L1TkPrimaryVertex() {}
 
-    L1TkPrimaryVertex(float z, float s) : zvertex(z), sum(s) {}
+    L1TkPrimaryVertex(float z, float s) : zvertex_(z), sum_(s) {}
 
-    float getZvertex() const { return zvertex; }
-    float getSum() const { return sum; }
+    float zvertex() const { return zvertex_; }
+    float sum() const { return sum_; }
 
   private:
-    float zvertex;
-    float sum;
+    float zvertex_;
+    float sum_;
   };
 
 #include <vector>

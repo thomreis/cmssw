@@ -9,11 +9,11 @@ using namespace l1t;
 
 L1TkGlbMuonParticle::L1TkGlbMuonParticle(const LorentzVector& p4,
                                          const edm::Ref<MuonBxCollection>& muRef,
-                                         const edm::Ptr<L1TTTrackType>& trkPtr,
+                                         const edm::Ptr<L1TTTrackType>& trackPtr,
                                          float tkisol)
-    : L1Candidate(p4), muRef_(muRef), trkPtr_(trkPtr), theIsolation(tkisol), TrkzVtx_(999), quality_(999) {
+    : L1Candidate(p4), muRef_(muRef), trkPtr_(trackPtr), theIsolation(tkisol), TrkzVtx_(999), quality_(999) {
   if (trkPtr_.isNonnull()) {
-    float z = getTrkPtr()->POCA().z();
+    float z = trkPtr()->POCA().z();
     setTrkzVtx(z);
   }
 }

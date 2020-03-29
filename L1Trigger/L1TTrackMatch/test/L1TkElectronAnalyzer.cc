@@ -88,7 +88,7 @@ private:
   int matchEGWithGenParticle(const edm::Handle<reco::GenParticleCollection>& genH, 
 			     float& pt, float&  eta, float& phi);
   int matchEGWithSimTrack( const edm::Handle<edm::SimTrackContainer> & simH);
-  int getMotherParticleId(const reco::Candidate& gp);
+  int motherParticleId(const reco::Candidate& gp);
 
   int selectedEGTot_;
   int selectedEGTrkTot_;
@@ -249,7 +249,7 @@ void L1TkElectronAnalyzer::checkEfficiency(const edm::Handle<reco::GenParticleCo
   std::vector<L1TkElectronParticle>::const_iterator egTrkIter ;
   for (egTrkIter = l1TkElectronCollection_.begin(); egTrkIter != l1TkElectronCollection_.end(); ++egTrkIter) {
     if (fabs(egTrkIter->eta()) < etaCutoff_ && egTrkIter->pt() > 0) {
-      if ( egTrkIter->getTrkPtr().isNonnull() && egTrkIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
+      if ( egTrkIter->trkPtr().isNonnull() && egTrkIter->trkPtr()->momentum().perp() <= trkPtCutoff_) continue;
       float dPhi = reco::deltaPhi(egTrkIter->phi(), genPhi);
       float dEta = (egTrkIter->eta() - genEta);
       float dR =  sqrt(dPhi*dPhi + dEta*dEta);
@@ -296,17 +296,17 @@ void L1TkElectronAnalyzer::checkRate() {
     float iso_min = 999.0; 
     std::vector<L1TkElectronParticle>::const_iterator egTrkIter ;
     for (egTrkIter = l1TkElectronCollection_.begin(); egTrkIter != l1TkElectronCollection_.end(); ++egTrkIter) {
-      if ( !egTrkIter->getTrkPtr().isNonnull()) continue;
+      if ( !egTrkIter->trkPtr().isNonnull()) continue;
 
       if (fabs(egTrkIter->eta()) < etaCutoff_ && egTrkIter->et() > 0) {
-	if ( egTrkIter->getTrkPtr()->momentum().perp() <= trkPtCutoff_) continue;
+	if ( egTrkIter->trkPtr()->momentum().perp() <= trkPtCutoff_) continue;
 									     
-	float dPhi = reco::deltaPhi(phi_ele, egTrkIter->getEGRef()->phi());
-	float dEta = (eta_ele - egTrkIter->getEGRef()->eta());
+	float dPhi = reco::deltaPhi(phi_ele, egTrkIter->EGRef()->phi());
+	float dEta = (eta_ele - egTrkIter->EGRef()->eta());
 	float dR =  sqrt(dPhi*dPhi + dEta*dEta);
 	if (dR < dRmin) {
 	  dRmin = dR;
-          iso_min = egTrkIter->getTrkIsol();	
+          iso_min = egTrkIter->trkIsol();	
 	  et_min = egTrkIter->et();
 	}
       }
@@ -355,7 +355,7 @@ int L1TkElectronAnalyzer::matchEGWithGenParticle(const edm::Handle<reco::GenPart
     const reco::Candidate & p = (*genH)[i];
     if (abs(p.pdgId()) == 11 && p.status() == 1) {
       indx=1;
-      //      if (abs(getMotherParticleId(p)) == 24) indx = i;
+      //      if (abs(motherParticleId(p)) == 24) indx = i;
       break;
     }
   }
@@ -406,7 +406,7 @@ void L1TkElectronAnalyzer::scaleHistogram(TH1F* th, float fac){
     th->SetBinError(i, err*fac);
   }
 }
-int L1TkElectronAnalyzer::getMotherParticleId(const reco::Candidate& gp) {
+int L1TkElectronAnalyzer::motherParticleId(const reco::Candidate& gp) {
   int mid = -1;
   if (gp.numberOfMothers() == 0) return mid;
   const reco::Candidate* m0 = gp.mother(0);
