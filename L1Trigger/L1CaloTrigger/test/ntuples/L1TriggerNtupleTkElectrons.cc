@@ -1,8 +1,8 @@
 #include "L1Trigger/L1THGCalUtilities/interface/HGCalTriggerNtupleBase.h"
 
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
 
 class L1TriggerNtupleTkElectrons : public HGCalTriggerNtupleBase
 {
@@ -44,7 +44,7 @@ void
 L1TriggerNtupleTkElectrons::
 initialize(TTree& tree, const edm::ParameterSet& conf, edm::ConsumesCollector&& collector)
 {
-  tkEle_token_ = collector.consumes<l1t::L1TkElectronParticleCollection>(conf.getParameter<edm::InputTag>("TkElectrons"));
+  tkEle_token_ = collector.consumes<l1t::TkElectronCollection>(conf.getParameter<edm::InputTag>("TkElectrons"));
   branch_name_prefix_ = conf.getUntrackedParameter<std::string>("BranchNamePrefix", "tkEle");
 
   tree.Branch((branch_name_prefix_+"_n").c_str(),      &tkEle_n_, (branch_name_prefix_+"_n/I").c_str());
@@ -65,9 +65,9 @@ fill(const edm::Event& e, const edm::EventSetup& es)
 {
 
   // retrieve towers
-  edm::Handle<l1t::L1TkElectronParticleCollection> tkEle_h;
+  edm::Handle<l1t::TkElectronCollection> tkEle_h;
   e.getByToken(tkEle_token_, tkEle_h);
-  const l1t::L1TkElectronParticleCollection& tkEle_collection = *tkEle_h;
+  const l1t::TkElectronCollection& tkEle_collection = *tkEle_h;
 
 
   // triggerTools_.eventSetup(es);

@@ -26,8 +26,8 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"    
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h" 
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"    
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h" 
 
 //--------------------------------------------------------------------------------------------------
 class L1TPFProducer : public edm::stream::EDProducer<> {
@@ -49,7 +49,7 @@ class L1TPFProducer : public edm::stream::EDProducer<> {
         edm::EDGetTokenT<std::vector<l1t::Vertex>> extVtx_;
 
         edm::EDGetTokenT<l1t::MuonBxCollection> muCands_; // standalone muons
-        edm::EDGetTokenT<l1t::L1TkMuonParticleCollection> tkMuCands_;         // tk muons
+        edm::EDGetTokenT<l1t::TkMuonCollection> tkMuCands_;         // tk muons
 
         std::vector<edm::EDGetTokenT<l1t::PFClusterCollection>> emCands_;
         std::vector<edm::EDGetTokenT<l1t::PFClusterCollection>> hadCands_;
@@ -87,7 +87,7 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
     trkMaxChi2_(iConfig.getParameter<double>("trkMaxChi2")),
     trkMinStubs_(iConfig.getParameter<unsigned>("trkMinStubs")),
     muCands_(consumes<l1t::MuonBxCollection>(iConfig.getParameter<edm::InputTag>("muons"))),
-    tkMuCands_(consumes<l1t::L1TkMuonParticleCollection>(iConfig.getParameter<edm::InputTag>("tkMuons"))),
+    tkMuCands_(consumes<l1t::TkMuonCollection>(iConfig.getParameter<edm::InputTag>("tkMuons"))),
     emPtCut_(iConfig.getParameter<double>("emPtCut")),
     hadPtCut_(iConfig.getParameter<double>("hadPtCut")),
     l1regions_(iConfig),
@@ -221,10 +221,10 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
 
     if(useTrackerMuons_) {
-        edm::Handle<l1t::L1TkMuonParticleCollection> muons;
+        edm::Handle<l1t::TkMuonCollection> muons;
     	iEvent.getByToken(tkMuCands_, muons);
     	for (auto it = muons->begin(), ed = muons->end(); it != ed; ++it) {
-    	    const l1t::L1TkMuonParticle & mu = *it;
+    	    const l1t::TkMuon & mu = *it;
     	    if (debugR_ > 0 && deltaR(mu.eta(),mu.phi(),debugEta_,debugPhi_) > debugR_) continue;
     	    l1regions_.addMuon(mu);  // FIXME add a l1t::PFCandidate::MuonRef
     	}

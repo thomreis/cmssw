@@ -7,8 +7,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"    
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h" 
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"    
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h" 
 
 #include <unordered_map>
 
@@ -21,7 +21,7 @@ namespace l1tpf_impl {
         // add object, without tracking references
         void addTrack( const l1t::PFTrack & t ) ;
         void addMuon( const l1t::Muon & t );
-        void addMuon( const l1t::L1TkMuonParticle & t );
+        void addMuon( const l1t::TkMuon & t );
         void addCalo( const l1t::PFCluster & t ); 
         void addEmCalo( const l1t::PFCluster & t ); 
 

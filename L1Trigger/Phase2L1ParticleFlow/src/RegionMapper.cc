@@ -91,7 +91,7 @@ void RegionMapper::addMuon( const l1t::Muon &mu ) {
 }
 
 
-void RegionMapper::addMuon( const l1t::L1TkMuonParticle &mu) {
+void RegionMapper::addMuon( const l1t::TkMuon &mu) {
     // now let's be optimistic and make things very simple
     // we don't propagate anything
     for (Region &r : regions_) {
