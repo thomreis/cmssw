@@ -1,38 +1,38 @@
-#ifndef L1TkTrigger_L1GlbMuonParticle_h
-#define L1TkTrigger_L1GlbMuonParticle_h
+#ifndef TkTrigger_L1GlbMuon_h
+#define TkTrigger_L1GlbMuon_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkGlbMuonParticle
+// Class  :     TkGlbMuon
 
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/Ptr.h"
 
-#include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
+//#include "DataFormats/L1Trigger/interface/L1EmFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
 
 #include "DataFormats/L1Trigger/interface/Muon.h"
 
 namespace l1t {
-  class L1TkGlbMuonParticle : public L1Candidate {
+  class TkGlbMuon : public L1Candidate {
   public:
     typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
     typedef std::vector<L1TTTrackType> L1TTTrackCollection;
 
-    L1TkGlbMuonParticle() : theIsolation(-999.), TrkzVtx_(999.), quality_(999) {}
+    TkGlbMuon() : theIsolation(-999.), TrkzVtx_(999.), quality_(999) {}
 
-    L1TkGlbMuonParticle(const LorentzVector& p4,
+    TkGlbMuon(const LorentzVector& p4,
                         const edm::Ref<MuonBxCollection>& muRef,
                         const edm::Ptr<L1TTTrackType>& trkPtr,
                         float tkisol = -999.);
 
     //! more basic constructor, in case refs/ptrs can't be set or to be set separately
-    L1TkGlbMuonParticle(const L1Candidate& cand)
+    TkGlbMuon(const L1Candidate& cand)
         : L1Candidate(cand), theIsolation(-999.), TrkzVtx_(999.), quality_(999) {}
 
-    virtual ~L1TkGlbMuonParticle() {}
+    virtual ~TkGlbMuon() {}
 
     const edm::Ptr<L1TTTrackType>& trkPtr() const { return trkPtr_; }
 

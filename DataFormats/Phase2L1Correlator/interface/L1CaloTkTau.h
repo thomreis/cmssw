@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1CaloTkTauParticle_h
-#define L1TkTrigger_L1CaloTkTauParticle_h
+#ifndef TkTrigger_L1CaloTkTau_h
+#define TkTrigger_L1CaloTkTau_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1CaloTkTauParticle
+// Class  :     L1CaloTkTau
 //
 
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
@@ -18,31 +18,31 @@
 
 namespace l1t {
 
-  class L1CaloTkTauParticle;
+  class L1CaloTkTau;
 
-  typedef std::vector<L1CaloTkTauParticle> L1CaloTkTauParticleCollection;
+  typedef std::vector<L1CaloTkTau> L1CaloTkTauCollection;
 
-  typedef edm::Ref<L1CaloTkTauParticleCollection> L1CaloTkTauParticleRef;
-  typedef edm::RefVector<L1CaloTkTauParticleCollection> L1CaloTkTauParticleRefVector;
-  typedef std::vector<L1CaloTkTauParticleRef> L1CaloTkTauParticleVectorRef;
+  typedef edm::Ref<L1CaloTkTauCollection> L1CaloTkTauRef;
+  typedef edm::RefVector<L1CaloTkTauCollection> L1CaloTkTauRefVector;
+  typedef std::vector<L1CaloTkTauRef> L1CaloTkTauVectorRef;
 
   typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
   typedef std::vector<L1TTTrackType> L1TTTrackCollection;
   typedef edm::Ptr<L1TTTrackType> L1TTTrackRefPtr;
   typedef std::vector<L1TTTrackRefPtr> L1TTTrackRefPtr_Collection;
 
-  class L1CaloTkTauParticle : public L1Candidate {
+  class L1CaloTkTau : public L1Candidate {
   public:
-    L1CaloTkTauParticle();
+    L1CaloTkTau();
 
-    L1CaloTkTauParticle(const LorentzVector& p4,  // caloTau calibrated p4
+    L1CaloTkTau(const LorentzVector& p4,  // caloTau calibrated p4
                         const LorentzVector& tracksP4,
                         const std::vector<L1TTTrackRefPtr>& clustTracks,
                         Tau& caloTau,
                         float vtxIso = -999.);
     //float Et = -999. ); // calibrated Et
 
-    virtual ~L1CaloTkTauParticle() {}
+    virtual ~L1CaloTkTau() {}
 
     // ---------- const member functions ---------------------
 

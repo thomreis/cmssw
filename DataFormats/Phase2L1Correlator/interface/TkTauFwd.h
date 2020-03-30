@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1TauParticleFwd_h
-#define L1TkTrigger_L1TauParticleFwd_h
+#ifndef TkTrigger_L1TauFwd_h
+#define TkTrigger_L1TauFwd_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkTauParticleFwd
+// Class  :     TkTauFwd
 //
 
 #include <vector>
@@ -13,13 +13,13 @@
 
 namespace l1t {
 
-  class L1TkTauParticle;
+  class TkTau;
 
-  typedef std::vector<L1TkTauParticle> L1TkTauParticleCollection;
+  typedef std::vector<TkTau> TkTauCollection;
 
-  typedef edm::Ref<L1TkTauParticleCollection> L1TkTauParticleRef;
-  typedef edm::RefVector<L1TkTauParticleCollection> L1TkTauParticleRefVector;
-  typedef std::vector<L1TkTauParticleRef> L1TkTauParticleVectorRef;
+  typedef edm::Ref<TkTauCollection> TkTauRef;
+  typedef edm::RefVector<TkTauCollection> TkTauRefVector;
+  typedef std::vector<TkTauRef> TkTauVectorRef;
 }  // namespace l1t
 
 #endif

@@ -1,20 +1,20 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEmParticle
+// Class  :     TkEm
 //
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
 
 using namespace l1t;
 
-L1TkElectronParticle::L1TkElectronParticle() {}
+TkElectron::TkElectron() {}
 
-L1TkElectronParticle::L1TkElectronParticle(const LorentzVector& p4,
+TkElectron::TkElectron(const LorentzVector& p4,
                                            const edm::Ref<EGammaBxCollection>& egRef,
                                            const edm::Ptr<L1TTTrackType>& trackPtr,
                                            float tkisol)
-    : L1TkEmParticle(p4, egRef, tkisol, -999),
+    : TkEm(p4, egRef, tkisol, -999),
       trkPtr_(trackPtr)
 
 {

@@ -1,10 +1,10 @@
-#ifndef L1TrackTrigger_L1TkPhiCandidate_h
-#define L1TrackTrigger_L1TkPhiCandidate_h
+#ifndef L1TrackTrigger_TkPhiCandidate_h
+#define L1TrackTrigger_TkPhiCandidate_h
 
 // -*- C++ -*-
 //
 // Package:     DataFormats/L1TrackTrigger
-// Class:       L1TkPhiCandidate
+// Class:       TkPhiCandidate
 //
 
 #include "DataFormats/Common/interface/Ref.h"
@@ -15,7 +15,7 @@
 
 namespace l1t {
 
-  class L1TkPhiCandidate : public L1Candidate {
+  class TkPhiCandidate : public L1Candidate {
   public:
     static constexpr double kmass = 0.493;            // GeV
     static constexpr double phi_polemass = 1.019445;  // GeV
@@ -23,12 +23,12 @@ namespace l1t {
     using L1TTTrackType = TTTrack<Ref_Phase2TrackerDigi_>;
     using L1TTTrackCollection = std::vector<L1TTTrackType>;
 
-    L1TkPhiCandidate();
-    L1TkPhiCandidate(const LorentzVector& p4,
+    TkPhiCandidate();
+    TkPhiCandidate(const LorentzVector& p4,
                      const edm::Ptr<L1TTTrackType>& trkPtr1,
                      const edm::Ptr<L1TTTrackType>& trkPtr2);
 
-    virtual ~L1TkPhiCandidate() {}
+    virtual ~TkPhiCandidate() {}
 
     // ---------- const member functions ---------------------
     const edm::Ptr<L1TTTrackType>& trkPtr(size_t i) const { return trkPtrList_.at(i); }

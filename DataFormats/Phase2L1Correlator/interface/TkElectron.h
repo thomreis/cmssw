@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1ElectronParticle_h
-#define L1TkTrigger_L1ElectronParticle_h
+#ifndef TkTrigger_L1Electron_h
+#define TkTrigger_L1Electron_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEmParticle
+// Class  :     TkEm
 //
 
 #include "DataFormats/Common/interface/Ref.h"
@@ -12,26 +12,26 @@
 
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
 
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 
 namespace l1t {
 
-  class L1TkElectronParticle : public L1TkEmParticle {
+  class TkElectron : public TkEm {
   public:
     typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
     typedef std::vector<L1TTTrackType> L1TTTrackCollection;
 
-    L1TkElectronParticle();
+    TkElectron();
 
-    L1TkElectronParticle(const LorentzVector& p4,
+    TkElectron(const LorentzVector& p4,
                          const edm::Ref<EGammaBxCollection>& egRef,
                          const edm::Ptr<L1TTTrackType>& trkPtr,
                          float tkisol = -999.);
 
-    virtual ~L1TkElectronParticle() {}
+    virtual ~TkElectron() {}
 
     // ---------- const member functions ---------------------
 

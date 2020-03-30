@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1GlbMuonParticleFwd_h
-#define L1TkTrigger_L1GlbMuonParticleFwd_h
+#ifndef TkTrigger_L1GlbMuonFwd_h
+#define TkTrigger_L1GlbMuonFwd_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkGlbMuonParticleFwd
+// Class  :     TkGlbMuonFwd
 //
 
 #include <vector>
@@ -13,13 +13,13 @@
 
 namespace l1t {
 
-  class L1TkGlbMuonParticle;
+  class TkGlbMuon;
 
-  typedef std::vector<L1TkGlbMuonParticle> L1TkGlbMuonParticleCollection;
+  typedef std::vector<TkGlbMuon> TkGlbMuonCollection;
 
-  typedef edm::Ref<L1TkGlbMuonParticleCollection> L1TkGlbMuonParticleRef;
-  typedef edm::RefVector<L1TkGlbMuonParticleCollection> L1TkGlbMuonParticleRefVector;
-  typedef std::vector<L1TkGlbMuonParticleRef> L1TkGlbMuonParticleVectorRef;
+  typedef edm::Ref<TkGlbMuonCollection> TkGlbMuonRef;
+  typedef edm::RefVector<TkGlbMuonCollection> TkGlbMuonRefVector;
+  typedef std::vector<TkGlbMuonRef> TkGlbMuonVectorRef;
 }  // namespace l1t
 
 #endif

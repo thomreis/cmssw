@@ -1,13 +1,13 @@
-#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkHTMiss.h"
 
 using namespace l1t;
 
-L1TkHTMissParticle::L1TkHTMissParticle() {}
+TkHTMiss::TkHTMiss() {}
 
-L1TkHTMissParticle::L1TkHTMissParticle(const LorentzVector& p4,
+TkHTMiss::TkHTMiss(const LorentzVector& p4,
                                        const double& etTotal,
-                                       const edm::RefProd<L1TkJetParticleCollection>& jetCollRef,
-                                       const edm::Ref<L1TkPrimaryVertexCollection>& avtxRef,
+                                       const edm::RefProd<TkJetCollection>& jetCollRef,
+                                       const edm::Ref<TkPrimaryVertexCollection>& avtxRef,
                                        int bx)
     : L1Candidate(p4), EtTot_(etTotal), jetCollectionRef_(jetCollRef), vtxRef_(avtxRef), bx_(bx) {
   if (vtxRef_.isNonnull()) {

@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1EmParticle_h
-#define L1TkTrigger_L1EmParticle_h
+#ifndef TkTrigger_L1Em_h
+#define TkTrigger_L1Em_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEmParticle
+// Class  :     TkEm
 //
 
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
@@ -16,18 +16,18 @@
 
 namespace l1t {
 
-  class L1TkEmParticle : public L1Candidate {
+  class TkEm : public L1Candidate {
   public:
-    L1TkEmParticle();
+    TkEm();
 
-    L1TkEmParticle(const LorentzVector& p4, const edm::Ref<EGammaBxCollection>& egRef, float tkisol = -999.);
+    TkEm(const LorentzVector& p4, const edm::Ref<EGammaBxCollection>& egRef, float tkisol = -999.);
 
-    L1TkEmParticle(const LorentzVector& p4,
+    TkEm(const LorentzVector& p4,
                    const edm::Ref<EGammaBxCollection>& egRef,
                    float tkisol = -999.,
                    float tkisolPV = -999);
 
-    virtual ~L1TkEmParticle() {}
+    virtual ~TkEm() {}
 
     // ---------- const member functions ---------------------
 

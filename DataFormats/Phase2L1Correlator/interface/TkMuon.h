@@ -1,5 +1,5 @@
-#ifndef L1TkTrigger_L1MuonParticle_h
-#define L1TkTrigger_L1MuonParticle_h
+#ifndef TkTrigger_L1Muon_h
+#define TkTrigger_L1Muon_h
 
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
 #include "DataFormats/Common/interface/Ref.h"
@@ -10,30 +10,30 @@
 
 namespace l1t
 {
-  class L1TkMuonParticle : public L1Candidate
+  class TkMuon : public L1Candidate
   {
     public:
 
     typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
     typedef std::vector< L1TTTrackType > L1TTTrackCollection;
 
-  L1TkMuonParticle() : theIsolation(-999.), TrkzVtx_(999.), quality_(999),pattern_(0) {}
+  TkMuon() : theIsolation(-999.), TrkzVtx_(999.), quality_(999),pattern_(0) {}
 
-      L1TkMuonParticle( const LorentzVector& p4,
+      TkMuon( const LorentzVector& p4,
    		        const edm::Ref< l1t::RegionalMuonCandBxCollection >& muRef,
 		        const edm::Ptr< L1TTTrackType >& trkPtr,
 		        float tkisol = -999. );
 
       //One more constructor for Tracker+ Stubs algorithm not requiring the Muon candidate
-      L1TkMuonParticle( const LorentzVector& p4,
+      TkMuon( const LorentzVector& p4,
 		        const edm::Ptr< L1TTTrackType >& trkPtr,
 		        float tkisol = -999. );
 
       
       //! more basic constructor, in case refs/ptrs can't be set or to be set separately
-      L1TkMuonParticle(const L1Candidate& cand) : L1Candidate(cand), theIsolation(-999.), TrkzVtx_(999.), quality_(999) {}
+      TkMuon(const L1Candidate& cand) : L1Candidate(cand), theIsolation(-999.), TrkzVtx_(999.), quality_(999) {}
 
-      virtual ~L1TkMuonParticle() {}
+      virtual ~TkMuon() {}
 
 
       const edm::Ptr< L1TTTrackType >& trkPtr() const

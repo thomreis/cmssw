@@ -1,7 +1,7 @@
-#ifndef L1TkTrigger_L1TkEtMissParticle_h
-#define L1TkTrigger_L1TkEtMissParticle_h
+#ifndef TkTrigger_TkEtMiss_h
+#define TkTrigger_TkEtMiss_h
 // Package:     L1Trigger
-// Class  :     L1TkEtMissParticle
+// Class  :     TkEtMiss
 // Original Author:  E. Perez
 //         Created:  Nov 14, 2013
 
@@ -9,22 +9,22 @@
 // user include files
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
 #include "DataFormats/Common/interface/Ref.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 
 namespace l1t {
-  class L1TkEtMissParticle : public L1Candidate {
+  class TkEtMiss : public L1Candidate {
   public:
     enum EtMissType { kMET, kMHT, kNumTypes };
-    L1TkEtMissParticle();
-    L1TkEtMissParticle(const LorentzVector& p4,
+    TkEtMiss();
+    TkEtMiss(const LorentzVector& p4,
                        EtMissType type,
                        const double& etTotal,
                        const double& etMissPU,
                        const double& etTotalPU,
-                       const edm::Ref<L1TkPrimaryVertexCollection>& aVtxRef = edm::Ref<L1TkPrimaryVertexCollection>(),
+                       const edm::Ref<TkPrimaryVertexCollection>& aVtxRef = edm::Ref<TkPrimaryVertexCollection>(),
                        int bx = 0);
 
-    L1TkEtMissParticle(const LorentzVector& p4,
+    TkEtMiss(const LorentzVector& p4,
                        EtMissType type,
                        const double& etTotal,
                        const double& etMissPU,
@@ -41,7 +41,7 @@ namespace l1t {
     double etMissPU() const { return etMissPU_; }
     double etTotalPU() const { return etTotalPU_; }
     int bx() const { return bx_; }
-    const edm::Ref<L1TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
+    const edm::Ref<TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
 
     // ---------- member functions ---------------------------
     void setEtTotal(const double& etTotal) { etTot_ = etTotal; }
@@ -53,7 +53,7 @@ namespace l1t {
     double etTot_;
     double etMissPU_;
     double etTotalPU_;
-    edm::Ref<L1TkPrimaryVertexCollection> vtxRef_;
+    edm::Ref<TkPrimaryVertexCollection> vtxRef_;
     int bx_;
   };
 }  // namespace l1t

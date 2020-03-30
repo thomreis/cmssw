@@ -1,19 +1,19 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEmParticle
+// Class  :     TkEm
 //
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
 
 using namespace l1t;
 
-L1TkEmParticle::L1TkEmParticle() {}
+TkEm::TkEm() {}
 
-L1TkEmParticle::L1TkEmParticle(const LorentzVector& p4, const edm::Ref<EGammaBxCollection>& egRef, float tkisol)
+TkEm::TkEm(const LorentzVector& p4, const edm::Ref<EGammaBxCollection>& egRef, float tkisol)
     : L1Candidate(p4), egRef_(egRef), TrkIsol_(tkisol), TrkIsolPV_(-999) {}
 
-L1TkEmParticle::L1TkEmParticle(const LorentzVector& p4,
+TkEm::TkEm(const LorentzVector& p4,
                                const edm::Ref<EGammaBxCollection>& egRef,
                                float tkisol,
                                float tkisolPV)

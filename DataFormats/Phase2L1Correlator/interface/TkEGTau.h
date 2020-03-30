@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1TkEGTauParticle_h
-#define L1TkTrigger_L1TkEGTauParticle_h
+#ifndef TkTrigger_TkEGTau_h
+#define TkTrigger_TkEGTau_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEGTauParticle
+// Class  :     TkEGTau
 //
 
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
@@ -18,13 +18,13 @@
 
 namespace l1t {
 
-  class L1TkEGTauParticle;
+  class TkEGTau;
 
-  typedef std::vector<L1TkEGTauParticle> L1TkEGTauParticleCollection;
+  typedef std::vector<TkEGTau> TkEGTauCollection;
 
-  typedef edm::Ref<L1TkEGTauParticleCollection> L1TkEGTauParticleRef;
-  typedef edm::RefVector<L1TkEGTauParticleCollection> L1TkEGTauParticleRefVector;
-  typedef std::vector<L1TkEGTauParticleRef> L1TkEGTauParticleVectorRef;
+  typedef edm::Ref<TkEGTauCollection> TkEGTauRef;
+  typedef edm::RefVector<TkEGTauCollection> TkEGTauRefVector;
+  typedef std::vector<TkEGTauRef> TkEGTauVectorRef;
 
   typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
   typedef std::vector<L1TTTrackType> L1TTTrackCollection;
@@ -33,16 +33,16 @@ namespace l1t {
   typedef edm::Ref<EGammaBxCollection> EGammaRef;
   typedef std::vector<EGammaRef> EGammaVectorRef;
 
-  class L1TkEGTauParticle : public L1Candidate {
+  class TkEGTau : public L1Candidate {
   public:
-    L1TkEGTauParticle();
+    TkEGTau();
 
-    L1TkEGTauParticle(const LorentzVector& p4,
+    TkEGTau(const LorentzVector& p4,
                       const std::vector<L1TTTrackRefPtr>& clustTracks,
                       const std::vector<EGammaRef>& clustEGs,
                       float iso = -999.);
 
-    virtual ~L1TkEGTauParticle() {}
+    virtual ~TkEGTau() {}
 
     // ---------- const member functions ---------------------
 

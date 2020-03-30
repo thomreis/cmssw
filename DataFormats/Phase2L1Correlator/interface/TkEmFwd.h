@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1EmParticleFwd_h
-#define L1TkTrigger_L1EmParticleFwd_h
+#ifndef TkTrigger_L1EmFwd_h
+#define TkTrigger_L1EmFwd_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEmParticleFwd
+// Class  :     TkEmFwd
 //
 
 #include <vector>
@@ -13,13 +13,13 @@
 
 namespace l1t {
 
-  class L1TkEmParticle;
+  class TkEm;
 
-  typedef std::vector<L1TkEmParticle> L1TkEmParticleCollection;
+  typedef std::vector<TkEm> TkEmCollection;
 
-  typedef edm::Ref<L1TkEmParticleCollection> L1TkEmParticleRef;
-  typedef edm::RefVector<L1TkEmParticleCollection> L1TkEmParticleRefVector;
-  typedef std::vector<L1TkEmParticleRef> L1TkEmParticleVectorRef;
+  typedef edm::Ref<TkEmCollection> TkEmRef;
+  typedef edm::RefVector<TkEmCollection> TkEmRefVector;
+  typedef std::vector<TkEmRef> TkEmVectorRef;
 }  // namespace l1t
 
 #endif

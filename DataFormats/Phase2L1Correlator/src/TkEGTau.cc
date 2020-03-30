@@ -1,16 +1,16 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkEGTauParticle
+// Class  :     TkEGTau
 //
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEGTauParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEGTau.h"
 
 using namespace l1t;
 
-L1TkEGTauParticle::L1TkEGTauParticle() {}
+TkEGTau::TkEGTau() {}
 
-L1TkEGTauParticle::L1TkEGTauParticle(const LorentzVector& p4,
+TkEGTau::TkEGTau(const LorentzVector& p4,
                                      const std::vector<L1TTTrackRefPtr>& clustTracks,
                                      const std::vector<EGammaRef>& clustEGs,
                                      float iso)

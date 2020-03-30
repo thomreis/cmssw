@@ -1,10 +1,10 @@
-#ifndef L1TkTrigger_L1ElectronParticleFwd_h
-#define L1TkTrigger_L1ElectronParticleFwd_h
+#ifndef TkTrigger_L1ElectronFwd_h
+#define TkTrigger_L1ElectronFwd_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkElectronParticleFwd
+// Class  :     TkElectronFwd
 //
 
 #include <vector>
@@ -12,12 +12,12 @@
 #include "DataFormats/Common/interface/RefVector.h"
 
 namespace l1t {
-  class L1TkElectronParticle;
+  class TkElectron;
 
-  typedef std::vector<L1TkElectronParticle> L1TkElectronParticleCollection;
+  typedef std::vector<TkElectron> TkElectronCollection;
 
-  typedef edm::Ref<L1TkElectronParticleCollection> L1TkElectronParticleRef;
-  typedef edm::RefVector<L1TkElectronParticleCollection> L1TkElectronParticleRefVector;
-  typedef std::vector<L1TkElectronParticleRef> L1TkElectronParticleVectorRef;
+  typedef edm::Ref<TkElectronCollection> TkElectronRef;
+  typedef edm::RefVector<TkElectronCollection> TkElectronRefVector;
+  typedef std::vector<TkElectronRef> TkElectronVectorRef;
 }  // namespace l1t
 #endif

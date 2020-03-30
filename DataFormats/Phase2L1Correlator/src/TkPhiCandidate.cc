@@ -1,15 +1,15 @@
 // -*- C++ -*-
 //
 // Package:     DataFormats/L1TrackTrigger
-// Class  :     L1TkPhiCandidate
+// Class  :     TkPhiCandidate
 //
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPhiCandidate.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidate.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 using namespace l1t;
 
-L1TkPhiCandidate::L1TkPhiCandidate() {}
-L1TkPhiCandidate::L1TkPhiCandidate(const LorentzVector& p4,
+TkPhiCandidate::TkPhiCandidate() {}
+TkPhiCandidate::TkPhiCandidate(const LorentzVector& p4,
                                    const edm::Ptr<L1TTTrackType>& trkPtr1,
                                    const edm::Ptr<L1TTTrackType>& trkPtr2)
     : L1Candidate(p4) {
@@ -17,7 +17,7 @@ L1TkPhiCandidate::L1TkPhiCandidate(const LorentzVector& p4,
   trkPtrList_.push_back(trkPtr2);
 }
 // deltaR between track pair
-double L1TkPhiCandidate::dRTrkPair() const {
+double TkPhiCandidate::dRTrkPair() const {
   const edm::Ptr<L1TTTrackType>& itrk = trkPtr(0);
   const edm::Ptr<L1TTTrackType>& jtrk = trkPtr(1);
 
@@ -29,16 +29,16 @@ double L1TkPhiCandidate::dRTrkPair() const {
 }
 
 // difference from nominal mass
-double L1TkPhiCandidate::dmass() const { return std::fabs(phi_polemass - mass()); }
+double TkPhiCandidate::dmass() const { return std::fabs(phi_polemass - mass()); }
 // position difference between track pair
-double L1TkPhiCandidate::dxyTrkPair() const {
+double TkPhiCandidate::dxyTrkPair() const {
   const edm::Ptr<L1TTTrackType>& itrk = trkPtr(0);
   const edm::Ptr<L1TTTrackType>& jtrk = trkPtr(1);
 
   return std::sqrt(std::pow(itrk->POCA().x() - jtrk->POCA().x(), 2) +
                    std::pow(itrk->POCA().y() - jtrk->POCA().y(), 2));
 }
-double L1TkPhiCandidate::dzTrkPair() const { return (trkPtr(0)->POCA().z() - trkPtr(1)->POCA().z()); }
-double L1TkPhiCandidate::vx() const { return 0.5 * (trkPtr(0)->POCA().x() + trkPtr(1)->POCA().x()); }
-double L1TkPhiCandidate::vy() const { return 0.5 * (trkPtr(0)->POCA().y() + trkPtr(1)->POCA().y()); }
-double L1TkPhiCandidate::vz() const { return 0.5 * (trkPtr(0)->POCA().z() + trkPtr(1)->POCA().z()); }
+double TkPhiCandidate::dzTrkPair() const { return (trkPtr(0)->POCA().z() - trkPtr(1)->POCA().z()); }
+double TkPhiCandidate::vx() const { return 0.5 * (trkPtr(0)->POCA().x() + trkPtr(1)->POCA().x()); }
+double TkPhiCandidate::vy() const { return 0.5 * (trkPtr(0)->POCA().y() + trkPtr(1)->POCA().y()); }
+double TkPhiCandidate::vz() const { return 0.5 * (trkPtr(0)->POCA().z() + trkPtr(1)->POCA().z()); }

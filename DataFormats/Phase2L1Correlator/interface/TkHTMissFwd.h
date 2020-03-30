@@ -1,7 +1,7 @@
-#ifndef L1TkTrigger_L1TkHTMissParticleFwd_h
-#define L1TkTrigger_L1TkHTMissParticleFwd_h
+#ifndef TkTrigger_TkHTMissFwd_h
+#define TkTrigger_TkHTMissFwd_h
 // Package:     L1Trigger
-// Class  :     L1TkHTMissParticleFwd
+// Class  :     TkHTMissFwd
 
 // system include files
 // user include files
@@ -12,12 +12,12 @@
 #include "DataFormats/Common/interface/RefVector.h"
 
 namespace l1t {
-  class L1TkHTMissParticle;
-  typedef std::vector<L1TkHTMissParticle> L1TkHTMissParticleCollection;
-  //typedef edm::RefProd< L1TkHTMissParticle > L1TkHTMissParticleRefProd ;
-  //typedef edm::Ref< L1TkHTMissParticleCollection > L1TkHTMissParticleRef ;
-  //typedef edm::RefVector< L1TkHTMissParticleCollection > L1TkHTMissParticleRefVector ;
-  //typedef std::vector< L1TkHTMissParticleRef > L1TkHTMissParticleVectorRef ;
+  class TkHTMiss;
+  typedef std::vector<TkHTMiss> TkHTMissCollection;
+  //typedef edm::RefProd< TkHTMiss > TkHTMissRefProd ;
+  //typedef edm::Ref< TkHTMissCollection > TkHTMissRef ;
+  //typedef edm::RefVector< TkHTMissCollection > TkHTMissRefVector ;
+  //typedef std::vector< TkHTMissRef > TkHTMissVectorRef ;
 }  // namespace l1t
 
 #endif

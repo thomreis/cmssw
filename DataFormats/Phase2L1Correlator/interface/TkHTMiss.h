@@ -1,7 +1,7 @@
-#ifndef L1TkTrigger_L1TkHTMissParticle_h
-#define L1TkTrigger_L1TkHTMissParticle_h
+#ifndef TkTrigger_TkHTMiss_h
+#define TkTrigger_TkHTMiss_h
 // Package:     L1Trigger
-// Class  :     L1TkHTMissParticle
+// Class  :     TkHTMiss
 // Original Author:  E. Perez
 //         Created:  Nov 14, 2013
 
@@ -11,19 +11,19 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/Ref.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJet.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJetFwd.h"
 
 namespace l1t {
-  class L1TkHTMissParticle : public L1Candidate {
+  class TkHTMiss : public L1Candidate {
   public:
-    L1TkHTMissParticle();
-    L1TkHTMissParticle(
+    TkHTMiss();
+    TkHTMiss(
         const LorentzVector& p4,
         const double& EtTotal,
-        const edm::RefProd<L1TkJetParticleCollection>& jetCollRef = edm::RefProd<L1TkJetParticleCollection>(),
-        const edm::Ref<L1TkPrimaryVertexCollection>& aVtxRef = edm::Ref<L1TkPrimaryVertexCollection>(),
+        const edm::RefProd<TkJetCollection>& jetCollRef = edm::RefProd<TkJetCollection>(),
+        const edm::Ref<TkPrimaryVertexCollection>& aVtxRef = edm::Ref<TkPrimaryVertexCollection>(),
         int bx = 0);
 
     // ---------- const member functions ---------------------
@@ -36,8 +36,8 @@ namespace l1t {
     double EtTotalPU() const { return EtTotalPU_; }
     int bx() const { return bx_; }
     float vtx() const { return zvtx_; }
-    const edm::RefProd<L1TkJetParticleCollection>& jetCollectionRef() const { return jetCollectionRef_; }
-    const edm::Ref<L1TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
+    const edm::RefProd<TkJetCollection>& jetCollectionRef() const { return jetCollectionRef_; }
+    const edm::Ref<TkPrimaryVertexCollection>& vtxRef() const { return vtxRef_; }
 
     // ---------- member functions ---------------------------
     void setEtTotal(const double& EtTotal) { EtTot_ = EtTotal; }
@@ -53,8 +53,8 @@ namespace l1t {
     double EtMissPU_;   // HTM form jets that don't come from zvtx
     double EtTotalPU_;  // HT from jets that don't come from zvtx
 
-    edm::RefProd<L1TkJetParticleCollection> jetCollectionRef_;
-    edm::Ref<L1TkPrimaryVertexCollection> vtxRef_;
+    edm::RefProd<TkJetCollection> jetCollectionRef_;
+    edm::Ref<TkPrimaryVertexCollection> vtxRef_;
 
     int bx_;
   };

@@ -1,15 +1,15 @@
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEtMiss.h"
 
 using namespace l1t;
 
-L1TkEtMissParticle::L1TkEtMissParticle() {}
+TkEtMiss::TkEtMiss() {}
 
-L1TkEtMissParticle::L1TkEtMissParticle(const LorentzVector& p4,
+TkEtMiss::TkEtMiss(const LorentzVector& p4,
                                        EtMissType type,
                                        const double& etTotal,
                                        const double& etMissPU,
                                        const double& etTotalPU,
-                                       const edm::Ref<L1TkPrimaryVertexCollection>& avtxRef,
+                                       const edm::Ref<TkPrimaryVertexCollection>& avtxRef,
                                        int bx)
     : L1Candidate(p4),
       type_(type),
@@ -19,7 +19,7 @@ L1TkEtMissParticle::L1TkEtMissParticle(const LorentzVector& p4,
       vtxRef_(avtxRef),
       bx_(bx) {}
 
-L1TkEtMissParticle::L1TkEtMissParticle(const LorentzVector& p4,
+TkEtMiss::TkEtMiss(const LorentzVector& p4,
                                        EtMissType type,
                                        const double& etTotal,
                                        const double& etMissPU,

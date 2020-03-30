@@ -1,13 +1,13 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TkGlbMuonParticle
+// Class  :     TkGlbMuon
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkGlbMuonParticle.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkGlbMuon.h"
 
 using namespace l1t;
 
-L1TkGlbMuonParticle::L1TkGlbMuonParticle(const LorentzVector& p4,
+TkGlbMuon::TkGlbMuon(const LorentzVector& p4,
                                          const edm::Ref<MuonBxCollection>& muRef,
                                          const edm::Ptr<L1TTTrackType>& trackPtr,
                                          float tkisol)
