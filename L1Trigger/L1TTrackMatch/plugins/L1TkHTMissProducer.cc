@@ -13,8 +13,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkHTMiss.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkHTMissFwd.h"
 
 
 using namespace l1t;
@@ -37,8 +37,8 @@ class L1TkHTMissProducer : public edm::EDProducer {
     bool PrimaryVtxConstrain;       // use event primary vertex instead of leading jet (if DoVtxConstrain)
     bool UseCaloJets;            // Determines whether or not calo jets are used
     float DeltaZ;                   // for jets [cm] (if DoTvxConstrain)
-    const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
-    const edm::EDGetTokenT< L1TkJetParticleCollection > jetToken;
+    const edm::EDGetTokenT< TkPrimaryVertexCollection > pvToken;
+    const edm::EDGetTokenT< TkJetCollection > jetToken;
     unsigned int minNtracksHighPt;
     unsigned int minNtracksLowPt;
 
@@ -48,8 +48,8 @@ class L1TkHTMissProducer : public edm::EDProducer {
 //constructor//
 ///////////////
 L1TkHTMissProducer::L1TkHTMissProducer(const edm::ParameterSet& iConfig) :
-  pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
-  jetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkJetInputTag")))
+  pvToken(consumes<TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
+  jetToken(consumes<TkJetCollection>(iConfig.getParameter<edm::InputTag>("TkJetInputTag")))
 {
   jet_minPt  = (float)iConfig.getParameter<double>("jet_minPt");
   jet_maxEta = (float)iConfig.getParameter<double>("jet_maxEta");
@@ -59,8 +59,8 @@ L1TkHTMissProducer::L1TkHTMissProducer(const edm::ParameterSet& iConfig) :
   DeltaZ              = (float)iConfig.getParameter<double>("DeltaZ");
   minNtracksHighPt=iConfig.getParameter<int>("jet_minNtracksHighPt");
   minNtracksLowPt=iConfig.getParameter<int>("jet_minNtracksLowPt");       
-  if (UseCaloJets) produces<L1TkHTMissParticleCollection>("L1TkCaloHTMiss");
-  else produces<L1TkHTMissParticleCollection>("L1TrackerHTMiss");
+  if (UseCaloJets) produces<TkHTMissCollection>("TkCaloHTMiss");
+  else produces<TkHTMissCollection>("L1TrackerHTMiss");
 }
 
 //////////////
@@ -75,20 +75,20 @@ L1TkHTMissProducer::~L1TkHTMissProducer() {
 void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
 
-  std::unique_ptr<L1TkHTMissParticleCollection> MHTCollection(new L1TkHTMissParticleCollection);
+  std::unique_ptr<TkHTMissCollection> MHTCollection(new TkHTMissCollection);
 
   // L1 primary vertex
-  edm::Handle<L1TkPrimaryVertexCollection> L1VertexHandle;
+  edm::Handle<TkPrimaryVertexCollection> L1VertexHandle;
   iEvent.getByToken(pvToken, L1VertexHandle);
-  std::vector<L1TkPrimaryVertex>::const_iterator vtxIter;
+  std::vector<TkPrimaryVertex>::const_iterator vtxIter;
 
   // L1 track-trigger jets
-  edm::Handle<L1TkJetParticleCollection> L1TkJetsHandle;
+  edm::Handle<TkJetCollection> L1TkJetsHandle;
   iEvent.getByToken(jetToken, L1TkJetsHandle);
-  std::vector<L1TkJetParticle>::const_iterator jetIter;
+  std::vector<TkJet>::const_iterator jetIter;
 
   if ( ! L1TkJetsHandle.isValid() ) {
-    LogError("L1TkHTMissProducer")<< "\nWarning: L1TkJetParticleCollection not found in the event. Exit"<< std::endl;
+    LogError("TkHTMissProducer")<< "\nWarning: TkJetCollection not found in the event. Exit"<< std::endl;
     return;
   }
 
@@ -97,20 +97,20 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   // ----------------------------------------------------------------------------------------------
   float evt_zvtx = 999;
   bool found_vtx = false;
-  edm::Ref< L1TkPrimaryVertexCollection > L1VtxRef; 	// null reference
+  edm::Ref< TkPrimaryVertexCollection > L1VtxRef; 	// null reference
   if ( DoVtxConstrain && PrimaryVtxConstrain && UseCaloJets) {
     if( !L1VertexHandle.isValid() ) {
-      LogError("L1TkHTMissProducer")<< "\nWarning: L1TkPrimaryVertexCollection not found in the event. Exit."<< std::endl;
+      LogError("L1TkHTMissProducer")<< "\nWarning: TkPrimaryVertexCollection not found in the event. Exit."<< std::endl;
       return ;
     }
     else {
-      std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
+      std::vector<TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
       // by convention, the first vertex in the collection is the one that should
       // be used by default
       evt_zvtx = vtxIter->zvertex();
       found_vtx = true;
       int ivtx = 0;
-      edm::Ref< L1TkPrimaryVertexCollection > vtxRef( L1VertexHandle, ivtx );
+      edm::Ref< TkPrimaryVertexCollection > vtxRef( L1VertexHandle, ivtx );
       L1VtxRef = vtxRef;
     }
   } //endif PrimaryVtxConstrain
@@ -177,8 +177,8 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     // define missing HT
     float et = sqrt(sumPx_calo*sumPx_calo + sumPy_calo*sumPy_calo);
     math::XYZTLorentzVector missingEt(-sumPx_calo, -sumPy_calo, 0, et);
-    edm::RefProd<L1TkJetParticleCollection> jetCollRef(L1TkJetsHandle);
-    L1TkHTMissParticle tkHTM(missingEt, HT_calo, jetCollRef, L1VtxRef);
+    edm::RefProd<TkJetCollection> jetCollRef(L1TkJetsHandle);
+    TkHTMiss tkHTM(missingEt, HT_calo, jetCollRef, L1VtxRef);
 
     if (DoVtxConstrain && !PrimaryVtxConstrain) {
       tkHTM.setVtx(evt_zvtx);
@@ -218,8 +218,8 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     // define missing HT
     float et = sqrt(sumPx*sumPx + sumPy*sumPy);
     math::XYZTLorentzVector missingEt(-sumPx, -sumPy, 0, et);
-    edm::RefProd<L1TkJetParticleCollection> jetCollRef(L1TkJetsHandle);
-    L1TkHTMissParticle tkHTM(missingEt, HT, jetCollRef, L1VtxRef);
+    edm::RefProd<TkJetCollection> jetCollRef(L1TkJetsHandle);
+    TkHTMiss tkHTM(missingEt, HT, jetCollRef, L1VtxRef);
 
     MHTCollection->push_back(tkHTM);
     iEvent.put( std::move(MHTCollection), "L1TrackerHTMiss" );

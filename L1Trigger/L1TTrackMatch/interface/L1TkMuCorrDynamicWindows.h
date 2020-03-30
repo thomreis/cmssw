@@ -13,8 +13,8 @@
 // #include "MuTkTree.h" // my interface to the ntuples
 #include "TMath.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1TMuon/interface/EMTFTrack.h"
 

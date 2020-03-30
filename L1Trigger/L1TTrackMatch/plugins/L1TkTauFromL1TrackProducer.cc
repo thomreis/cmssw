@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 //
-// Producer for a L1TkTauParticle from Track seeds.
+// Producer for a TkTau from Track seeds.
 //
 // 
 
@@ -22,8 +22,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTau.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTauFwd.h"
 
 
 
@@ -86,7 +86,7 @@ L1TkTauFromL1TrackProducer::L1TkTauFromL1TrackProducer(const edm::ParameterSet& 
 {
 
 
-  produces<L1TkTauParticleCollection>();
+  produces<TkTauCollection>();
 
 }
 
@@ -102,7 +102,7 @@ L1TkTauFromL1TrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
 
 
 
-  std::unique_ptr<L1TkTauParticleCollection> result(new L1TkTauParticleCollection);
+  std::unique_ptr<TkTauCollection> result(new TkTauCollection);
 
 
   // L1 tracks
@@ -192,7 +192,7 @@ L1TkTauFromL1TrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
       edm::Ptr< L1TTTrackType > L1TrackPtrNull3;     //  null pointer
       edm::Ref< TauBxCollection > tauCaloRef; // null pointer
 
-      L1TkTauParticle trkTau( p4[i],
+      TkTau trkTau( p4[i],
 			      tauCaloRef,
 			      l1tracks[i],
 			      L1TrackPtrNull2,
@@ -278,7 +278,7 @@ L1TkTauFromL1TrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
     if (minRelIso<0.25) {
       edm::Ref< TauBxCollection > tauCaloRef; // null pointer
       
-      L1TkTauParticle trkTau( p4[i]+p4[jmin]+p4[kmin],
+      TkTau trkTau( p4[i]+p4[jmin]+p4[kmin],
 			      tauCaloRef,
 			      l1tracks[i],
 			      l1tracks[jmin],

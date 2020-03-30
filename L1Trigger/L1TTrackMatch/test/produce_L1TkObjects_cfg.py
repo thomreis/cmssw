@@ -73,7 +73,7 @@ process.slhccalo = cms.Path( process.RawToDigi + process.valHcalTriggerPrimitive
         # L1Reco. The (Run-1) L1EG algorithm has already been
         # run in the DIGI step of the production.
 process.load('Configuration.StandardSequences.L1Reco_cff')
-process.L1Reco = cms.Path( process.l1extraParticles )
+process.L1Reco = cms.Path( process.l1extras )
 
 
 # ----    Produce the L1EGCrystal clusters (code of Sasha Savin & Nick Smith)
@@ -100,11 +100,11 @@ process.es_prefer_dt = cms.ESPrefer("DTConfigTrivialProducer","L1DTConfig")
 
 # ---------------------------------------------------------------------------
 
-# Now we produce L1TkEmParticles and L1TkElectrons
+# Now we produce TkEms and TkElectrons
 
 # ----  "photons" isolated w.r.t. L1Tracks :
 
-process.load("SLHCUpgradeSimulations.L1TrackTrigger.L1TkEmParticleProducer_cfi")
+process.load("SLHCUpgradeSimulations.L1TrackTrigger.TkEmProducer_cfi")
 process.pL1TkPhotons = cms.Path( process.L1TkPhotons )
 
 # ---- "photons", tighter isolation working point  -  e.g. for SinglePhoton trigger
@@ -135,8 +135,8 @@ process.pElectronsTkIsoLoose = cms.Path( process.L1TkIsoElectronsLoose )
 # ---------------------------------------------------------------------------
 # --- L1TkMET
 
-process.load("SLHCUpgradeSimulations.L1TrackTrigger.L1TkPrimaryVertexProducer_cfi")
-process.pL1TkPrimaryVertex = cms.Path( process.L1TkPrimaryVertex )
+process.load("SLHCUpgradeSimulations.L1TrackTrigger.TkPrimaryVertexProducer_cfi")
+process.pTkPrimaryVertex = cms.Path( process.TkPrimaryVertex )
 
 process.load("SLHCUpgradeSimulations.L1TrackTrigger.L1TrackerEtMissProducer_cfi")
 process.pL1TrkMET = cms.Path( process.L1TrackerEtMiss )
@@ -193,13 +193,13 @@ process.Out.outputCommands.append('keep *_l1TkMuonsExt*_*_*')
 
 
         # the L1EG objects
-process.Out.outputCommands.append('keep *_SLHCL1ExtraParticles_*_*' )
-process.Out.outputCommands.append('keep *_SLHCL1ExtraParticlesNewClustering_*_*')
-process.Out.outputCommands.append('keep l1extraL1Em*_l1extraParticles_*_*')
+process.Out.outputCommands.append('keep *_SLHCL1Extras_*_*' )
+process.Out.outputCommands.append('keep *_SLHCL1ExtrasNewClustering_*_*')
+process.Out.outputCommands.append('keep l1extraL1Em*_l1extras_*_*')
                 # for crystal-level granularity :
 process.Out.outputCommands.append('keep *_L1EGammaCrystalsProducer_*_*')
 #process.Out.outputCommands.append('keep *_l1ExtraCrystalProducer_*_*')
-        # the L1TkEmParticles
+        # the TkEms
 process.Out.outputCommands.append('keep *_L1TkPhotons_*_*')
         # the L1TkElectrons
 process.Out.outputCommands.append('keep *_L1TkElectrons_*_*')
@@ -208,8 +208,8 @@ process.Out.outputCommands.append('keep *_L1TkElectronsLoose_*_*')
 process.Out.outputCommands.append('keep *_L1TkIsoElectronsLoose_*_*')
 
 
-        # the L1TkPrimaryVertex
-process.Out.outputCommands.append('keep *_L1TkPrimaryVertex_*_*')
+        # the TkPrimaryVertex
+process.Out.outputCommands.append('keep *_TkPrimaryVertex_*_*')
         # the TrkMET
 process.Out.outputCommands.append('keep *_L1TrackerEtMiss*_*_*')
         # the calo-based L1MET
@@ -217,7 +217,7 @@ process.Out.outputCommands.append('keep *_l1extraParticles_MET_*')
 
 	# TkTaus
 process.Out.outputCommands.append('keep *_L1TkEmTauProducer_*_*')
-process.Out.outputCommands.append('keep *_SLHCL1ExtraParticles_Taus_*')
+process.Out.outputCommands.append('keep *_SLHCL1Extras_Taus_*')
 
 	# jets, HT, MHT
 # Collections of L1TkJets :

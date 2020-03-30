@@ -182,7 +182,7 @@ process.L1TrackTrigger_step = cms.Path(process.L1TrackletTracks)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # ---------------------------------------------------------------------------
 
-# Now we produce L1TkEmParticles and L1TkElectrons
+# Now we produce TkEms and TkElectrons
 
 
 # ----  "electrons" from L1Tracks. Inclusive electrons :

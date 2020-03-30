@@ -1,5 +1,5 @@
 // input: L1TkTracks and  RegionalMuonCand (standalone with component details)
-// match the two and produce a collection of L1TkMuonParticle
+// match the two and produce a collection of TkMuon
 // eventually, this should be made modular and allow to swap out different algorithms
 
 // user include files
@@ -17,8 +17,8 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
 #include "L1Trigger/L1TMuon/interface/MicroGMTConfiguration.h"
 #include "L1Trigger/L1TTrackMatch/interface/L1TkMuCorrDynamicWindows.h"
 #include "L1Trigger/L1TTrackMatch/interface/L1TkMuMantra.h"
@@ -71,22 +71,22 @@ private:
   // the TP algorithm
   void runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxCollection>&,
                           const edm::Handle<L1TTTrackCollectionType>&,
-                          L1TkMuonParticleCollection& tkMuons, const int detector) const;
+                          TkMuonCollection& tkMuons, const int detector) const;
 
   // algo for endcap regions using dynamic windows for making the match
   void runOnMTFCollection_v2(const edm::Handle<EMTFTrackCollection>&,
                           const edm::Handle<L1TTTrackCollectionType>&,
-                          L1TkMuonParticleCollection& tkMuons) const;
+                          TkMuonCollection& tkMuons) const;
 
   // given the matching indexes, build the output collection of track muons
-  void build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMuons,
+  void build_tkMuons_from_idxs (TkMuonCollection& tkMuons,
                                 const std::vector<int>& matches,
                                 const edm::Handle<L1TTTrackCollectionType>& l1tksH,
                                 const edm::Handle<RegionalMuonCandBxCollection>& muonH,
                                 int detector) const;
   
   // as above, but for the TkMu that were built from a EMTFCollection - do not produce a valid muon ref
-  void build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMuons,
+  void build_tkMuons_from_idxs (TkMuonCollection& tkMuons,
                                 const std::vector<int>& matches,
                                 const edm::Handle<L1TTTrackCollectionType>& l1tksH,
                                 int detector) const;
@@ -191,7 +191,7 @@ L1TkMuonProducer::L1TkMuonProducer(const edm::ParameterSet& iConfig) :
 
    use5ParameterFit_     = iConfig.getParameter<bool>("use5ParameterFit");
    useTPMatchWindows_     = iConfig.getParameter<bool>("useTPMatchWindows");
-   produces<L1TkMuonParticleCollection>();
+   produces<TkMuonCollection>();
 
    // initializations
    if (emtfMatchAlgoVersion_ == kDynamicWindows)
@@ -317,9 +317,9 @@ L1TkMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<L1TTTrackCollectionType> l1tksH;
   iEvent.getByToken(trackToken, l1tksH);
 
-  L1TkMuonParticleCollection oc_bmtf_tkmuon;
-  L1TkMuonParticleCollection oc_omtf_tkmuon;
-  L1TkMuonParticleCollection oc_emtf_tkmuon;
+  TkMuonCollection oc_bmtf_tkmuon;
+  TkMuonCollection oc_omtf_tkmuon;
+  TkMuonCollection oc_emtf_tkmuon;
 
   std::vector<L1TkMuMantraDF::track_df> mantradf_tracks; // if needed, just encode once for all trk finders
   if (bmtfMatchAlgoVersion_ == kMantra || omtfMatchAlgoVersion_ == kMantra || emtfMatchAlgoVersion_ == kMantra){
@@ -364,7 +364,7 @@ L1TkMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     throw cms::Exception("TkMuAlgoConfig") << "endcap : trying to run an invalid algorithm (this should never happen)\n";
 
   // now combine all trk muons into a single output collection!
-  std::unique_ptr<L1TkMuonParticleCollection> oc_tkmuon(new L1TkMuonParticleCollection());
+  std::unique_ptr<TkMuonCollection> oc_tkmuon(new TkMuonCollection());
   for (const auto& p : {oc_bmtf_tkmuon, oc_omtf_tkmuon, oc_emtf_tkmuon}){
     oc_tkmuon->insert(oc_tkmuon->end(), p.begin(), p.end());
   }
@@ -376,7 +376,7 @@ L1TkMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 void
 L1TkMuonProducer::runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxCollection>& muonH,
                                      const edm::Handle<L1TTTrackCollectionType>& l1tksH,
-                                     L1TkMuonParticleCollection& tkMuons,const int detector) const
+                                     TkMuonCollection& tkMuons,const int detector) const
 {
   const L1TTTrackCollectionType& l1tks = (*l1tksH.product());
   const RegionalMuonCandBxCollection& l1mtfs = (*muonH.product());
@@ -477,7 +477,7 @@ L1TkMuonProducer::runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxColl
 
         float trkisol = -999;
 
-        L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+        TkMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
 
 //        std::cout<<"carga?"<<matchTk.rInv(nPars)<<std::endl;
         l1tkmu.setTrackCurvature(matchTk.rInv());
@@ -495,7 +495,7 @@ L1TkMuonProducer::runOnMTFCollection_v1(const edm::Handle<RegionalMuonCandBxColl
 void
 L1TkMuonProducer::runOnMTFCollection_v2(const edm::Handle<EMTFTrackCollection>& muonH,
                                      const edm::Handle<L1TTTrackCollectionType>& l1tksH,
-                                     L1TkMuonParticleCollection& tkMuons) const
+                                     TkMuonCollection& tkMuons) const
 {
   const EMTFTrackCollection& l1mus = (*muonH.product());
   const L1TTTrackCollectionType& l1trks = (*l1tksH.product());
@@ -523,7 +523,7 @@ L1TkMuonProducer::runOnMTFCollection_v2(const edm::Handle<EMTFTrackCollection>& 
     edm::Ref< RegionalMuonCandBxCollection > l1muRef; // FIXME! The reference to the muon is null
     edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, il1ttrack);
     float trkisol = -999; // FIXME: now doing as in the TP algo
-    L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+    TkMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
     l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(3);
@@ -662,7 +662,7 @@ std::vector<L1TkMuMantraDF::muon_df>  L1TkMuonProducer::product_to_muvec (const 
   return result;
 }
 
-void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMuons,
+void L1TkMuonProducer::build_tkMuons_from_idxs (TkMuonCollection& tkMuons,
                                 const std::vector<int>& matches,
                                 const edm::Handle<L1TTTrackCollectionType>& l1tksH,
                                 const edm::Handle<RegionalMuonCandBxCollection>& muonH,
@@ -686,7 +686,7 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
     edm::Ref< RegionalMuonCandBxCollection > l1muRef(muonH, imatch);
 
     float trkisol = -999; // FIXME
-    L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+    TkMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
     l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(detector);
@@ -696,7 +696,7 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
 }
 
 
-void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMuons,
+void L1TkMuonProducer::build_tkMuons_from_idxs (TkMuonCollection& tkMuons,
                                 const std::vector<int>& matches,
                                 const edm::Handle<L1TTTrackCollectionType>& l1tksH,
                                 int detector) const
@@ -717,7 +717,7 @@ void L1TkMuonProducer::build_tkMuons_from_idxs (L1TkMuonParticleCollection& tkMu
     edm::Ref< RegionalMuonCandBxCollection > l1muRef; // NOTE: this is the only difference from the function above, but could not find a way to make a conditional constructor
 
     float trkisol = -999; // FIXME
-    L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+    TkMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
     l1tkmu.setTrackCurvature(matchTk.rInv());
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     l1tkmu.setMuonDetector(detector);

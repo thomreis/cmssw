@@ -41,21 +41,21 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkHTMissParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEtMiss.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEtMissFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJet.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJetFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkHTMiss.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkHTMissFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTau.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTauFwd.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -99,29 +99,29 @@ private:
   // HEPMC token
   const edm::EDGetTokenT<edm::HepMCProduct> hepMCToken;
 
-  // to test the L1TkPrimaryVertex :
-  const edm::EDGetTokenT< L1TkPrimaryVertexCollection > tkPvToken;
+  // to test the TkPrimaryVertex :
+  const edm::EDGetTokenT< TkPrimaryVertexCollection > tkPvToken;
 
   // for L1TrackEtmiss:
-  const edm::EDGetTokenT< L1TkEtMissParticleCollection >  tkEtMissToken;
+  const edm::EDGetTokenT< TkEtMissCollection >  tkEtMissToken;
 
-  // for L1TkEmParticles
-  const edm::EDGetTokenT< L1TkJetParticleCollection >  tkJetToken;
+  // for TkEms
+  const edm::EDGetTokenT< TkJetCollection >  tkJetToken;
 
   // for L1TkHTMiss
-  const edm::EDGetTokenT< L1TkHTMissParticleCollection > tkHTMissToken;
+  const edm::EDGetTokenT< TkHTMissCollection > tkHTMissToken;
 
-  // for L1TkJetParticles
-  const edm::EDGetTokenT< L1TkEmParticleCollection > tkPhotonToken;
+  // for TkJets
+  const edm::EDGetTokenT< TkEmCollection > tkPhotonToken;
 
   // for L1TkElectron
-  const edm::EDGetTokenT< L1TkElectronParticleCollection > tkElecToken;
+  const edm::EDGetTokenT< TkElectronCollection > tkElecToken;
 
   // for L1TkMuon
-  const edm::EDGetTokenT< L1TkMuonParticleCollection > tkMuonToken;
+  const edm::EDGetTokenT< TkMuonCollection > tkMuonToken;
 
   // for L1TkTau
-  const edm::EDGetTokenT< L1TkTauParticleCollection > tkTauToken;
+  const edm::EDGetTokenT< TkTauCollection > tkTauToken;
 };
 
 //
@@ -137,14 +137,14 @@ private:
 //
 PrintL1TkObjects::PrintL1TkObjects(const edm::ParameterSet& iConfig) :
    hepMCToken(consumes<edm::HepMCProduct>(edm::InputTag("generator",""))),
-   tkPvToken(consumes< L1TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1TkVtxInputTag"))),
-   tkEtMissToken(consumes< L1TkEtMissParticleCollection> (iConfig.getParameter<edm::InputTag>("L1TkEtMissInputTag"))),
-   tkJetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkJetsInputTag"))),
-   tkHTMissToken(consumes<L1TkHTMissParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkHTMInputTag"))),
-   tkPhotonToken(consumes<L1TkEmParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkPhotonsInputTag"))),
-   tkElecToken(consumes<L1TkElectronParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkElectronsInputTag"))),
-   tkMuonToken(consumes<L1TkMuonParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkMuonsInputTag"))),
-   tkTauToken(consumes<L1TkTauParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkTausInputTag")))
+   tkPvToken(consumes< TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1TkVtxInputTag"))),
+   tkEtMissToken(consumes< TkEtMissCollection> (iConfig.getParameter<edm::InputTag>("TkEtMissInputTag"))),
+   tkJetToken(consumes<TkJetCollection>(iConfig.getParameter<edm::InputTag>("TkJetsInputTag"))),
+   tkHTMissToken(consumes<TkHTMissCollection>(iConfig.getParameter<edm::InputTag>("TkHTMInputTag"))),
+   tkPhotonToken(consumes<TkEmCollection>(iConfig.getParameter<edm::InputTag>("TkPhotonsInputTag"))),
+   tkElecToken(consumes<TkElectronCollection>(iConfig.getParameter<edm::InputTag>("TkElectronsInputTag"))),
+   tkMuonToken(consumes<TkMuonCollection>(iConfig.getParameter<edm::InputTag>("TkMuonsInputTag"))),
+   tkTauToken(consumes<TkTauCollection>(iConfig.getParameter<edm::InputTag>("TkTausInputTag")))
 {
    //now do what ever initialization is needed
 
@@ -220,13 +220,13 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	//
         // retrieve the L1 vertices
         
- edm::Handle<L1TkPrimaryVertexCollection> L1VertexHandle;
+ edm::Handle<TkPrimaryVertexCollection> L1VertexHandle;
  iEvent.getByToken(tkPvToken,L1VertexHandle);
- std::vector<L1TkPrimaryVertex>::const_iterator vtxIter;
+ std::vector<TkPrimaryVertex>::const_iterator vtxIter;
  
  if ( L1VertexHandle.isValid() ) {
-     std::cout << " -----  L1TkPrimaryVertex objects   ----- " << std::endl;
-     vtxIter = L1VertexHandle->begin();     // only one algorithm is run in the L1TkPrimaryVertexProducer
+     std::cout << " -----  TkPrimaryVertex objects   ----- " << std::endl;
+     vtxIter = L1VertexHandle->begin();     // only one algorithm is run in the TkPrimaryVertexProducer
 					    // (in contrast to earlier, under-dev, versions of the code)
         float z = vtxIter -> zvertex();
         float sum = vtxIter -> sum();
@@ -238,15 +238,15 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	// retrieve the EtMiss objects
 	//
 
- edm::Handle<L1TkEtMissParticleCollection> L1TkEtMissHandle;
+ edm::Handle<TkEtMissCollection> L1TkEtMissHandle;
  iEvent.getByToken(tkEtMissToken, L1TkEtMissHandle);
- std::vector<L1TkEtMissParticle>::const_iterator etmIter;
+ std::vector<TkEtMiss>::const_iterator etmIter;
 
  if (L1TkEtMissHandle.isValid() ) {
     std::cout << " -----  L1TkEtMiss objects  -----  " << std::endl; 
     etmIter = L1TkEtMissHandle -> begin();	// idem: only one TrkMET now.
 	float etmis = etmIter -> et();
-	const edm::Ref< L1TkPrimaryVertexCollection > vtxRef = etmIter -> vtxRef();
+	const edm::Ref< TkPrimaryVertexCollection > vtxRef = etmIter -> vtxRef();
 	float zvtx = vtxRef -> zvertex();
         float etMissPU = etmIter -> etMissPU();
 	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << " and ETmiss from PU = " << etMissPU << std::endl;
@@ -255,15 +255,15 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         //
         // ----------------------------------------------------------------------
-        // retrieve the L1TkJetParticle objects
+        // retrieve the TkJet objects
         //
         
- edm::Handle<L1TkJetParticleCollection> L1TkJetsHandle;
+ edm::Handle<TkJetCollection> L1TkJetsHandle;
  iEvent.getByToken(tkJetToken, L1TkJetsHandle);
- std::vector<L1TkJetParticle>::const_iterator jetIter ;
+ std::vector<TkJet>::const_iterator jetIter ;
 
  if ( L1TkJetsHandle.isValid() ) {
-    std::cout << " -----   L1TkJetParticle  objects -----  " << std::endl;
+    std::cout << " -----   TkJet  objects -----  " << std::endl;
     for (jetIter = L1TkJetsHandle -> begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
         float et = jetIter -> pt();
         float phi = jetIter -> phi();
@@ -290,12 +290,12 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         // retrieve HT and HTM
 	//
 
- edm::Handle<L1TkHTMissParticleCollection> L1TkHTMHandle;
+ edm::Handle<TkHTMissCollection> L1TkHTMHandle;
  iEvent.getByToken(tkHTMissToken, L1TkHTMHandle);
 
  if ( L1TkHTMHandle.isValid() ) {
-	std::cout << " -----  L1TkHTMissParticle: size (should be 1) = " << L1TkHTMHandle -> size() << std::endl;
-	std::vector<L1TkHTMissParticle>::const_iterator HTMIter = L1TkHTMHandle -> begin();
+	std::cout << " -----  TkHTMiss: size (should be 1) = " << L1TkHTMHandle -> size() << std::endl;
+	std::vector<TkHTMiss>::const_iterator HTMIter = L1TkHTMHandle -> begin();
 	float HTT = HTMIter -> EtTotal();
 	float HTM = HTMIter -> EtMiss();
 	//float HTM_the_same = HTMIter -> et();
@@ -305,23 +305,23 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::cout << " HTT = " << HTT << " HTM = " << HTM << " " << "phi(HTM) = " << phi << std::endl;
 	 
 	// access the L1TkJets used to build HT and HTM :
-	const edm::RefProd< L1TkJetParticleCollection > jetCollRef = HTMIter -> jetCollectionRef();
- 	std::vector<L1TkJetParticle>::const_iterator jet = jetCollRef -> begin();
+	const edm::RefProd< TkJetCollection > jetCollRef = HTMIter -> jetCollectionRef();
+ 	std::vector<TkJet>::const_iterator jet = jetCollRef -> begin();
 	std::cout << " ET of the first L1TkJet = " << jet -> et() << std::endl;
  }
 
 
         //
         // ----------------------------------------------------------------------
-        // retrieve the L1TkEmParticle objects
+        // retrieve the TkEm objects
 	//
 
- edm::Handle<L1TkEmParticleCollection> L1TkPhotonsHandle;
+ edm::Handle<TkEmCollection> L1TkPhotonsHandle;
  iEvent.getByToken(tkPhotonToken, L1TkPhotonsHandle);
- std::vector<L1TkEmParticle>::const_iterator phoIter ;
+ std::vector<TkEm>::const_iterator phoIter ;
 
  if ( L1TkPhotonsHandle.isValid() ) {
-    std::cout << " -----   L1TkEmParticle  objects -----  " << std::endl;
+    std::cout << " -----   TkEm  objects -----  " << std::endl;
     for (phoIter = L1TkPhotonsHandle -> begin(); phoIter != L1TkPhotonsHandle->end(); ++phoIter) {
 	float et = phoIter -> pt();
 	float phi = phoIter -> phi();
@@ -340,15 +340,15 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         //
         // ----------------------------------------------------------------------
-        // retrieve the L1TkElectronParticle objects
+        // retrieve the TkElectron objects
         //
 
- edm::Handle<L1TkElectronParticleCollection> L1TkElectronsHandle;
+ edm::Handle<TkElectronCollection> L1TkElectronsHandle;
  iEvent.getByToken(tkElecToken, L1TkElectronsHandle);
- std::vector<L1TkElectronParticle>::const_iterator eleIter ;
+ std::vector<TkElectron>::const_iterator eleIter ;
 
  if ( L1TkElectronsHandle.isValid() ) {
-    std::cout << " -----   L1TkElectronParticle  objects -----  " << std::endl;
+    std::cout << " -----   TkElectron  objects -----  " << std::endl;
     for (eleIter = L1TkElectronsHandle -> begin(); eleIter != L1TkElectronsHandle->end(); ++eleIter) {
         float et = eleIter -> pt();
         float phi = eleIter -> phi();
@@ -387,9 +387,9 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         // retrieve the L1TkMuons
         //
 
- edm::Handle<L1TkMuonParticleCollection> L1TkMuonsHandle;
+ edm::Handle<TkMuonCollection> L1TkMuonsHandle;
  iEvent.getByToken(tkMuonToken, L1TkMuonsHandle);
- std::vector<L1TkMuonParticle>::const_iterator muIter;
+ std::vector<TkMuon>::const_iterator muIter;
 
  if ( L1TkMuonsHandle.isValid() ) {
     std::cout << " -----   L1TkMuonPaticle objects ---- " << std::endl;
@@ -407,9 +407,9 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         // retrieve the L1TkMuons
         //
 
- edm::Handle<L1TkTauParticleCollection> L1TkTausHandle;
+ edm::Handle<TkTauCollection> L1TkTausHandle;
  iEvent.getByToken(tkTauToken,L1TkTausHandle);
- std::vector<L1TkTauParticle>::const_iterator tauIter;
+ std::vector<TkTau>::const_iterator tauIter;
 
  if ( L1TkTausHandle.isValid() ) {
     std::cout << " -----   L1TkTauPaticle objects ---- " << std::endl;

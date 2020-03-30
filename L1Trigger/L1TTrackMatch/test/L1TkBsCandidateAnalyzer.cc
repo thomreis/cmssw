@@ -36,10 +36,10 @@
 
 // L1Candidate etc.
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPhiCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPhiCandidateFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkBsCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkBsCandidateFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidate.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidateFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidate.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidateFwd.h"
 
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "TH1F.h"
@@ -70,15 +70,15 @@ private:
     TH1D* cutFlow;
   };
   std::map<std::string, HistoList> histoMap_;
-  const edm::EDGetTokenT<L1TkBsCandidateCollection> tkBsToken_;
-  const edm::EDGetTokenT<L1TkBsCandidateCollection> tkBsLooseWPToken_;
-  const edm::EDGetTokenT<L1TkBsCandidateCollection> tkBsTightWPToken_;
+  const edm::EDGetTokenT<TkBsCandidateCollection> tkBsToken_;
+  const edm::EDGetTokenT<TkBsCandidateCollection> tkBsLooseWPToken_;
+  const edm::EDGetTokenT<TkBsCandidateCollection> tkBsTightWPToken_;
 };
 
 L1TkBsCandidateAnalyzer::L1TkBsCandidateAnalyzer(const edm::ParameterSet& iConfig):
-  tkBsToken_(consumes<L1TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("L1TkBsCandidateInputTag"))),
-  tkBsLooseWPToken_(consumes<L1TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("L1TkBsCandidateLooseWPInputTag"))),
-  tkBsTightWPToken_(consumes<L1TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("L1TkBsCandidateTightWPInputTag")))
+  tkBsToken_(consumes<TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("TkBsCandidateInputTag"))),
+  tkBsLooseWPToken_(consumes<TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("TkBsCandidateLooseWPInputTag"))),
+  tkBsTightWPToken_(consumes<TkBsCandidateCollection>(iConfig.getParameter<edm::InputTag>("TkBsCandidateTightWPInputTag")))
 {
 }
 void L1TkBsCandidateAnalyzer::beginJob() {
@@ -104,7 +104,7 @@ void L1TkBsCandidateAnalyzer::beginJob() {
 }
 void L1TkBsCandidateAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
-  std::map<std::string, const edm::EDGetTokenT<L1TkBsCandidateCollection>> tokenMap {
+  std::map<std::string, const edm::EDGetTokenT<TkBsCandidateCollection>> tokenMap {
       {"Medium", tkBsToken_},
       {"Loose",  tkBsLooseWPToken_}, 
       {"Tight",  tkBsTightWPToken_}
@@ -113,18 +113,18 @@ void L1TkBsCandidateAnalyzer::analyze(const edm::Event& iEvent, const edm::Event
     if (histoMap_.find(el.first) != histoMap_.end()) {
       const HistoList& hl = histoMap_.find(el.first)->second;
       hl.cutFlow->Fill(0);
-      // the L1TkBsCandidate
-      edm::Handle<L1TkBsCandidateCollection> collHandle;
+      // the TkBsCandidate
+      edm::Handle<TkBsCandidateCollection> collHandle;
       bool res = iEvent.getByToken(el.second, collHandle);
       if (res && collHandle.isValid()) {
         hl.cutFlow->Fill(1);
-        L1TkBsCandidateCollection bsColl = *(collHandle.product());
+        TkBsCandidateCollection bsColl = *(collHandle.product());
         hl.nBs->Fill(bsColl.size());
         if (bsColl.size() > 0) hl.cutFlow->Fill(2);
         for (auto const& v: bsColl) hl.bsmass->Fill(v.mass());
       }
       else {
-        std::cerr << "analyze: L1TkBsCandidateCollection for InputTag L1TkBsCandidateInputTag not found!" << std::endl; 
+        std::cerr << "analyze: TkBsCandidateCollection for InputTag TkBsCandidateInputTag not found!" << std::endl; 
       }
     }
   }

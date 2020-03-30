@@ -37,12 +37,12 @@
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
 
 
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
@@ -149,9 +149,9 @@ private:
   const edm::EDGetTokenT< RegionalMuonCandBxCollection > bmtfToken;
   const edm::EDGetTokenT< RegionalMuonCandBxCollection > omtfToken;
   const edm::EDGetTokenT< RegionalMuonCandBxCollection > emtfToken;
-  const edm::EDGetTokenT< L1TkMuonParticleCollection > tkMuToken;
-  const edm::EDGetTokenT< L1TkEmParticleCollection > tkPhToken;
-  const edm::EDGetTokenT< L1TkElectronParticleCollection > tkElToken;
+  const edm::EDGetTokenT< TkMuonCollection > tkMuToken;
+  const edm::EDGetTokenT< TkEmCollection > tkPhToken;
+  const edm::EDGetTokenT< TkElectronCollection > tkElToken;
   const edm::EDGetTokenT< reco::GenParticleCollection > genToken;
 
   int ievent; 
@@ -164,8 +164,8 @@ L1TkObjectAnalyzer::L1TkObjectAnalyzer(const edm::ParameterSet& iConfig) :
   bmtfToken(consumes< RegionalMuonCandBxCollection >(iConfig.getParameter<edm::InputTag>("L1BMTFInputTag"))),
   omtfToken(consumes< RegionalMuonCandBxCollection >(iConfig.getParameter<edm::InputTag>("L1OMTFInputTag"))),
   emtfToken(consumes< RegionalMuonCandBxCollection >(iConfig.getParameter<edm::InputTag>("L1EMTFInputTag"))),
-  tkPhToken(consumes< L1TkEmParticleCollection > (iConfig.getParameter<edm::InputTag>("L1TkPhotonInputTag"))),
-  tkElToken(consumes< L1TkElectronParticleCollection > (iConfig.getParameter<edm::InputTag>("L1TkElectronInputTag"))),
+  tkPhToken(consumes< TkEmCollection > (iConfig.getParameter<edm::InputTag>("L1TkPhotonInputTag"))),
+  tkElToken(consumes< TkElectronCollection > (iConfig.getParameter<edm::InputTag>("L1TkElectronInputTag"))),
   genToken(consumes < reco::GenParticleCollection > (iConfig.getParameter<edm::InputTag>("GenParticleInputTag")))
 {
 
@@ -318,9 +318,9 @@ L1TkObjectAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     MuonBxCollection muCollection = (*muonHandle.product());
     nL1Obj->Fill(muCollection.size(0));
 
-    edm::Handle< L1TkMuonParticleCollection > l1TkMuonHandle;
+    edm::Handle< TkMuonCollection > l1TkMuonHandle;
     iEvent.getByToken(tkMuToken, l1TkMuonHandle);
-    L1TkMuonParticleCollection l1TkMuCollection = (*l1TkMuonHandle.product()); 
+    TkMuonCollection l1TkMuCollection = (*l1TkMuonHandle.product()); 
     nL1TrkObj->Fill(l1TkMuCollection.size());
 
     if (analysisOption_ == "Efficiency" && genIndex >= 0) checkEfficiency(muCollection, l1TkMuCollection);
@@ -333,9 +333,9 @@ L1TkObjectAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     EGammaBxCollection egCollection = (*eGammaHandle.product());
     nL1Obj->Fill(egCollection.size(0));
 
-    edm::Handle< L1TkEmParticleCollection > l1TkPhotonHandle;
+    edm::Handle< TkEmCollection > l1TkPhotonHandle;
     iEvent.getByToken(tkPhToken, l1TkPhotonHandle);
-    L1TkEmParticleCollection l1TkPhCollection = (*l1TkPhotonHandle.product()); 
+    TkEmCollection l1TkPhCollection = (*l1TkPhotonHandle.product()); 
     nL1TrkObj->Fill(l1TkPhCollection.size());
 
     if (analysisOption_ == "Efficiency" && genIndex >= 0) checkEfficiency(egCollection, l1TkPhCollection);
@@ -347,9 +347,9 @@ L1TkObjectAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     EGammaBxCollection egCollection = (*eGammaHandle.product());
     nL1Obj->Fill(egCollection.size(0));
 
-    edm::Handle< L1TkElectronParticleCollection > l1TkElectronHandle;
+    edm::Handle< TkElectronCollection > l1TkElectronHandle;
     iEvent.getByToken(tkElToken, l1TkElectronHandle);
-    L1TkElectronParticleCollection l1TkElCollection = (*l1TkElectronHandle.product()); 
+    TkElectronCollection l1TkElCollection = (*l1TkElectronHandle.product()); 
     nL1TrkObj->Fill(l1TkElCollection.size());
 
     if (analysisOption_ == "Efficiency" && genIndex >= 0) checkEfficiency(egCollection, l1TkElCollection);

@@ -33,8 +33,8 @@
 #include "Geometry/Records/interface/TrackerTopologyRcd.h"
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 
-//#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+//#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 
 
 ////////////////////////////
@@ -172,7 +172,7 @@ L1TkFastVertexProducer::L1TkFastVertexProducer(const edm::ParameterSet& iConfig)
 
 
 
-  produces<L1TkPrimaryVertexCollection>();
+  produces<TkPrimaryVertexCollection>();
 
 }
 
@@ -196,7 +196,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 {  
   using namespace edm;
    
-  std::unique_ptr<L1TkPrimaryVertexCollection> result(new L1TkPrimaryVertexCollection);
+  std::unique_ptr<TkPrimaryVertexCollection> result(new TkPrimaryVertexCollection);
  
   // Tracker Topology 
   edm::ESHandle<TrackerTopology> tTopoHandle_;
@@ -272,7 +272,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     
     //     std::cout<<zvtx_gen<<endl;
     
-    L1TkPrimaryVertex genvtx( zvtx_gen, -999.); 
+    TkPrimaryVertex genvtx( zvtx_gen, -999.); 
     
     result -> push_back( genvtx );
     iEvent.put( std::move(result) );
@@ -377,8 +377,8 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     binmax = htmp_weight -> GetMaximumBin();
     float zvtx_weight = htmp_weight -> GetBinCenter( binmax );
     
-    L1TkPrimaryVertex vtx1( zvtx, zvtx_gen);
-    L1TkPrimaryVertex vtx2( zvtx_weight, zvtx_gen);
+    TkPrimaryVertex vtx1( zvtx, zvtx_gen);
+    TkPrimaryVertex vtx2( zvtx_weight, zvtx_gen);
   */
   
   
@@ -401,7 +401,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     }  
   } 
     
-  //L1TkPrimaryVertex vtx3( zvtx_sliding, zvtx_gen);
+  //TkPrimaryVertex vtx3( zvtx_sliding, zvtx_gen);
   
   zvtx_sliding = -999;
   sigma_max = -999;
@@ -419,8 +419,8 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     }
   }
   //  cout<<zvtx_sliding<<"\t"<< sigma_max<<endl;
-  //L1TkPrimaryVertex vtx4( zvtx_sliding, zvtx_gen);
-  L1TkPrimaryVertex vtx4( zvtx_sliding, sigma_max);
+  //TkPrimaryVertex vtx4( zvtx_sliding, zvtx_gen);
+  TkPrimaryVertex vtx4( zvtx_sliding, sigma_max);
   
   
   /*
@@ -439,7 +439,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     
     binmax = htmp_weight_cleaned -> GetMaximumBin();
     float zvtx_weight_cleaned = htmp_weight_cleaned -> GetBinCenter( binmax );
-    L1TkPrimaryVertex vtx5( zvtx_weight_cleaned, zvtx_gen);
+    TkPrimaryVertex vtx5( zvtx_weight_cleaned, zvtx_gen);
   */
   
   result -> push_back( vtx4 );

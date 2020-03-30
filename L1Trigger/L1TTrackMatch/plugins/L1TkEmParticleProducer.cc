@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 //
-// dummy producer for a L1TkEmParticle
+// dummy producer for a TkEm
 // 
 
 // system include files
@@ -21,10 +21,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -86,7 +86,7 @@ class L1TkEmParticleProducer : public edm::EDProducer {
 
         const edm::EDGetTokenT< EGammaBxCollection > egToken;
         const edm::EDGetTokenT<std::vector<TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
-        const edm::EDGetTokenT<L1TkPrimaryVertexCollection> vertexToken;
+        const edm::EDGetTokenT<TkPrimaryVertexCollection> vertexToken;
 
 } ;
 
@@ -97,7 +97,7 @@ class L1TkEmParticleProducer : public edm::EDProducer {
 L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig) :
   egToken(consumes< EGammaBxCollection >(iConfig.getParameter<edm::InputTag>("L1EGammaInputTag"))),
   trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag"))),
-  vertexToken(consumes< L1TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))) 
+  vertexToken(consumes< TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))) 
   {
   
   label = iConfig.getParameter<std::string>("label");  // label of the collection produced
@@ -122,7 +122,7 @@ L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig)
    IsoCut = (float)iConfig.getParameter<double>("IsoCut");
    RelativeIsolation = iConfig.getParameter<bool>("RelativeIsolation");
 
-   produces<L1TkEmParticleCollection>(label);
+   produces<TkEmCollection>(label);
 }
 
 L1TkEmParticleProducer::~L1TkEmParticleProducer() {
@@ -134,7 +134,7 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 {
    using namespace edm;
   
-   std::unique_ptr<L1TkEmParticleCollection> result(new L1TkEmParticleCollection);
+   std::unique_ptr<TkEmCollection> result(new TkEmCollection);
   
    // the L1EGamma objects
    edm::Handle<EGammaBxCollection> eGammaHandle;
@@ -150,16 +150,16 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
    // the primary vertex (used only if PrimaryVtxConstrain = true)
    float zvtxL1tk = -999;
    //if (PrimaryVtxConstrain) {
-     edm::Handle<L1TkPrimaryVertexCollection> L1VertexHandle;
+     edm::Handle<TkPrimaryVertexCollection> L1VertexHandle;
      iEvent.getByToken(vertexToken, L1VertexHandle);
      if (!L1VertexHandle.isValid() ) {
        LogWarning("L1TkEmParticleProducer")
-	 << "\nWarning: L1TkPrimaryVertexCollection not found in the event. Won't use any PrimaryVertex constraint."
+	 << "\nWarning: TkPrimaryVertexCollection not found in the event. Won't use any PrimaryVertex constraint."
 	 << std::endl;
        PrimaryVtxConstrain = false;
      }
      else {
-       std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
+       std::vector<TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
        // by convention, the first vertex in the collection is the one that should
        // be used by default
        zvtxL1tk = vtxIter -> zvertex();
@@ -178,7 +178,7 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
   if( !eGammaHandle.isValid() )
     {
       LogError("L1TkEmParticleProducer")
-	<< "\nWarning: L1EmParticleCollection not found in the event. Exit."
+	<< "\nWarning: L1EmCollection not found in the event. Exit."
 	<< std::endl;
       return;
     }
@@ -275,7 +275,7 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       if (PrimaryVtxConstrain) {isolation=trkisolPV;}
       
       const math::XYZTLorentzVector P4 = egIter -> p4() ;
-      L1TkEmParticle trkEm(  P4,
+      TkEm trkEm(  P4,
 			     EGammaRef,
 			     trkisol,trkisolPV);
       

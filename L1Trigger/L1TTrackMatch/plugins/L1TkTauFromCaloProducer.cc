@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 //
-// Producer for a L1TkTauParticle from matching L1 Tracks to L1 Calo Taus
+// Producer for a TkTau from matching L1 Tracks to L1 Calo Taus
 // The code matches the highest Et L1CaloTaus in an event with high pT L1TkTracks.
 // A signal cone is created around the matching track and more L1TkTracks can be added 
 // to this cluster if the user-defined criteria are satisfied. An isolation annulus is built
@@ -26,9 +26,9 @@
 #include "DataFormats/DetId/interface/DetId.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkTauParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTau.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkTauFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
@@ -120,7 +120,7 @@ bool GetTkTauFromCaloIsolation(const L1TTTrackRefPtr_Collection c_L1Tks,
 
   const edm::EDGetTokenT< TauBxCollection > tauToken;
   const edm::EDGetTokenT< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
-  const edm::EDGetTokenT< L1TkPrimaryVertexCollection > tkpvToken;
+  const edm::EDGetTokenT< TkPrimaryVertexCollection > tkpvToken;
   
 } ;
 
@@ -129,7 +129,7 @@ bool GetTkTauFromCaloIsolation(const L1TTTrackRefPtr_Collection c_L1Tks,
 L1TkTauFromCaloProducer::L1TkTauFromCaloProducer(const edm::ParameterSet& iConfig) :
   tauToken(consumes< TauBxCollection >(iConfig.getParameter<edm::InputTag>("L1CaloTaus_InputTag"))),
   trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TkTracks_InputTag"))),
-  tkpvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1TkPV_InputTag")))
+  tkpvToken(consumes<TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1TkPV_InputTag")))
 {
 
   cfg_L1TTTracks_NFitParameters             = iConfig.getParameter< uint32_t >("L1TTTracks_NFitParameters");
@@ -150,7 +150,7 @@ L1TkTauFromCaloProducer::L1TkTauFromCaloProducer(const edm::ParameterSet& iConfi
   cfg_L1TkTau_IsolationTks_DeltaRMax        = iConfig.getParameter< double >("L1TkTau_IsolationTks_DeltaRMax");
   cfg_L1TkTau_IsolationTks_DeltaPOCAzMax    = iConfig.getParameter< double >("L1TkTau_IsolationTks_DeltaPOCAzMax");
   
-  produces<L1TkTauParticleCollection>();
+  produces<TkTauCollection>();
 }
 
 
@@ -162,14 +162,14 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   
   using namespace edm;
   using namespace std;
-  std::unique_ptr<L1TkTauParticleCollection> result(new L1TkTauParticleCollection);
+  std::unique_ptr<TkTauCollection> result(new TkTauCollection);
   
   // ------------ Primary Vertex using L1TTTracks  ------------ //
 
   // L1 primary vertex
-  edm::Handle<L1TkPrimaryVertexCollection> h_L1TkPVs;
+  edm::Handle<TkPrimaryVertexCollection> h_L1TkPVs;
   iEvent.getByToken(tkpvToken, h_L1TkPVs);
-  std::vector< L1TkPrimaryVertex > c_L1TkPVs;
+  std::vector< TkPrimaryVertex > c_L1TkPVs;
 
 
   // double PV_SumPt   = 0.0;
@@ -180,7 +180,7 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 						    // cut is actually not applied.
 
   /// For-loop: PVs (size should be one)
-  for ( std::vector< L1TkPrimaryVertex >::const_iterator PV = h_L1TkPVs->begin();  PV != h_L1TkPVs->end(); PV++){
+  for ( std::vector< TkPrimaryVertex >::const_iterator PV = h_L1TkPVs->begin();  PV != h_L1TkPVs->end(); PV++){
     
     // PV_SumPt   = PV->sum();
     PV_ZVertex = PV->zvertex();
@@ -359,7 +359,7 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     float L1TkTau_TkIsol = -999.9;
     edm::Ref< TauBxCollection > L1CaloTauRef( h_L1CaloTau, calo_counter );
         
-    /// Since the L1TkTauParticle does not support a vector of Track Ptrs yet, use instead a "hack" to simplify the code.
+    /// Since the TkTau does not support a vector of Track Ptrs yet, use instead a "hack" to simplify the code.
     edm::Ptr< L1TTTrackType > L1TrackPtrNull;
     if (L1TkTau_TkPtrs.size() == 1) { 
       L1TkTau_TkPtrs.push_back(L1TrackPtrNull); 
@@ -370,8 +370,8 @@ void L1TkTauFromCaloProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     }
     else{}
 
-    /// Fill The L1TkTauParticle object
-    L1TkTauParticle L1TkTauFromCalo( L1CaloTauRef->p4(), L1CaloTauRef, L1TkTau_TkPtrs[0], L1TkTau_TkPtrs[1], L1TkTau_TkPtrs[2], L1TkTau_TkIsol );
+    /// Fill The TkTau object
+    TkTau L1TkTauFromCalo( L1CaloTauRef->p4(), L1CaloTauRef, L1TkTau_TkPtrs[0], L1TkTau_TkPtrs[1], L1TkTau_TkPtrs[2], L1TkTau_TkIsol );
     result -> push_back( L1TkTauFromCalo );
 
   } /// For-Loop: L1CaloTaus

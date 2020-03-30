@@ -15,8 +15,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEtMissParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEtMiss.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEtMissFwd.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
 
 // detector geometry
@@ -75,7 +75,7 @@ trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.g
   maxEta = (float)iConfig.getParameter<double>("maxEta");
   HighPtTracks = iConfig.getParameter<int>("HighPtTracks");
 
-  produces<L1TkEtMissParticleCollection>("trkMET");
+  produces<TkEtMissCollection>("trkMET");
 }
 
 //////////////
@@ -94,7 +94,7 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   iSetup.get<TrackerTopologyRcd>().get(tTopoHandle_);
   const TrackerTopology* tTopo = tTopoHandle_.product();
 
-  std::unique_ptr<L1TkEtMissParticleCollection> METCollection(new L1TkEtMissParticleCollection);
+  std::unique_ptr<TkEtMissCollection> METCollection(new TkEtMissCollection);
 
   edm::Handle<VertexCollection> L1VertexHandle;
   iEvent.getByToken(pvToken,L1VertexHandle);
@@ -184,8 +184,8 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   math::XYZTLorentzVector missingEt( -sumPx, -sumPy, 0, et);
 
   int ibx = 0;
-  METCollection->push_back( L1TkEtMissParticle( missingEt,
-    L1TkEtMissParticle::kMET,
+  METCollection->push_back( TkEtMiss( missingEt,
+    TkEtMiss::kMET,
     etTot,
     etmiss_PU,
     etTot_PU,

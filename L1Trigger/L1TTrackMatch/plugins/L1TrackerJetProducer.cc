@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// Producer of L1TkJetParticle,                                          //
+// Producer of TkJet,                                          //
 // Cluster L1 tracks using fastjet                                       //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
@@ -25,8 +25,8 @@
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "L1Trigger/TrackTrigger/interface/StubPtConsistency.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJet.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJetFwd.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -102,7 +102,7 @@ trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.g
 PVertexToken(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("L1PrimaryVertexTag")))
 {
 
-  produces<L1TkJetParticleCollection>("L1TrackerJets");
+  produces<TkJetCollection>("L1TrackerJets");
   L1Tk_nPar   =(int)iConfig.getParameter<int>("L1Tk_nPar");
   TRK_ZMAX    = (float)iConfig.getParameter<double>("TRK_ZMAX");
   TRK_CHI2MAX = (float)iConfig.getParameter<double>("TRK_CHI2MAX");
@@ -130,7 +130,7 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   // output container
   // ----------------------------------------------------------------------------------------------
 
-  std::unique_ptr<L1TkJetParticleCollection> L1TrackerJets(new L1TkJetParticleCollection);
+  std::unique_ptr<TkJetCollection> L1TrackerJets(new TkJetCollection);
 
 
   // ----------------------------------------------------------------------------------------------
@@ -155,8 +155,8 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
   const TrackerGeometry* const theTrackerGeom = tGeomHandle.product();
   
-  edm::Handle<VertexCollection >L1TkPrimaryVertexHandle;
-  iEvent.getByToken(PVertexToken, L1TkPrimaryVertexHandle);
+  edm::Handle<VertexCollection >TkPrimaryVertexHandle;
+  iEvent.getByToken(PVertexToken, TkPrimaryVertexHandle);
   fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, CONESize);
   std::vector<fastjet::PseudoJet>  JetInputs;
 
@@ -183,7 +183,7 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (tmp_isPS) tmp_trk_nstubPS++;
     }
     if(tmp_trk_nstubPS<TRK_NSTUBPSMIN)continue;
-    double DeltaZtoVtx=fabs(L1TkPrimaryVertexHandle->begin()->z0()-iterL1Track->POCA().z());
+    double DeltaZtoVtx=fabs(TkPrimaryVertexHandle->begin()->z0()-iterL1Track->POCA().z());
     if(DeltaZtoVtx>DeltaZ0Cut)continue;
 
     fastjet::PseudoJet psuedoJet(iterL1Track->momentum().x(), iterL1Track->momentum().y(), iterL1Track->momentum().z(), iterL1Track->momentum().mag());
@@ -209,7 +209,7 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     }
     avgZ=avgZ/sumpt;
     edm::Ref< JetBxCollection > jetRef ;
-    L1TkJetParticle trkJet(jetP4, jetRef, L1TrackPtrs, avgZ);
+    TkJet trkJet(jetP4, jetRef, L1TrackPtrs, avgZ);
     L1TrackerJets->push_back(trkJet);
 
   }

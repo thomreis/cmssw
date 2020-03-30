@@ -33,10 +33,10 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
 
 
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
@@ -121,10 +121,10 @@ private:
   float egEtThreshold_;
 
   EGammaBxCollection eGammaCollection_;
-  L1TkElectronParticleCollection l1TkElectronCollection_;
+  TkElectronCollection l1TkElectronCollection_;
 
   const edm::EDGetTokenT< EGammaBxCollection > egToken;
-  const edm::EDGetTokenT< L1TkElectronParticleCollection > tkElToken;
+  const edm::EDGetTokenT< TkElectronCollection > tkElToken;
   const edm::EDGetTokenT< reco::GenParticleCollection > genToken;
   const edm::EDGetTokenT< std::vector< L1TTTrackType > > trackToken;
 
@@ -133,7 +133,7 @@ private:
 
 L1TkElectronAnalyzer::L1TkElectronAnalyzer(const edm::ParameterSet& iConfig) :
   egToken(consumes< EGammaBxCollection >(iConfig.getParameter<edm::InputTag>("L1EGammaInputTag"))),
-  tkElToken(consumes< L1TkElectronParticleCollection > (iConfig.getParameter<edm::InputTag>("L1TkElectronInputTag"))),
+  tkElToken(consumes< TkElectronCollection > (iConfig.getParameter<edm::InputTag>("TkElectronInputTag"))),
   genToken(consumes < reco::GenParticleCollection > (iConfig.getParameter<edm::InputTag>("GenParticleInputTag"))),
   trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
@@ -208,7 +208,7 @@ L1TkElectronAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    L1TTTrackCollectionType::const_iterator trackIter;
 
    // the L1TkElectron
-  edm::Handle< L1TkElectronParticleCollection > l1tkElectronHandle;
+  edm::Handle< TkElectronCollection > l1tkElectronHandle;
   iEvent.getByToken(tkElToken, l1tkElectronHandle);
   l1TkElectronCollection_ = (*l1tkElectronHandle.product());
   nEGammaTrk->Fill(l1TkElectronCollection_.size());
@@ -246,7 +246,7 @@ void L1TkElectronAnalyzer::checkEfficiency(const edm::Handle<reco::GenParticleCo
   if (nSelectedEG == 0 ) return;
   int nSelectedEGTrk = 0;
   int nSelectedEGTrkEt = 0;
-  std::vector<L1TkElectronParticle>::const_iterator egTrkIter ;
+  std::vector<TkElectron>::const_iterator egTrkIter ;
   for (egTrkIter = l1TkElectronCollection_.begin(); egTrkIter != l1TkElectronCollection_.end(); ++egTrkIter) {
     if (fabs(egTrkIter->eta()) < etaCutoff_ && egTrkIter->pt() > 0) {
       if ( egTrkIter->trkPtr().isNonnull() && egTrkIter->trkPtr()->momentum().perp() <= trkPtCutoff_) continue;
@@ -294,7 +294,7 @@ void L1TkElectronAnalyzer::checkRate() {
     float et_min; 
     float dRmin = 999.9;
     float iso_min = 999.0; 
-    std::vector<L1TkElectronParticle>::const_iterator egTrkIter ;
+    std::vector<TkElectron>::const_iterator egTrkIter ;
     for (egTrkIter = l1TkElectronCollection_.begin(); egTrkIter != l1TkElectronCollection_.end(); ++egTrkIter) {
       if ( !egTrkIter->trkPtr().isNonnull()) continue;
 

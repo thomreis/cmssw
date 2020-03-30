@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// Producer of L1TkJetParticle,                                          //
+// Producer of TkJet,                                          //
 // associating L1 jets to a z vertex using nearby L1 tracks              //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
@@ -19,8 +19,8 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJet.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkJetFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -93,7 +93,7 @@ jetToken(consumes< JetBxCollection >(iConfig.getParameter<edm::InputTag>("L1Cent
 trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
 
-  produces<L1TkJetParticleCollection>("L1TkCaloJets");
+  produces<TkJetCollection>("L1TkCaloJets");
 
   TRK_ZMAX    = (float)iConfig.getParameter<double>("TRK_ZMAX");
   TRK_CHI2MAX = (float)iConfig.getParameter<double>("TRK_CHI2MAX");
@@ -121,7 +121,7 @@ void L1TkCaloJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   // output container
   // ----------------------------------------------------------------------------------------------
 
-  std::unique_ptr<L1TkJetParticleCollection> cenTkJets(new L1TkJetParticleCollection);
+  std::unique_ptr<TkJetCollection> cenTkJets(new TkJetCollection);
 
 
   // ----------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void L1TkCaloJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
   if ( !CentralJetHandle.isValid() ) {
     LogError("L1TkCaloJetProducer")
-    << "\nWarning: L1JetParticleCollection not found in the event. Exit"
+    << "\nWarning: L1JetCollection not found in the event. Exit"
     << std::endl;
   }
   else {
@@ -375,11 +375,11 @@ void L1TkCaloJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 
       // ----------------------------------------------------------------------------------------------
-      // end of jet loop, create the L1TkJetParticle and push to collection
+      // end of jet loop, create the TkJet and push to collection
       // ----------------------------------------------------------------------------------------------
 
       const math::XYZTLorentzVector jetP4 = jetIter->p4();
-      L1TkJetParticle trkJet(jetP4, jetRef, L1TrackPtrs, this_zpos);
+      TkJet trkJet(jetP4, jetRef, L1TrackPtrs, this_zpos);
 
       cenTkJets->push_back(trkJet);
 

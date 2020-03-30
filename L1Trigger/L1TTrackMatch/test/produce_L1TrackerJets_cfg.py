@@ -32,8 +32,8 @@ Source_Files = cms.untracked.vstring('file:/mnt/hadoop/store/user/rish/MinBiasPU
 
 
 process.source = cms.Source("PoolSource", fileNames = Source_Files) #, inputCommands=cms.untracked.vstring('drop *EMTF_*_*_*'))
-process.load("L1Trigger.L1TTrackMatch.L1TkPrimaryVertexProducer_cfi")
-process.pL1TkPrimaryVertex = cms.Path( process.L1TkPrimaryVertex )
+process.load("L1Trigger.L1TTrackMatch.TkPrimaryVertexProducer_cfi")
+process.pTkPrimaryVertex = cms.Path( process.TkPrimaryVertex )
 process.load("L1Trigger.L1TTrackMatch.L1TrackerJetProducer_cfi");
 process.pL1TrackerJets=cms.Path(process.L1TrackerJets)
 process.out = cms.OutputModule( "PoolOutputModule",
@@ -41,4 +41,4 @@ process.out = cms.OutputModule( "PoolOutputModule",
                                 fileName = cms.untracked.string("test.root" )
 		               )
 process.FEVToutput_step = cms.EndPath(process.out)
-#process.schedule = cms.Schedule(process.TTTracks,process.TTTracksWithTruth,process.pL1TkPrimaryVertex,process.pL1TrackerJets,process.FEVToutput_step)
+#process.schedule = cms.Schedule(process.TTTracks,process.TTTracksWithTruth,process.pTkPrimaryVertex,process.pL1TrackerJets,process.FEVToutput_step)

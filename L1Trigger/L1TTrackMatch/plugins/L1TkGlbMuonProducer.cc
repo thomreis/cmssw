@@ -1,12 +1,12 @@
 // -*- C++ -*-
 //
 // input: L1 TkTracks and  L1Muon
-// match the two and produce a collection of L1TkGlbMuonParticle
+// match the two and produce a collection of TkGlbMuon
 // eventually, this should be made modular and allow to swap out different algorithms
 
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkGlbMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkGlbMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkGlbMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkGlbMuonFwd.h"
 
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -115,7 +115,7 @@ L1TkGlbMuonProducer::L1TkGlbMuonProducer(const edm::ParameterSet& iConfig) :
 
    use5ParameterFit_     = iConfig.getParameter<bool>("use5ParameterFit");
    useTPMatchWindows_     = iConfig.getParameter<bool>("useTPMatchWindows");
-   produces<L1TkGlbMuonParticleCollection>();
+   produces<TkGlbMuonCollection>();
 }
 
 L1TkGlbMuonProducer::~L1TkGlbMuonProducer() {
@@ -126,7 +126,7 @@ void
 L1TkGlbMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-  std::unique_ptr<L1TkGlbMuonParticleCollection> tkMuons(new L1TkGlbMuonParticleCollection);
+  std::unique_ptr<TkGlbMuonCollection> tkMuons(new TkGlbMuonCollection);
 
   // the L1EGamma objects
   edm::Handle<MuonBxCollection> l1musH;
@@ -238,7 +238,7 @@ L1TkGlbMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         math::XYZPoint v3(tkv3.x(), tkv3.y(), tkv3.z());
         float trkisol = -999;
 
-        L1TkGlbMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+        TkGlbMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
 
         // EP: add the zvtx information
         l1tkmu.setTrkzVtx( (float)tkv3.z() );

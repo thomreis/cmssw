@@ -155,20 +155,20 @@ process.L1TrackTrigger_step = cms.Path(process.L1TrackletTracks)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # ---------------------------------------------------------------------------
 
-# Now we produce L1TkEmParticles and L1TkElectrons
+# Now we produce TkEms and TkElectrons
 
 process.load("L1Trigger.L1TTrackMatch.L1TkObjectProducers_cff")
 process.pL1TkObjects = cms.Path(process.L1TkElectrons
                              + process.L1TkPhotons
                              + process.L1TkCaloJets
-                             + process.L1TkPrimaryVertex
+                             + process.TkPrimaryVertex
                              + process.L1TrackerEtMiss
                              + process.L1TkCaloHTMissVtx
                              + process.L1TkMuons
                              + process.L1TkTauFromCalo)
 
 process.printTkObj = cms.EDAnalyzer( 'PrintL1TkObjects' ,
-    L1TkVtxInputTag       = cms.InputTag("L1TkPrimaryVertex",""),
+    L1TkVtxInputTag       = cms.InputTag("TkPrimaryVertex",""),
     L1TkEtMissInputTag    = cms.InputTag("L1TrackerEtMiss","MET"),
     L1TkJetsInputTag      = cms.InputTag("L1TkCaloJets","L1TkCaloJets"),
     L1TkHTMInputTag       = cms.InputTag("L1TkCaloHTMissVtx", "L1TkCaloHTMiss"),

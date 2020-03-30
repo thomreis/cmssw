@@ -43,7 +43,7 @@
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 
 using namespace l1t ;
 
@@ -51,14 +51,14 @@ using namespace l1t ;
 // class declaration
 //
 
-class L1TkPrimaryVertexProducer : public edm::EDProducer {
+class TkPrimaryVertexProducer : public edm::EDProducer {
    public:
 
    typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
    typedef std::vector< L1TTTrackType >  L1TTTrackCollectionType;
 
-      explicit L1TkPrimaryVertexProducer(const edm::ParameterSet&);
-      ~L1TkPrimaryVertexProducer();
+      explicit TkPrimaryVertexProducer(const edm::ParameterSet&);
+      ~TkPrimaryVertexProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -110,7 +110,7 @@ class L1TkPrimaryVertexProducer : public edm::EDProducer {
 //
 // constructors and destructor
 //
-L1TkPrimaryVertexProducer::L1TkPrimaryVertexProducer(const edm::ParameterSet& iConfig) :
+TkPrimaryVertexProducer::TkPrimaryVertexProducer(const edm::ParameterSet& iConfig) :
   trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
    //register your products
@@ -126,12 +126,12 @@ L1TkPrimaryVertexProducer::L1TkPrimaryVertexProducer(const edm::ParameterSet& iC
 
   SumPtSquared = iConfig.getParameter<bool>("SumPtSquared");
 
-  produces<L1TkPrimaryVertexCollection>();
+  produces<TkPrimaryVertexCollection>();
 
 }
 
 
-L1TkPrimaryVertexProducer::~L1TkPrimaryVertexProducer()
+TkPrimaryVertexProducer::~TkPrimaryVertexProducer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -146,11 +146,11 @@ L1TkPrimaryVertexProducer::~L1TkPrimaryVertexProducer()
 
 // ------------ method called to produce the data  ------------
 void
-L1TkPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+TkPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
- std::unique_ptr<L1TkPrimaryVertexCollection> result(new L1TkPrimaryVertexCollection);
+ std::unique_ptr<TkPrimaryVertexCollection> result(new TkPrimaryVertexCollection);
 
   
   ////////////////////////
@@ -174,7 +174,7 @@ L1TkPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
  if( !L1TTTrackHandle.isValid() )
         {
-          LogError("L1TkPrimaryVertexProducer")
+          LogError("TkPrimaryVertexProducer")
             << "\nWarning: LTTkTrackCollection not found in the event. Exit"
             << std::endl;
  	    return;
@@ -190,7 +190,7 @@ L1TkPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
    if (! SumPtSquared)  imode = 1;   // max(Sum PT)
 
    float z1 = MaxPtVertex( L1TTTrackHandle, sum1, nmin, nPSmin, ptmin, imode, tTopo );
-   L1TkPrimaryVertex vtx1( z1, sum1 );
+   TkPrimaryVertex vtx1( z1, sum1 );
 
  result -> push_back( vtx1 );
 
@@ -198,7 +198,7 @@ L1TkPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 }
 
 
-float L1TkPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TTTrackCollectionType> & L1TTTrackHandle,
+float TkPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TTTrackCollectionType> & L1TTTrackHandle,
  		float& Sum,
 		int nmin, int nPSmin, float ptmin, int imode,
 		const TrackerTopology* topol) {
@@ -229,7 +229,7 @@ float L1TkPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TTTrackCollecti
 }  
 
 
-float L1TkPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TTTrackCollectionType> & L1TTTrackHandle,
+float TkPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TTTrackCollectionType> & L1TTTrackHandle,
 		float z, int nmin, int nPSmin, float ptmin, int imode,
 		const TrackerTopology* topol) {
 
@@ -261,7 +261,7 @@ float L1TkPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TTTrackCollecti
 
       int tmp_trk_nstub = (int) theStubs.size();
       if ( tmp_trk_nstub < 0) {
-	std::cout << " ... could not retrieve the vector of stubs in L1TkPrimaryVertexProducer::SumPtVertex " << std::endl;
+	std::cout << " ... could not retrieve the vector of stubs in TkPrimaryVertexProducer::SumPtVertex " << std::endl;
 	continue;
       }
 
@@ -300,18 +300,18 @@ float L1TkPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TTTrackCollecti
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-L1TkPrimaryVertexProducer::beginJob()
+TkPrimaryVertexProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-L1TkPrimaryVertexProducer::endJob() {
+TkPrimaryVertexProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 void
-L1TkPrimaryVertexProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+TkPrimaryVertexProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 {
 
 
@@ -320,7 +320,7 @@ L1TkPrimaryVertexProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetu
 // ------------ method called when ending the processing of a run  ------------
 /*
 void
-L1TkPrimaryVertexProducer::endRun(edm::Run&, edm::EventSetup const&)
+TkPrimaryVertexProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 */
@@ -328,7 +328,7 @@ L1TkPrimaryVertexProducer::endRun(edm::Run&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void
-L1TkPrimaryVertexProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+TkPrimaryVertexProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
@@ -336,14 +336,14 @@ L1TkPrimaryVertexProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::Even
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void
-L1TkPrimaryVertexProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+TkPrimaryVertexProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
  
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-L1TkPrimaryVertexProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+TkPrimaryVertexProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -352,4 +352,4 @@ L1TkPrimaryVertexProducer::fillDescriptions(edm::ConfigurationDescriptions& desc
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TkPrimaryVertexProducer);
+DEFINE_FWK_MODULE(TkPrimaryVertexProducer);

@@ -5,7 +5,7 @@
 // 
 /**\class L1WP2ElectronMatchAlgo 
 
- Description: Producer of a L1TkEmParticle
+ Description: Producer of a TkEm
 
  Implementation:
      [Notes on implementation]
@@ -36,10 +36,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -54,7 +54,7 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPrimaryVertex.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
 
 #include <string>
 #include "TMath.h"
@@ -114,7 +114,7 @@ class L1WP2ElectronProducer : public edm::EDProducer {
   
         const edm::EDGetTokenT< EGammaBxCollection > egToken;
         const edm::EDGetTokenT< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
-        const edm::EDGetTokenT<L1TkPrimaryVertexCollection> vertexToken;
+        const edm::EDGetTokenT<TkPrimaryVertexCollection> vertexToken;
 } ;
 
 
@@ -124,7 +124,7 @@ class L1WP2ElectronProducer : public edm::EDProducer {
 L1WP2ElectronProducer::L1WP2ElectronProducer(const edm::ParameterSet& iConfig) :
   egToken(consumes< EGammaBxCollection >(iConfig.getParameter<edm::InputTag>("L1EGammaInputTag"))),
   trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag"))),
-  vertexToken(consumes< L1TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1VertexInputTag")))
+  vertexToken(consumes< TkPrimaryVertexCollection >(iConfig.getParameter<edm::InputTag>("L1VertexInputTag")))
   {
 
    label = iConfig.getParameter<std::string>("label");  // label of the collection produced
@@ -153,7 +153,7 @@ L1WP2ElectronProducer::L1WP2ElectronProducer(const edm::ParameterSet& iConfig) :
    dRCutoff        = iConfig.getParameter< std::vector<double> >("TrackEGammaDeltaR"); 
    dEtaCutoff      = (float)iConfig.getParameter<double>("TrackEGammaDeltaEta"); 
 
-   produces<L1TkEmParticleCollection>(label);
+   produces<TkEmCollection>(label);
 }
 
 L1WP2ElectronProducer::~L1WP2ElectronProducer() {
@@ -162,7 +162,7 @@ L1WP2ElectronProducer::~L1WP2ElectronProducer() {
 // ------------ method called to produce the data  ------------
 void
 L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::unique_ptr<L1TkEmParticleCollection> result(new L1TkEmParticleCollection);
+  std::unique_ptr<TkEmCollection> result(new TkEmCollection);
   
   // geometry needed to call pTFrom2Stubs
   edm::ESHandle<TrackerGeometry> geomHandle;
@@ -182,7 +182,7 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
   if( !eGammaHandle.isValid() ) {
     edm::LogError("L1WP2ElectronProducer")
-      << "\nWarning: L1EmParticleCollection not found in the event. Exit"
+      << "\nWarning: L1EmCollection not found in the event. Exit"
       << std::endl;
     return;
   }
@@ -194,7 +194,7 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   }
 
   float zvtxL1tk = -999;
-  edm::Handle<L1TkPrimaryVertexCollection> L1VertexHandle;
+  edm::Handle<TkPrimaryVertexCollection> L1VertexHandle;
   iEvent.getByToken(vertexToken, L1VertexHandle);
   if(!L1VertexHandle.isValid() ) {
     edm::LogError("L1WP2ElectronProducer")
@@ -203,7 +203,7 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     return;
   }
   else {
-    std::vector<L1TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
+    std::vector<TkPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
     zvtxL1tk = vtxIter -> zvertex();
   }
 
@@ -261,7 +261,7 @@ L1WP2ElectronProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
       trkisol = trkisol  / et_ele;
     }
     
-    L1TkEmParticle trkEm( P4, 
+    TkEm trkEm( P4, 
       			  EGammaRef,
 			  trkisol,
       			  trkisol );

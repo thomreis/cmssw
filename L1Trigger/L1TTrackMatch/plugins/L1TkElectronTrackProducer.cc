@@ -5,7 +5,7 @@
 //
 /**\class L1TkElectronTrackMatchAlgo
 
- Description: Producer of a L1TkElectronParticle, for the algorithm matching a L1Track to the L1EG object
+ Description: Producer of a TkElectron, for the algorithm matching a L1Track to the L1EG object
 
  Implementation:
      [Notes on implementation]
@@ -36,8 +36,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkElectronParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -155,7 +155,7 @@ L1TkElectronTrackProducer::L1TkElectronTrackProducer(const edm::ParameterSet& iC
    dEtaCutoff      = iConfig.getParameter< std::vector<double> >("TrackEGammaDeltaEta");
    matchType       = iConfig.getParameter< std::string >("TrackEGammaMatchType");
 
-   produces<L1TkElectronParticleCollection>(label);
+   produces<TkElectronCollection>(label);
 }
 
 L1TkElectronTrackProducer::~L1TkElectronTrackProducer() {
@@ -164,7 +164,7 @@ L1TkElectronTrackProducer::~L1TkElectronTrackProducer() {
 // ------------ method called to produce the data  ------------
 void
 L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::unique_ptr<L1TkElectronParticleCollection> result(new L1TkElectronParticleCollection);
+  std::unique_ptr<TkElectronCollection> result(new TkElectronCollection);
 
 
   // geometry needed to call pTFrom2Stubs
@@ -185,12 +185,12 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
   if( !eGammaHandle.isValid() ) {
     edm::LogError("L1TkElectronTrackProducer")
-      << "\nWarning: L1EmParticleCollection not found in the event. Exit"
+      << "\nWarning: L1EmCollection not found in the event. Exit"
       << std::endl;
     return;
   }
   if (!L1TTTrackHandle.isValid() ) {
-    edm::LogError("L1TkEmParticleProducer")
+    edm::LogError("TkEmProducer")
       << "\nWarning: L1TTTrackCollectionType not found in the event. Exit."
       << std::endl;
     return;
@@ -239,7 +239,7 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
         trkisol = trkisol  / et_ele;
       }
 
-      L1TkElectronParticle trkEm( P4,
+      TkElectron trkEm( P4,
 				  EGammaRef,
 				  matchedL1TrackPtr,
 				  trkisol );

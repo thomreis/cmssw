@@ -9,7 +9,7 @@
 //      Stubs are taken to be inputs to EMTF, EMTFHitCollection
 //      Use DynamicWindow matching algorithm which assumes muon 
 //      detector object (here Stubs) have coordinates at 2nd station.  
-//      Match the two and produce a collection of L1TkMuonParticle
+//      Match the two and produce a collection of TkMuon
 
 // user include files
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -26,8 +26,8 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticle.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkMuonParticleFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
 #include "L1Trigger/L1TMuon/interface/MicroGMTConfiguration.h"
 #include "L1Trigger/L1TTrackMatch/interface/L1TkMuCorrDynamicWindows.h"
 #include "L1Trigger/L1TMuonEndCap/interface/Common.h"
@@ -72,12 +72,12 @@ public:
 private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
   
-  void makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>& , L1TkMuonParticleCollection& ) const;
+  void makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>& , TkMuonCollection& ) const;
 
   // algo for endcap regions using dynamic windows for making the match trk + muStub
   void runOnMuonHitCollection(const edm::Handle<EMTFHitCollection>&,
                           const edm::Handle<L1TTTrackCollectionType>&,
-                          L1TkMuonParticleCollection& tkMuons) const;
+                          TkMuonCollection& tkMuons) const;
 
   void cleanStubs(const EMTFHitCollection &, EMTFHitCollection &) const;
 
@@ -113,8 +113,8 @@ L1TkMuonStubProducer::L1TkMuonStubProducer(const edm::ParameterSet& iConfig) :
     throw cms::Exception("TkMuAlgoConfig") << "the ID of the EMTF algo matcher passed is invalid\n";
    
 
-   produces<L1TkMuonParticleCollection>();
-   produces<L1TkMuonParticleCollection>("ME0Ext");
+   produces<TkMuonCollection>();
+   produces<TkMuonCollection>("ME0Ext");
 
    // initializations
    if (emtfMatchAlgoVersion_ == kDynamicWindows)
@@ -175,8 +175,8 @@ L1TkMuonStubProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<L1TTTrackCollectionType> l1tksH;
   iEvent.getByToken(trackToken, l1tksH);
 
-  L1TkMuonParticleCollection oc_endcap_tkmuonStub;
-  L1TkMuonParticleCollection oc_me0Extended_tkmuonStub;
+  TkMuonCollection oc_endcap_tkmuonStub;
+  TkMuonCollection oc_me0Extended_tkmuonStub;
 
   // process each of the MTF collections separately! -- we don't want to filter the muons
   //if (emtfMatchAlgoVersion_ == kDynamicWindows) 
@@ -185,7 +185,7 @@ L1TkMuonStubProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //throw cms::Exception("TkMuAlgoConfig") << "trying to run an invalid algorithm (this should never happen)\n";
 
   // now combine all trk muons into a single output collection!
-  std::unique_ptr<L1TkMuonParticleCollection> oc_tkmuon(new L1TkMuonParticleCollection());
+  std::unique_ptr<TkMuonCollection> oc_tkmuon(new TkMuonCollection());
   for (const auto& p : {oc_endcap_tkmuonStub}){
     oc_tkmuon->insert(oc_tkmuon->end(), p.begin(), p.end());
   }
@@ -193,7 +193,7 @@ L1TkMuonStubProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    makeMuonsME0Extended(l1emtfHCH,oc_me0Extended_tkmuonStub);
 
   // now combine all trk muons into a single output collection!
-  std::unique_ptr<L1TkMuonParticleCollection> oc_me0Ext(new L1TkMuonParticleCollection());
+  std::unique_ptr<TkMuonCollection> oc_me0Ext(new TkMuonCollection());
   for (const auto& p : {oc_me0Extended_tkmuonStub}){
     oc_me0Ext->insert(oc_me0Ext->end(), p.begin(), p.end());
   }
@@ -206,7 +206,7 @@ L1TkMuonStubProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 void
-L1TkMuonStubProducer::makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>& muonStubH, L1TkMuonParticleCollection& tkMuons) const
+L1TkMuonStubProducer::makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>& muonStubH, TkMuonCollection& tkMuons) const
 
 {
   const EMTFHitCollection& l1muStubs = (*muonStubH.product());
@@ -241,7 +241,7 @@ L1TkMuonStubProducer::makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>&
     
     // build a L1Candidate
     reco::Candidate::PolarLorentzVector muonLV(pt,eta,phi,0);
-    L1TkMuonParticle muon(muonLV);
+    TkMuon muon(muonLV);
 
     int charge = 1;
     if(stubBend > 0) charge = -1;
@@ -264,7 +264,7 @@ L1TkMuonStubProducer::makeMuonsME0Extended(const edm::Handle<EMTFHitCollection>&
 void
 L1TkMuonStubProducer::runOnMuonHitCollection(const edm::Handle<EMTFHitCollection>& muonStubH,
                                      const edm::Handle<L1TTTrackCollectionType>& l1tksH,
-                                     L1TkMuonParticleCollection& tkMuons) const
+                                     TkMuonCollection& tkMuons) const
 
 {
   const EMTFHitCollection& l1muStubs = (*muonStubH.product());
@@ -304,7 +304,7 @@ L1TkMuonStubProducer::runOnMuonHitCollection(const edm::Handle<EMTFHitCollection
     edm::Ref< RegionalMuonCandBxCollection > l1muRef; // FIXME! The reference to the muon is null 
     edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, il1ttrack);
     float trkisol = -999; // FIXME: now doing as in the TP algo
-    L1TkMuonParticle l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
+    TkMuon l1tkmu(l1tkp4, l1muRef, l1tkPtr, trkisol);
     l1tkmu.setTrkzVtx( (float)tkv3.z() );
     
     // Set curvature

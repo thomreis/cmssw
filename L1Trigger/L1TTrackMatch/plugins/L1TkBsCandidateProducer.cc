@@ -43,10 +43,10 @@
 #include "DataFormats/L1TrackTrigger/interface/TTStub.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTrack.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPhiCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkPhiCandidateFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkBsCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/L1TkBsCandidateFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidate.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidateFwd.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidate.h"
+#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidateFwd.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
@@ -76,7 +76,7 @@ private:
 
   int findPhiCandidates(const edm::Handle<L1TTTrackCollectionType>& trkHandle, 
 			const TrackerTopology* tTopo,
-			L1TkPhiCandidateCollection& list) const;
+			TkPhiCandidateCollection& list) const;
   bool selectTrack(L1TTTrackCollectionType::const_iterator itrk, 
 		   const TrackerTopology* tTopo) const;
   void stubInfo(L1TTTrackCollectionType::const_iterator itrk, 
@@ -87,8 +87,8 @@ private:
   static void deltaPos(L1TTTrackCollectionType::const_iterator itrk, 
 		       L1TTTrackCollectionType::const_iterator jtrk, 
 		       double& dxy, double& dz);
-  static void deltaPos(const L1TkPhiCandidate& phia, 
-		       const L1TkPhiCandidate& phib, 
+  static void deltaPos(const TkPhiCandidate& phia, 
+		       const TkPhiCandidate& phib, 
 		       double& dxy, double& dz);
 
   // ----------member data ---------------------------
@@ -141,13 +141,13 @@ L1TkBsCandidateProducer::L1TkBsCandidateProducer(const edm::ParameterSet& iConfi
   bsMassMax_(iConfig.getParameter<double>("BsMassMax")),
   label_(iConfig.getParameter<std::string>("label"))  // label of the collection produced  
 {
-  produces<L1TkBsCandidateCollection>(label_);
+  produces<TkBsCandidateCollection>(label_);
 }
 L1TkBsCandidateProducer::~L1TkBsCandidateProducer() {
 }
 // ------------ method called to produce the data  ------------
 void L1TkBsCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::unique_ptr<L1TkBsCandidateCollection> collection(new L1TkBsCandidateCollection);
+  std::unique_ptr<TkBsCandidateCollection> collection(new TkBsCandidateCollection);
 
   ++evcounters[0];
   // the L1Tracks
@@ -165,7 +165,7 @@ void L1TkBsCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     if (ntrk > 3) ++evcounters[1];
 
     // First pass: build Phi candidates from L1 Tracks (assigning kaon mass to each track)
-    L1TkPhiCandidateCollection phiColl;
+    TkPhiCandidateCollection phiColl;
     int nCand = findPhiCandidates(trkHandle, tTopo, phiColl); 
     if (nCand > 1) {
       ++evcounters[2];
@@ -205,7 +205,7 @@ void L1TkBsCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 	  double mass = bsv.M();    
 	  if (mass < bsMassMin_ || mass > bsMassMax_) continue;
 	  ++icounters[4];
-	  L1TkBsCandidate bsCandidate(bsv, phia, phib);
+	  TkBsCandidate bsCandidate(bsv, phia, phib);
 	  collection->push_back(bsCandidate);
 	}
       }
@@ -222,7 +222,7 @@ void L1TkBsCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 }
 int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollectionType>& trkHandle, 
 					       const TrackerTopology* tTopo,                               
-					       L1TkPhiCandidateCollection& list) const
+					       TkPhiCandidateCollection& list) const
 {
   size_t itrk = 0;
   for (auto it = trkHandle->begin(); it != trkHandle->end(); ++it, itrk++) {
@@ -232,7 +232,7 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
     math::PtEtaPhiMLorentzVector trkv1(it->momentum().perp(), 
 				       it->momentum().eta(), 
 				       it->momentum().phi(), 
-				       L1TkPhiCandidate::kmass);
+				       TkPhiCandidate::kmass);
 
     size_t jtrk = 0;
     for (auto jt = trkHandle->begin(); jt != trkHandle->end(); ++jt, jtrk++) {
@@ -254,7 +254,7 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
       math::PtEtaPhiMLorentzVector trkv2(jt->momentum().perp(), 
 					 jt->momentum().eta(), 
 					 jt->momentum().phi(), 
-					 L1TkPhiCandidate::kmass);
+					 TkPhiCandidate::kmass);
 
       // Select mass window
       math::XYZTLorentzVector p4(trkv1.Px() + trkv2.Px(), 
@@ -264,7 +264,7 @@ int L1TkBsCandidateProducer::findPhiCandidates(const edm::Handle<L1TTTrackCollec
       double mass = p4.M();
       if (mass < phiMassMin_ || mass > phiMassMax_) continue;
 
-      L1TkPhiCandidate cand(p4, trkPtr1, trkPtr2);
+      TkPhiCandidate cand(p4, trkPtr1, trkPtr2);
       list.push_back(cand);
     }
   }
@@ -314,8 +314,8 @@ void L1TkBsCandidateProducer::deltaPos(L1TTTrackCollectionType::const_iterator i
 		+ std::pow(itrk->POCA().y() - jtrk->POCA().y(), 2));
   dz  = itrk->POCA().z() - jtrk->POCA().z();
 }
-void L1TkBsCandidateProducer::deltaPos(const L1TkPhiCandidate& phia, 
-				       const L1TkPhiCandidate& phib, 
+void L1TkBsCandidateProducer::deltaPos(const TkPhiCandidate& phia, 
+				       const TkPhiCandidate& phib, 
 				       double& dxy, double& dz) 
 {
   dxy = std::sqrt(std::pow(phia.vx() - phib.vx(), 2) + std::pow(phia.vy() - phib.vy(), 2));
