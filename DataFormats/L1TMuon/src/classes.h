@@ -10,7 +10,6 @@
 #include "DataFormats/L1TMuon/interface/EMTFRoad.h"
 #include "DataFormats/L1TMuon/interface/EMTFTrack.h"
 #include "DataFormats/L1TMuon/interface/CPPFDigi.h"
-#include "DataFormats/L1TMuon/interface/L1MuCorrelatorHit.h"
 
 #include "DataFormats/L1TMuon/interface/L1MuBMTrack.h"
 #include "DataFormats/L1TMuon/interface/L1MuBMTrackSegPhi.h"
@@ -18,9 +17,4 @@
 #include "DataFormats/L1TMuon/interface/L1MuKBMTCombinedStub.h"
 #include "DataFormats/L1TMuon/interface/L1MuKBMTrack.h"
 
-#include "DataFormats/L1TMuon/interface/BayesMuCorrelatorTrack.h"
-
 #include <vector>
-
-
-
