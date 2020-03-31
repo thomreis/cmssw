@@ -84,9 +84,9 @@ phase2_SimL1Emulator = SimL1Emulator.copy()
 
 #%% # Barrel EGamma
 #%% # ########################################################################
-from L1Trigger.L1CaloTrigger.l1EGammaCrystalsProducer_cfi import *
+#%%from L1Trigger.L1CaloTrigger.l1EGammaCrystalsProducer_cfi import *
 #%% phase2_SimL1Emulator += l1EGammaCrystalsProducer
-_phase2_siml1emulator.add(l1EGammaCrystalsProducer)
+#%% _phase2_siml1emulator.add(l1EGammaCrystalsProducer)
 from L1Trigger.L1CaloTrigger.L1EGammaCrystalsEmulatorProducer_cfi import *
 #%% phase2_SimL1Emulator += L1EGammaClusterEmuProducer
 _phase2_siml1emulator.add(L1EGammaClusterEmuProducer)
@@ -132,13 +132,13 @@ _phase2_siml1emulator.add(L1TkPrimaryVertex)
 #phase2_SimL1Emulator += L1TkIsoElectrons # warning this has a PhaseI EG seed!
 #phase2_SimL1Emulator += L1TkPhotons # warning this has a PhaseI EG seed!
 #%% phase2_SimL1Emulator += L1TkElectronsCrystal
-_phase2_siml1emulator.add(L1TkElectronsCrystal)
+#_phase2_siml1emulator.add(L1TkElectronsCrystal)
 #%% phase2_SimL1Emulator += L1TkElectronsEllipticMatchCrystal
 _phase2_siml1emulator.add(L1TkElectronsEllipticMatchCrystal)
 #%% phase2_SimL1Emulator += L1TkIsoElectronsCrystal
-_phase2_siml1emulator.add(L1TkIsoElectronsCrystal)
+#_phase2_siml1emulator.add(L1TkIsoElectronsCrystal)
 #%% phase2_SimL1Emulator += L1TkElectronsLooseCrystal
-_phase2_siml1emulator.add(L1TkElectronsLooseCrystal)
+#_phase2_siml1emulator.add(L1TkElectronsLooseCrystal)
 #%% phase2_SimL1Emulator += L1WP2Electrons
 _phase2_siml1emulator.add(L1WP2Electrons)
 #%% phase2_SimL1Emulator += L1TkPhotonsCrystal
@@ -162,7 +162,7 @@ _phase2_siml1emulator.add(L1TkPhotonsCrystal)
 #%% phase2_SimL1Emulator += L1TrackerTaus
 #%% phase2_SimL1Emulator += L1TkEGTaus
 #%% phase2_SimL1Emulator += L1TkCaloTaus
-_phase2_siml1emulator.add( L1TkMuons, L1TkMuonsTP, L1TkGlbMuons )
+_phase2_siml1emulator.add( L1TkMuons )
 
 #%% # PF Candidates
 #%% # ########################################################################
