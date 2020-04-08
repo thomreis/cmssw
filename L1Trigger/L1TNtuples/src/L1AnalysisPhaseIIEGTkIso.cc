@@ -85,14 +85,14 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollec
   int matchedTrackIdx = -1;
   if (matchedTrackPtr.isNonnull()) {
     matchedTrackIdx = matchedTrackPtr.key();
-    //std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->getMomentum().eta() << ", phi: " << matchedTrackPtr->getMomentum().phi() << ", dR: " << matchedTrackDR << std::endl;
+    //std::cout << "Matched track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << matchedTrackPtr->getMomentum().perp() << ", eta: " << matchedTrackPtr->eta() << ", phi: " << matchedTrackPtr->phi() << ", dR: " << matchedTrackDR << std::endl;
     l1Phase2EGTkIso_.EGHasMatchedTrack.push_back(1);
     l1Phase2EGTkIso_.matchedTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
-    l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->getMomentum().perp());
-    l1Phase2EGTkIso_.matchedTkEta.push_back(matchedTrackPtr->getMomentum().eta());
-    l1Phase2EGTkIso_.matchedTkPhi.push_back(matchedTrackPtr->getMomentum().phi());
-    l1Phase2EGTkIso_.matchedTkRInv.push_back(matchedTrackPtr->getRInv());
-    l1Phase2EGTkIso_.matchedTkChi2.push_back(matchedTrackPtr->getChi2());
+    l1Phase2EGTkIso_.matchedTkPt.push_back(matchedTrackPtr->momentum().perp());
+    l1Phase2EGTkIso_.matchedTkEta.push_back(matchedTrackPtr->eta());
+    l1Phase2EGTkIso_.matchedTkPhi.push_back(matchedTrackPtr->phi());
+    l1Phase2EGTkIso_.matchedTkRInv.push_back(matchedTrackPtr->rInv());
+    l1Phase2EGTkIso_.matchedTkChi2.push_back(matchedTrackPtr->chi2());
     l1Phase2EGTkIso_.matchedTkDR.push_back(matchedTrackDR);
     l1Phase2EGTkIso_.matchedTkDEta.push_back(matchedTrackDEta);
     l1Phase2EGTkIso_.matchedTkDPhi.push_back(matchedTrackDPhi);
@@ -110,12 +110,12 @@ edm::Ptr<L1Analysis::L1AnalysisPhaseIIEGTkIso::L1TTTrackType> L1Analysis::L1Anal
   int iTrack = 0;
   int iMatchedTrack = -1;
   for (L1TTTrackCollectionType::const_iterator trkIt = tttrack->begin(); trkIt != tttrack->end(); ++trkIt) {
-    auto trkPt = trkIt->getMomentum().perp();
+    auto trkPt = trkIt->momentum().perp();
     if (useTwoStubsPt_) {
       trkPt = pTFrom2Stubs::pTFrom2(trkIt, tGeom);
     }
 
-    if (trkPt > trkPtMin_ and trkIt->getChi2() < trkChi2Max_) {
+    if (trkPt > trkPtMin_ and trkIt->chi2() < trkChi2Max_) {
       // calculate dR to EG
       double dPhi = 999.;
       double dR = 999.;
@@ -157,13 +157,13 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
   for (L1TTTrackCollectionType::const_iterator trkIt = tttrack->begin(); trkIt != tttrack->end(); ++trkIt) {
     if (++iTrack != matchedTrackIdx) { // Do not use the matched track in the isolation
       // track momentum calculation
-      auto trkPt = trkIt->getMomentum().perp();
+      auto trkPt = trkIt->momentum().perp();
       if (useTwoStubsPt_) {
         trkPt = pTFrom2Stubs::pTFrom2(trkIt, tGeom);
       }
 
       // basic track selection
-      if (trkIt->getChi2() > trkChi2MaxIso
+      if (trkIt->chi2() > trkChi2MaxIso
           or trkIt->getStubRefs().size() < trkNStubMinIso
           or trkPt < trkPtMinIso) {
         continue;
@@ -185,21 +185,21 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::setIsoTracks(const l1t::EGammaBxColle
         // calculate distance from matched track
         if (matchedTrackIdx >= 0) {
           edm::Ptr<L1TTTrackType> matchedTrackPtr(tttrack, matchedTrackIdx);
-          const auto phi1 = static_cast<float>(trkIt->getMomentum().phi());
-          const auto phi2 = static_cast<float>(matchedTrackPtr->getMomentum().phi());
+          const auto phi1 = static_cast<float>(trkIt->phi());
+          const auto phi2 = static_cast<float>(matchedTrackPtr->phi());
           dPhiTrkTrk = reco::deltaPhi(phi1, phi2);
-          dEtaTrkTrk = static_cast<float>(trkIt->getMomentum().eta() - matchedTrackPtr->getMomentum().eta());
+          dEtaTrkTrk = static_cast<float>(trkIt->eta() - matchedTrackPtr->eta());
           dRTrkTrk = std::sqrt(dPhiTrkTrk * dPhiTrkTrk + dEtaTrkTrk * dEtaTrkTrk);
-          dzTrkTrk = fabs(trkIt->getPOCA().z() - matchedTrackPtr->getPOCA().z());
+          dzTrkTrk = fabs(trkIt->POCA().z() - matchedTrackPtr->POCA().z());
         }
 
-        //std::cout << "Iso track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << trkPt << ", eta: " << trkIt->getMomentum().eta() << ", phi: " << trkIt->getMomentum().phi() << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << ", dR tktk: " << dRTrkTrk << ", dEta tktk: " << dEtaTrkTrk << ", dPhi tktk: " << dPhiTrkTrk << ", dz tktk: " << dzTrkTrk << std::endl;
+        //std::cout << "Iso track: EG idx: " << l1Phase2EGTkIso_.nEG - 1 << ", pt: " << trkPt << ", eta: " << trkIt->eta() << ", phi: " << trkIt->phi() << ", dR: " << dR << ", dEta: " << dEta << ", dPhi: " << dPhi << ", dR tktk: " << dRTrkTrk << ", dEta tktk: " << dEtaTrkTrk << ", dPhi tktk: " << dPhiTrkTrk << ", dz tktk: " << dzTrkTrk << std::endl;
         l1Phase2EGTkIso_.isoTkEGIdx.push_back(l1Phase2EGTkIso_.nEG - 1);
         l1Phase2EGTkIso_.isoTkPt.push_back(trkPt);
-        l1Phase2EGTkIso_.isoTkEta.push_back(trkIt->getMomentum().eta());
-        l1Phase2EGTkIso_.isoTkPhi.push_back(trkIt->getMomentum().phi());
-        l1Phase2EGTkIso_.isoTkRInv.push_back(trkIt->getRInv());
-        l1Phase2EGTkIso_.isoTkChi2.push_back(trkIt->getChi2());
+        l1Phase2EGTkIso_.isoTkEta.push_back(trkIt->eta());
+        l1Phase2EGTkIso_.isoTkPhi.push_back(trkIt->phi());
+        l1Phase2EGTkIso_.isoTkRInv.push_back(trkIt->rInv());
+        l1Phase2EGTkIso_.isoTkChi2.push_back(trkIt->chi2());
         l1Phase2EGTkIso_.isoTkDR.push_back(dR);
         l1Phase2EGTkIso_.isoTkDEta.push_back(dEta);
         l1Phase2EGTkIso_.isoTkDPhi.push_back(dPhi);
