@@ -1,8 +1,8 @@
 #ifndef DataFormats_Phase2L1Taus_L1HPSPFTau_H
 #define DataFormats_Phase2L1Taus_L1HPSPFTau_H
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"    // l1t::PFCandidate, l1t::PFCandidateRef, l1t::PFCandidateRefVector
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFJet.h"          // l1t::PFJet, l1t::PFJetCollection, l1t::PFJetRef 
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"    // l1t::PFCandidate, l1t::PFCandidateRef, l1t::PFCandidateRefVector
+#include "DataFormats/L1TParticleFlow/interface/PFJet.h"          // l1t::PFJet, l1t::PFJetCollection, l1t::PFJetRef 
 #include "DataFormats/Candidate/interface/LeafCandidate.h"             // reco::LeafCandidate 
 #include "DataFormats/Candidate/interface/Particle.h"                  // reco::Particle::LorentzVector
 #include "DataFormats/L1TVertex/interface/Vertex.h"                    // l1t::Vertex, l1t::VertexRef

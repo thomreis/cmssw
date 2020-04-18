@@ -4,6 +4,6 @@
 	<use name="FWCore/FWLite"/>
 	<use name="FWCore/Utilities"/>
 	<use name="DataFormats/FWLite"/>
-	<use name="DataFormats/Phase2L1ParticleFlow"/>
+	<use name="DataFormats/L1TParticleFlow"/>
 	<use name="L1Trigger/Phase2L1ParticleFlow"/>
 </bin>

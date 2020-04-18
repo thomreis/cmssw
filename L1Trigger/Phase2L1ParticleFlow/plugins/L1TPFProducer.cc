@@ -12,9 +12,9 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include "DataFormats/Common/interface/View.h"
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -27,8 +27,8 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"    
-#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h" 
+#include "DataFormats/L1TCorrelator/interface/TkMuon.h"    
+#include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h" 
 
 //--------------------------------------------------------------------------------------------------
 class L1TPFProducer : public edm::stream::EDProducer<> {

@@ -8,7 +8,7 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFTrack.h"
+#include "DataFormats/L1TParticleFlow/interface/PFTrack.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/L1TPFUtils.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/ParametricResolution.h"
 

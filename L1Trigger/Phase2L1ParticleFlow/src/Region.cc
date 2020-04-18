@@ -1,5 +1,5 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/Region.h"
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 #include <algorithm>
 #include <cassert>
 

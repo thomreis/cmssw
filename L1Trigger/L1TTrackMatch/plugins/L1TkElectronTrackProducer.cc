@@ -36,8 +36,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 

@@ -1,7 +1,7 @@
 #ifndef L1TkTauEtComparator_HH
 #define L1TkTauEtComparator_HH
-#include "DataFormats/Phase2L1Correlator/interface/TkTau.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkTauFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkTau.h"
+#include "DataFormats/L1TCorrelator/interface/TkTauFwd.h"
 
 namespace L1TkTau{
   class EtComparator {

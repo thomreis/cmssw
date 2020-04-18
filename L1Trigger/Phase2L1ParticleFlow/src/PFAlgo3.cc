@@ -1,6 +1,6 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/PFAlgo3.h"
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
 #include "FWCore/Utilities/interface/Exception.h"
 

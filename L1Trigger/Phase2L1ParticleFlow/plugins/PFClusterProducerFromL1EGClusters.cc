@@ -4,7 +4,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCluster.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCluster.h"
 #include "L1Trigger/Phase2L1ParticleFlow/src/corrector.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/ParametricResolution.h"
 #include "DataFormats/Phase2L1CaloTrig/interface/L1EGCrystalCluster.h"

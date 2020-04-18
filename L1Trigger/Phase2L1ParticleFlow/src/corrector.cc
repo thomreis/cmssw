@@ -15,7 +15,7 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCluster.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCluster.h"
 
 
 l1tpf::corrector::corrector(const std::string &filename, float emfMax, bool debug) :

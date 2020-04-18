@@ -36,10 +36,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkEm.h"
+#include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -54,7 +54,7 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 
 #include <string>
 #include "TMath.h"

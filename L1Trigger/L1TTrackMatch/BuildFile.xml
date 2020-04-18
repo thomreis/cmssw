@@ -21,7 +21,7 @@
 <use   name="FWCore/MessageLogger"/>
 <use   name="DataFormats/L1Trigger"/>
 <use   name="DataFormats/L1TrackTrigger"/>
-<use   name="DataFormats/Phase2L1Correlator"/>
+<use   name="DataFormats/L1TCorrelator"/>
 <use   name="DataFormats/HepMCCandidate"/>
 <use   name="SimDataFormats/Vertex"/>
 <use   name="SimDataFormats/TrackingHit"/>

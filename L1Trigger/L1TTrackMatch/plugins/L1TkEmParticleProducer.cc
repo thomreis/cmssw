@@ -21,10 +21,10 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkEm.h"
+#include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 

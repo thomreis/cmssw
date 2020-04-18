@@ -27,7 +27,7 @@
 #include "DataFormats/FWLite/interface/Run.h"
 #include "DataFormats/FWLite/interface/LuminosityBlock.h"
 #include "DataFormats/FWLite/interface/Event.h"
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFTrack.h"
+#include "DataFormats/L1TParticleFlow/interface/PFTrack.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/Region.h"
 

@@ -41,21 +41,21 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEtMiss.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEtMissFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkJet.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkJetFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkHTMiss.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkHTMissFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkMuon.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkMuonFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkTau.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkTauFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
+#include "DataFormats/L1TCorrelator/interface/TkEtMiss.h"
+#include "DataFormats/L1TCorrelator/interface/TkEtMissFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkEm.h"
+#include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkJet.h"
+#include "DataFormats/L1TCorrelator/interface/TkJetFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkHTMiss.h"
+#include "DataFormats/L1TCorrelator/interface/TkHTMissFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkMuon.h"
+#include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkTau.h"
+#include "DataFormats/L1TCorrelator/interface/TkTauFwd.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -296,7 +296,7 @@ PrintL1TkObjects::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
  if ( L1TkHTMHandle.isValid() ) {
 	std::cout << " -----  TkHTMiss: size (should be 1) = " << L1TkHTMHandle -> size() << std::endl;
 	std::vector<TkHTMiss>::const_iterator HTMIter = L1TkHTMHandle -> begin();
-	float HTT = HTMIter -> EtTotal();
+	float HTT = HTMIter -> etTotal();
 	float HTM = HTMIter -> EtMiss();
 	//float HTM_the_same = HTMIter -> et();
 

@@ -1,4 +1,4 @@
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "CommonTools/UtilAlgos/interface/StringCutObjectSelector.h"
 #include "CommonTools/UtilAlgos/interface/SingleObjectSelector.h"

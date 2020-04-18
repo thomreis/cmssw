@@ -33,10 +33,10 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
-#include "DataFormats/Phase2L1Correlator/interface/TkEm.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkEmFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectron.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkElectronFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkEm.h"
+#include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
 
 
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"

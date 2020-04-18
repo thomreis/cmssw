@@ -91,7 +91,7 @@ Implementation:
 #include "DataFormats/HcalDigi/interface/HcalTriggerPrimitiveDigi.h"
 #include "CalibFormats/CaloTPG/interface/CaloTPGTranscoder.h"
 #include "CalibFormats/CaloTPG/interface/CaloTPGRecord.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkPrimaryVertex.h"
+#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "SimCalorimetry/EcalEBTrigPrimProducers/plugins/EcalEBTrigPrimProducer.h"
 #include "DataFormats/EcalDigi/interface/EcalEBTriggerPrimitiveDigi.h"

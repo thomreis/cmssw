@@ -36,10 +36,10 @@
 
 // L1Candidate etc.
 #include "DataFormats/L1Trigger/interface/L1Candidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkPhiCandidateFwd.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidate.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkBsCandidateFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkPhiCandidate.h"
+#include "DataFormats/L1TCorrelator/interface/TkPhiCandidateFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkBsCandidate.h"
+#include "DataFormats/L1TCorrelator/interface/TkBsCandidateFwd.h"
 
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "TH1F.h"

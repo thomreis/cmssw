@@ -7,7 +7,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/L1THGCal/interface/HGCalMulticluster.h"
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCluster.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCluster.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 #include "CommonTools/Utils/interface/StringObjectFunction.h"
 #include "CommonTools/MVAUtils/interface/TMVAZipReader.h"

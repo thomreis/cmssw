@@ -5,8 +5,8 @@
 // eventually, this should be made modular and allow to swap out different algorithms
 
 
-#include "DataFormats/Phase2L1Correlator/interface/TkGlbMuon.h"
-#include "DataFormats/Phase2L1Correlator/interface/TkGlbMuonFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkGlbMuon.h"
+#include "DataFormats/L1TCorrelator/interface/TkGlbMuonFwd.h"
 
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"

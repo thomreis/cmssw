@@ -1,6 +1,6 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/PFAlgoBase.h"
 
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
 using namespace l1tpf_impl;
 

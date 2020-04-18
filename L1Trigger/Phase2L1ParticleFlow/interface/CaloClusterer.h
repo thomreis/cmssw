@@ -13,7 +13,7 @@ namespace edm { class ParameterSet; }
 #include <vector>
 #include <array>
 #include <algorithm>
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCluster.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCluster.h"
 #include "DataFormats/Common/interface/OrphanHandle.h"
 
 namespace l1tpf_calo {
