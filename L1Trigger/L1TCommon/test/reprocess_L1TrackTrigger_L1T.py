@@ -21,7 +21,7 @@ GEOMETRY = "D41"
 L1TRKALGO = 'HYBRID'
 
 # Write output dataset?
-WRITE_DATA = True
+WRITE_DATA = False
 
 if (L1TRKALGO == 'HYBRID_FLOAT'):
     if ( not os.path.exists( os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat' ) ):
@@ -64,7 +64,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(2))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(5))
 
 # Get list of MC datasets from repo, or specify yourself.
 
@@ -110,12 +110,8 @@ process.source = cms.Source("PoolSource",
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string('Muon_PU0_'+GEOMETRY+'.root'), closeFileFast = cms.untracked.bool(True))
 
-# process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
-process.Timing = cms.Service("Timing",
-          summaryOnly = cms.untracked.bool(False),
-          useJobReport = cms.untracked.bool(True)
-)
+#process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(False), useJobReport = cms.untracked.bool(True))
 
 
 
@@ -229,15 +225,14 @@ process.L1simulation_step = cms.Path(process.SimL1Emulator)
 
 # use this if cluster/stub associators not available 
 # process.schedule = cms.Schedule(process.TTClusterStubTruth,process.TTTracksEmulationWithTruth,process.ana)
-
 # use this to only run tracking + track associator
 #process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
 process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth, process.L1simulation_step)
 #process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth, process.hgcl1tpg_step, process.L1simulation_step)
 #process.schedule = cms.Schedule(process.hgcl1tpg_step)
 
-print("# L1simulation_step sequence:  ")
-print("# {0}".format(process.L1simulation_step))
+#print("# L1simulation_step sequence:  ")
+#print("# {0}".format(process.L1simulation_step))
 
 if (WRITE_DATA):
 
