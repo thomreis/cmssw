@@ -32,7 +32,7 @@
 // data formats
 #include "DataFormats/L1Trigger/interface/EGamma.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
-#include "DataFormats/Phase2L1ParticleFlow/interface/PFCandidate.h" 
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
