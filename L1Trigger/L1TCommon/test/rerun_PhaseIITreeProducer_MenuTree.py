@@ -5,12 +5,13 @@
 # with command line options: repr --processName=REPR --python_filename=reprocess_test_10_5_0_pre1.py --no_exec -s L1 --datatier GEN-SIM-DIGI-RAW -n 2 --era Phase2 --eventcontent FEVTDEBUGHLT --filein root://cms-xrd-global.cern.ch//store/mc/PhaseIIMTDTDRAutumn18DR/DYToLL_M-50_14TeV_pythia8/FEVT/PU200_pilot_103X_upgrade2023_realistic_v2_ext4-v1/280000/FF5C31D5-D96E-5E48-B97F-61A0E00DF5C4.root --conditions 103X_upgrade2023_realistic_v2 --beamspot HLLHC14TeV --geometry Extended2023D28 --fileout file:step2_2ev_reprocess_slim.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.ProcessModifiers.convertHGCalDigisSim_cff import convertHGCalDigisSim
+#from Configuration.ProcessModifiers.convertHGCalDigisSim_cff import convertHGCalDigisSim
 from Configuration.StandardSequences.Eras import eras
 
-#process = cms.Process('REPR', eras.Phase2C8_trigger) # for L1 TDR samples
+#process = cms.Process('REPR', eras.Phase2C9_trigger) # for HLT TDR samples
+process = cms.Process('REPR', eras.Phase2C8_trigger) # for L1 TDR samples
 #process = cms.Process('REPR',eras.Phase2_trigger,convertHGCalDigisSim)
-process = cms.Process('REPR',eras.Phase2C4_trigger) # for MTD samples
+#process = cms.Process('REPR',eras.Phase2C4_trigger) # for MTD samples
 #process = cms.Process('REPR',eras.Phase2C4_timing_layer_bar)
 
 # import of standard configurations
@@ -19,10 +20,10 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2023D35Reco_cff') # for MTD samples
-process.load('Configuration.Geometry.GeometryExtended2023D35_cff') # for MTD samples
-#process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff') # for L1 TDR samples
-#process.load('Configuration.Geometry.GeometryExtended2023D41_cff') # for L1 TDR samples
+#process.load('Configuration.Geometry.GeometryExtended2026D35Reco_cff') # for MTD samples
+#process.load('Configuration.Geometry.GeometryExtended2026D35_cff') # for MTD samples
+process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff') # for L1 TDR samples
+process.load('Configuration.Geometry.GeometryExtended2026D41_cff') # for L1 TDR samples
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -52,7 +53,7 @@ process.source = cms.Source("PoolSource",
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/71C02E39-ED72-054B-871F-6B1FD1A1C14A.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/283255C6-1E20-6F48-8B8B-31E6A62BD48D.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/190EDE9F-770B-174A-8BA6-F7814FC67FD4.root',
-#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FF57637B-0567-DD46-9838-CDF532DAF083.root',
+'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FF57637B-0567-DD46-9838-CDF532DAF083.root',
 #'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FD4BE924-35A6-F540-A1EC-405BA169FEBB.root',
 #'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FD32690F-270D-FF42-9ED7-6D99AB85C9CA.root',
 #'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FC9D2ACA-BA79-3845-849C-48FB12BFFB35.root',
@@ -98,7 +99,7 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9BF6F44-3A8C-9342-81AD-E87DFEAA3254.root',
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F9698F16-C2B8-1240-842D-860F2AE744C4.root',
 #'/store/mc/PhaseIITDRSpring19DR/Nu_E10-pythia8-gun/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v3/70001/F91DF4FA-F2D7-A34A-B91D-9F234D48BE6A.root',
-'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/NoPU_103X_upgrade2023_realistic_v2-v1/70000/B0464430-CA74-7844-A36A-A5EF21C3D7C0.root'
+#'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/NoPU_103X_upgrade2023_realistic_v2-v1/70000/B0464430-CA74-7844-A36A-A5EF21C3D7C0.root'
 #'/store/mc/PhaseIIMTDTDRAutumn18DR/SingleE_FlatPt-2to100/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/70000/FF17CBE6-81E5-8D43-B58B-6DF17222820E.root',
 #'/store/mc/PhaseIIMTDTDRAutumn18DR/NeutrinoGun_E_10GeV/FEVT/PU200_103X_upgrade2023_realistic_v2-v1/280000/EFFCC733-2B7F-C645-929D-505B1E0949D6.root'
 ),
@@ -135,9 +136,7 @@ process.FEVTDEBUGHLToutput.outputCommands.append('keep *_*_*_REPR')
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_upgrade2023_realistic_v2', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
-
-process.GlobalTag = GlobalTag(process.GlobalTag, '103X_upgrade2023_realistic_v2', '') 
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
 process.load('SimCalorimetry.HcalTrigPrimProducers.hcaltpdigi_cff')
 process.load('CalibCalorimetry.CaloTPG.CaloTPGTranscoder_cfi')
@@ -160,22 +159,24 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # menu trees
 
-process.load("L1Trigger.L1TNtuples.l1PhaseIITreeProducer_cfi")
+#process.load("L1Trigger.L1TNtuples.l1PhaseIITreeProducer_cfi")
 process.load("L1Trigger.L1TNtuples.l1CaloTowerTree_cfi")
+process.load("L1Trigger.L1TNtuples.l1GeneratorTree_cfi")
+process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 process.l1CaloTowerTree.ecalEBToken = cms.untracked.InputTag("simEcalEBTriggerPrimitiveDigis")
 process.l1CaloTowerTree.ecalToken = cms.untracked.InputTag("simEcalTriggerPrimitiveDigis")
 process.l1CaloTowerTree.hcalToken = cms.untracked.InputTag("simHcalTriggerPrimitiveDigis")
 process.l1CaloTowerTree.l1TowerToken = cms.untracked.InputTag("simCaloStage2Digis")
 process.calotptree = cms.Path(process.l1CaloTowerTree)
 process.load("L1Trigger.L1TNtuples.l1EventTree_cfi")
-process.evttree = cms.Path(process.l1EventTree)
+process.evttree = cms.Path(process.offlineBeamSpot * process.l1EventTree)
 
 # tree with EG Tk Iso variables
 process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer","L1EGammaCollectionBXVEmulator"),
     l1EgHGC = cms.InputTag("l1EGammaEEProducer","L1EGammaCollectionBXVWithCuts"),
-    l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
-    #l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
+    #l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
     #l1Tracks = cms.InputTag("TMTrackProducer","TML1Tracks"),
     l1PFCandidates = cms.InputTag("l1pfCandidates","PF"),
     #l1PFCandidates = cms.InputTag("l1pfCandidates","Puppi"),
@@ -183,16 +184,16 @@ process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     egBarrelMinEt = cms.double(2.), # minimum Et for barrel EG object
     egHGCMinEt = cms.double(2.), # minimum Et for HGC EG object
     #trackMinPt = cms.double(2.), # minimum Pt to select tracks for matching
-    #trackMaxChi2 = cms.double(1e10), # maximum Chi2 to select tracks for matching
+    trackMaxChi2 = cms.double(1e10), # maximum Chi2 to select tracks for matching
     trackMinPt = cms.double(10.), # minimum Pt to select tracks for matching
-    trackMaxChi2 = cms.double(100), # maximum Chi2 to select tracks for matching
+    #trackMaxChi2 = cms.double(100), # maximum Chi2 to select tracks for matching
     useTwoStubsPt = cms.bool(False), # calculate track pT from 2 stubs
-    #trackEGammaMatchType = cms.string("PtDependentCut"),
-    trackEGammaMatchType = cms.string("EllipticalCut"),
+    trackEGammaMatchType = cms.string("PtDependentCut"),
+    #trackEGammaMatchType = cms.string("EllipticalCut"),
     trackEGammaDeltaPhi = cms.vdouble(0.07, 0., 0.), # functional Delta Phi cut parameters to match Track with L1EG objects
     trackEGammaDeltaR = cms.vdouble(0.08, 0., 0.), # functional Delta R cut parameters to match Track with L1EG objects
-    #trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
-    trackEGammaDeltaEta = cms.vdouble(0.015, 0.025, 0.0075), # Delta Eta cutoff to match Track with L1EG objects (elliptical cut values (EB high, EB low, HGC))
+    trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
+    #trackEGammaDeltaEta = cms.vdouble(0.015, 0.025, 0.0075), # Delta Eta cutoff to match Track with L1EG objects (elliptical cut values (EB high, EB low, HGC))
     trackMinPtForIsoEB = cms.double(2.), # minimum Pt to select tracks for the isolation in EB
     trackMinPtForIsoHGC = cms.double(2.), # minimum Pt to select tracks for the isolation in HGCal
     trackMaxChi2ForIsoEB = cms.double(1e10), # maximum Chi2 to select tracks for the isolation in EB
@@ -202,7 +203,7 @@ process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     dRMinForIso = cms.double(0.), # minimum dR to select tracks for the isolation
     dRMaxForIso = cms.double(0.8) # maximum dR to select tracks for the isolation
 )
-process.phase2EGTkIsoTreePath = cms.Path(process.l1PhaseIIEGTkIsoTree)
+process.phase2EGTkIsoTreePath = cms.Path(process.l1PhaseIIEGTkIsoTree * process.l1GeneratorTree)
 
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string('L1NtuplePhaseII.root')
@@ -213,7 +214,7 @@ process.schedule = cms.Schedule(
     process.L1simulation_step,
     process.evttree,
     #process.extraCollectionsMenuTree,
-    process.runmenutree,
+    #process.runmenutree,
     process.phase2EGTkIsoTreePath,
     #process.calotptree,
     process.endjob_step#,
@@ -230,10 +231,10 @@ from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,DropOu
 #call to customisation function DropDepricatedProducts imported from L1Trigger.Configuration.customiseUtils
 process = DropDepricatedProducts(process)
 
-from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
-process = L1TrackTriggerTracklet(process)
-#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
-#process = L1TrackTriggerHybrid(process)
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
+#process = L1TrackTriggerTracklet(process)
+from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
+process = L1TrackTriggerHybrid(process)
 #from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTMTT
 #process = L1TrackTriggerTMTT(process)
 
