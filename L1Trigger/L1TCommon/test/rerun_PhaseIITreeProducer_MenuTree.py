@@ -9,7 +9,8 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.StandardSequences.Eras import eras
 
 #process = cms.Process('REPR', eras.Phase2C9_trigger) # for HLT TDR samples
-process = cms.Process('REPR', eras.Phase2C8_trigger) # for L1 TDR samples
+#process = cms.Process('REPR', eras.Phase2C8_trigger) # for L1 TDR samples
+process = cms.Process('REPR', eras.Phase2C8) # for L1 TDR samples
 #process = cms.Process('REPR',eras.Phase2_trigger,convertHGCalDigisSim)
 #process = cms.Process('REPR',eras.Phase2C4_trigger) # for MTD samples
 #process = cms.Process('REPR',eras.Phase2C4_timing_layer_bar)
@@ -53,6 +54,13 @@ process.source = cms.Source("PoolSource",
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/71C02E39-ED72-054B-871F-6B1FD1A1C14A.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/283255C6-1E20-6F48-8B8B-31E6A62BD48D.root',
 #'/store/relval/CMSSW_10_6_0_patch2/RelValElectronGunPt2To100/GEN-SIM-DIGI-RAW/106X_upgrade2023_realistic_v3_2023D41noPU-v1/10000/190EDE9F-770B-174A-8BA6-F7814FC67FD4.root',
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/0D9ADA63-D0F0-3D40-8AF1-EA7C250ADD27.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/A62FD17F-85CC-DC4C-85AB-BDFED4C33156.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/17BA48DF-E784-1E4D-A304-EDEE636282E6.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/D9B2E929-00C9-3546-A50B-CE8CEABFB934.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/742FA8D4-FBDC-F74B-B24C-6396357A09EA.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/FC554DC8-1F1C-644A-B131-D07533351CA3.root'
+#'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v1/40000/D3B381B5-6FE4-A245-8548-EB9E06231F33.root'
 '/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FF57637B-0567-DD46-9838-CDF532DAF083.root',
 #'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FD4BE924-35A6-F540-A1EC-405BA169FEBB.root',
 #'/store/mc/PhaseIITDRSpring19DR/SingleElectron_PT2to100/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/60000/FD32690F-270D-FF42-9ED7-6D99AB85C9CA.root',
@@ -173,7 +181,7 @@ process.evttree = cms.Path(process.offlineBeamSpot * process.l1EventTree)
 
 # tree with EG Tk Iso variables
 process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
-    l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer","L1EGammaCollectionBXVEmulator"),
+    l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer"),
     l1EgHGC = cms.InputTag("l1EGammaEEProducer","L1EGammaCollectionBXVWithCuts"),
     #l1Tracks = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
     l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
@@ -188,12 +196,12 @@ process.l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     trackMinPt = cms.double(10.), # minimum Pt to select tracks for matching
     #trackMaxChi2 = cms.double(100), # maximum Chi2 to select tracks for matching
     useTwoStubsPt = cms.bool(False), # calculate track pT from 2 stubs
-    trackEGammaMatchType = cms.string("PtDependentCut"),
-    #trackEGammaMatchType = cms.string("EllipticalCut"),
+    #trackEGammaMatchType = cms.string("PtDependentCut"),
+    trackEGammaMatchType = cms.string("EllipticalCut"),
     trackEGammaDeltaPhi = cms.vdouble(0.07, 0., 0.), # functional Delta Phi cut parameters to match Track with L1EG objects
     trackEGammaDeltaR = cms.vdouble(0.08, 0., 0.), # functional Delta R cut parameters to match Track with L1EG objects
-    trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
-    #trackEGammaDeltaEta = cms.vdouble(0.015, 0.025, 0.0075), # Delta Eta cutoff to match Track with L1EG objects (elliptical cut values (EB high, EB low, HGC))
+    #trackEGammaDeltaEta = cms.vdouble(1e10, 0., 0.), # Delta Eta cutoff to match Track with L1EG objects
+    trackEGammaDeltaEta = cms.vdouble(0.015, 0.025, 0.0075), # Delta Eta cutoff to match Track with L1EG objects (elliptical cut values (EB high, EB low, HGC))
     trackMinPtForIsoEB = cms.double(2.), # minimum Pt to select tracks for the isolation in EB
     trackMinPtForIsoHGC = cms.double(2.), # minimum Pt to select tracks for the isolation in HGCal
     trackMaxChi2ForIsoEB = cms.double(1e10), # maximum Chi2 to select tracks for the isolation in EB
@@ -226,14 +234,22 @@ associatePatAlgosToolsTask(process)
 # Customisation from command line
 
 # Automatic addition of the customisation function from L1Trigger.Configuration.customiseUtils
-from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,DropOutputProducts 
+#from L1Trigger.Configuration.customiseUtils import DropDepricatedProducts,DropOutputProducts
 
 #call to customisation function DropDepricatedProducts imported from L1Trigger.Configuration.customiseUtils
-process = DropDepricatedProducts(process)
+#process = DropDepricatedProducts(process)
 
 #from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
 #process = L1TrackTriggerTracklet(process)
-from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerHybrid
+# since the customisation functions are not there anymore in 11_1_2 put the function here
+def L1TrackTriggerHybrid(process):
+    #print "L1T INFO:  run the L1TrackStep with Tracklet."
+    process.load('L1Trigger.TrackFindingTracklet.Tracklet_cfi')
+    process.L1TrackTriggerHybrid_step = cms.Path(process.TTTracksFromTrackletEmulation)
+    process.schedule.insert(2,process.L1TrackTriggerHybrid_step)
+    return process
+
 process = L1TrackTriggerHybrid(process)
 #from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTMTT
 #process = L1TrackTriggerTMTT(process)
