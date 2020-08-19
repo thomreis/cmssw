@@ -1,8 +1,8 @@
 // -*- C++ -*-
 //
-/**\class L1EgammaPfIsoProducer
+/**\class L1CandPfIsoProducer
 
- Description: Producer PF or PF PUPPI isolation for a L1EG object
+ Description: Produces PF or PF PUPPI isolations for a L1Candidate object collection
 
  Implementation:
      [Notes on implementation]
@@ -27,8 +27,6 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
-#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
-#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
 #include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
@@ -42,10 +40,11 @@
 // class declaration
 //
 
-class L1EgammaPfIsoProducer : public edm::stream::EDProducer<> {
+template <typename T>
+class L1CandPfIsoProducer : public edm::stream::EDProducer<> {
 public:
-  explicit L1EgammaPfIsoProducer(const edm::ParameterSet&);
-  ~L1EgammaPfIsoProducer() override;
+  explicit L1CandPfIsoProducer(const edm::ParameterSet&);
+  ~L1CandPfIsoProducer() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -55,7 +54,7 @@ private:
 
   float calcIso(const GlobalPoint& l1EgCaloPos, const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const;
   // ----------member data ---------------------------
-  const edm::EDGetTokenT<l1t::TkElectronCollection> l1EgammaToken_;
+  const edm::EDGetTokenT<T> l1CandToken_;
   const edm::EDGetTokenT<std::vector<l1t::PFCandidate>> l1PfCandToken_;
 
   // label of the collection produced
@@ -73,8 +72,9 @@ private:
 //
 // constructors and destructor
 //
-L1EgammaPfIsoProducer::L1EgammaPfIsoProducer(const edm::ParameterSet& iConfig)
-    : l1EgammaToken_(consumes<l1t::TkElectronCollection>(iConfig.getParameter<edm::InputTag>("l1EgammaInputTag"))),
+template <typename T>
+L1CandPfIsoProducer<T>::L1CandPfIsoProducer(const edm::ParameterSet& iConfig)
+    : l1CandToken_(consumes<T>(iConfig.getParameter<edm::InputTag>("l1CandInputTag"))),
       l1PfCandToken_(consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PfCandidateInputTag"))),
       label_(iConfig.getParameter<std::string>("label")),
       isoDRMin2_(static_cast<float>(iConfig.getParameter<double>("isoDRMin") * iConfig.getParameter<double>("isoDRMin"))),
@@ -84,21 +84,23 @@ L1EgammaPfIsoProducer::L1EgammaPfIsoProducer(const edm::ParameterSet& iConfig)
       relIso_(iConfig.getParameter<bool>("relativeIsolation")),
       bFieldZ_(0.)
 {
-  produces<l1t::TkElectronCollection>(label_);
+  produces<T>(label_);
 }
 
-L1EgammaPfIsoProducer::~L1EgammaPfIsoProducer() {}
+template <typename T>
+L1CandPfIsoProducer<T>::~L1CandPfIsoProducer() {}
 
 // ------------ method called to produce the data  ------------
-void L1EgammaPfIsoProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+template <typename T>
+void L1CandPfIsoProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // get the L1EGamma objects
-  edm::Handle<l1t::TkElectronCollection> l1EgammaCollHandle;
-  iEvent.getByToken(l1EgammaToken_, l1EgammaCollHandle);
-  if (!l1EgammaCollHandle.isValid()) {
+  edm::Handle<T> l1CandCollHandle;
+  iEvent.getByToken(l1CandToken_, l1CandCollHandle);
+  if (!l1CandCollHandle.isValid()) {
     throw cms::Exception("MissingProduct") << "L1 EGamma collection not found in the event. Exit.";
     return;
   }
-  const auto l1EgammaColl = l1EgammaCollHandle.product();
+  const auto l1CandColl = l1CandCollHandle.product();
 
   // get the L1 PF candidate objects
   edm::Handle<std::vector<l1t::PFCandidate>> l1PfCandCollHandle;
@@ -108,34 +110,34 @@ void L1EgammaPfIsoProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
     return;
   }
 
-  auto outColl = std::make_unique<l1t::TkElectronCollection>();
+  auto outColl = std::make_unique<T>();
 
-  // loop over L1 EG objects in the collection
-  for (const auto &l1Egamma : *l1EgammaColl) {
+  // loop over L1 objects in the collection
+  for (const auto &l1Cand : *l1CandColl) {
     // L1 EG position at the calorimeter
-    const auto l1EgPos = L1TkElectronTrackMatchAlgo::calorimeterPosition(l1Egamma.phi(), l1Egamma.eta(), l1Egamma.energy());
+    const auto l1CandPos = L1TkElectronTrackMatchAlgo::calorimeterPosition(l1Cand.phi(), l1Cand.eta(), l1Cand.energy());
 
     // calculate the PF isolation
-    auto iso = calcIso(l1EgPos, l1PfCandCollHandle);
+    auto iso = calcIso(l1CandPos, l1PfCandCollHandle);
 
     // relative or absolute isolation
-    if (relIso_ and l1Egamma.et() > 0.) {
-      iso /= l1Egamma.et();
+    if (relIso_ and l1Cand.et() > 0.) {
+      iso /= l1Cand.et();
     }
 
-    l1t::TkElectron l1eg(l1Egamma);
+    auto l1CandWithPfIso = l1Cand;
     // set the isolation variable
     // for the moment use the track isolation variable to store the value
-    l1eg.setTrkIsol(iso);
+    l1CandWithPfIso.setTrkIsol(iso);
 
     // write to the output collection
     if (isoCut_ <= 0.) {
       // irrespective of its relative isolation
-      outColl->emplace_back(l1eg);
+      outColl->emplace_back(l1CandWithPfIso);
     } else {
       // if it passes the isolation cut
       if (iso <= isoCut_) {
-        outColl->emplace_back(l1eg);
+        outColl->emplace_back(l1CandWithPfIso);
       }
     }
   }
@@ -143,7 +145,8 @@ void L1EgammaPfIsoProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
   iEvent.put(std::move(outColl), label_);
 }
 
-void L1EgammaPfIsoProducer::beginRun(const edm::Run &run, const edm::EventSetup &setup)
+template <typename T>
+void L1CandPfIsoProducer<T>::beginRun(const edm::Run &run, const edm::EventSetup &setup)
 {
   // magnetic field for particle propagation
   edm::ESHandle<MagneticField> magneticField;
@@ -152,9 +155,10 @@ void L1EgammaPfIsoProducer::beginRun(const edm::Run &run, const edm::EventSetup 
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void L1EgammaPfIsoProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+template <typename T>
+void L1CandPfIsoProducer<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("l1EgammaInputTag");
+  desc.add<edm::InputTag>("l1CandInputTag");
   desc.add<edm::InputTag>("l1PfCandidateInputTag");
   desc.add<std::string>("label", "");
   desc.add<double>("isoDRMin", 0.03);
@@ -166,7 +170,8 @@ void L1EgammaPfIsoProducer::fillDescriptions(edm::ConfigurationDescriptions& des
 }
 
 // method to calculate isolation
-float L1EgammaPfIsoProducer::calcIso(const GlobalPoint& l1EgCaloPos, const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const
+template <typename T>
+float L1CandPfIsoProducer<T>::calcIso(const GlobalPoint& l1EgCaloPos, const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const
 {
   float sumPt = 0.;
 
@@ -195,5 +200,12 @@ float L1EgammaPfIsoProducer::calcIso(const GlobalPoint& l1EgCaloPos, const edm::
   return sumPt;
 }
 
-//define this as a plug-in
-DEFINE_FWK_MODULE(L1EgammaPfIsoProducer);
+//define plugins for L1 TkElectrons and L1 TkEm
+#include "DataFormats/L1TCorrelator/interface/TkEm.h"
+#include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectron.h"
+#include "DataFormats/L1TCorrelator/interface/TkElectronFwd.h"
+typedef L1CandPfIsoProducer<l1t::TkEmCollection> L1TkEmPfIsoProducer;
+typedef L1CandPfIsoProducer<l1t::TkElectronCollection> L1TkElectronPfIsoProducer;
+DEFINE_FWK_MODULE(L1TkEmPfIsoProducer);
+DEFINE_FWK_MODULE(L1TkElectronPfIsoProducer);
