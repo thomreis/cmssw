@@ -52,7 +52,8 @@ private:
   void produce(edm::Event&, const edm::EventSetup&) override;
   void beginRun(const edm::Run&, const edm::EventSetup&) override;
 
-  float calcIso(const GlobalPoint& l1EgCaloPos, const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const;
+  float calcIso(const GlobalPoint& l1EgCaloPos,
+                const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const;
   // ----------member data ---------------------------
   const edm::EDGetTokenT<T> l1CandToken_;
   const edm::EDGetTokenT<std::vector<l1t::PFCandidate>> l1PfCandToken_;
@@ -75,15 +76,17 @@ private:
 template <typename T>
 L1CandPfIsoProducer<T>::L1CandPfIsoProducer(const edm::ParameterSet& iConfig)
     : l1CandToken_(consumes<T>(iConfig.getParameter<edm::InputTag>("l1CandInputTag"))),
-      l1PfCandToken_(consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PfCandidateInputTag"))),
+      l1PfCandToken_(
+          consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PfCandidateInputTag"))),
       label_(iConfig.getParameter<std::string>("label")),
-      isoDRMin2_(static_cast<float>(iConfig.getParameter<double>("isoDRMin") * iConfig.getParameter<double>("isoDRMin"))),
-      isoDRMax2_(static_cast<float>(iConfig.getParameter<double>("isoDRMax") * iConfig.getParameter<double>("isoDRMax"))),
+      isoDRMin2_(
+          static_cast<float>(iConfig.getParameter<double>("isoDRMin") * iConfig.getParameter<double>("isoDRMin"))),
+      isoDRMax2_(
+          static_cast<float>(iConfig.getParameter<double>("isoDRMax") * iConfig.getParameter<double>("isoDRMax"))),
       isoPtMin_(static_cast<float>(iConfig.getParameter<double>("isoPTMin"))),
       isoCut_(static_cast<float>(iConfig.getParameter<double>("isoCut"))),
       relIso_(iConfig.getParameter<bool>("relativeIsolation")),
-      bFieldZ_(0.)
-{
+      bFieldZ_(0.) {
   produces<T>(label_);
 }
 
@@ -113,7 +116,7 @@ void L1CandPfIsoProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& 
   auto outColl = std::make_unique<T>();
 
   // loop over L1 objects in the collection
-  for (const auto &l1Cand : *l1CandColl) {
+  for (const auto& l1Cand : *l1CandColl) {
     // L1 EG position at the calorimeter
     const auto l1CandPos = L1TkElectronTrackMatchAlgo::calorimeterPosition(l1Cand.phi(), l1Cand.eta(), l1Cand.energy());
 
@@ -146,8 +149,7 @@ void L1CandPfIsoProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& 
 }
 
 template <typename T>
-void L1CandPfIsoProducer<T>::beginRun(const edm::Run &run, const edm::EventSetup &setup)
-{
+void L1CandPfIsoProducer<T>::beginRun(const edm::Run& run, const edm::EventSetup& setup) {
   // magnetic field for particle propagation
   edm::ESHandle<MagneticField> magneticField;
   setup.get<IdealMagneticFieldRecord>().get(magneticField);
@@ -171,8 +173,8 @@ void L1CandPfIsoProducer<T>::fillDescriptions(edm::ConfigurationDescriptions& de
 
 // method to calculate isolation
 template <typename T>
-float L1CandPfIsoProducer<T>::calcIso(const GlobalPoint& l1EgCaloPos, const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const
-{
+float L1CandPfIsoProducer<T>::calcIso(const GlobalPoint& l1EgCaloPos,
+                                      const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const {
   float sumPt = 0.;
 
   // loop over PF candidates
