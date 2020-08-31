@@ -55,11 +55,12 @@ private:
   float calcIso(const GlobalPoint& l1EgCaloPos,
                 const edm::Handle<std::vector<l1t::PFCandidate>>& l1PfCandCollHandle) const;
   // ----------member data ---------------------------
+  // instance of the collection produced
+  std::string instance_;
+
   const edm::EDGetTokenT<T> l1CandToken_;
   const edm::EDGetTokenT<std::vector<l1t::PFCandidate>> l1PfCandToken_;
-
-  // label of the collection produced
-  std::string label_;
+  const edm::EDPutTokenT<T> resultToken_;
 
   float isoDRMin2_;
   float isoDRMax2_;
@@ -75,10 +76,11 @@ private:
 //
 template <typename T>
 L1CandPfIsoProducer<T>::L1CandPfIsoProducer(const edm::ParameterSet& iConfig)
-    : l1CandToken_(consumes<T>(iConfig.getParameter<edm::InputTag>("l1CandInputTag"))),
+    : instance_(iConfig.getParameter<std::string>("instance")),
+      l1CandToken_(consumes<T>(iConfig.getParameter<edm::InputTag>("l1CandInputTag"))),
       l1PfCandToken_(
           consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PfCandidateInputTag"))),
-      label_(iConfig.getParameter<std::string>("label")),
+      resultToken_(produces<T>(instance_)),
       isoDRMin2_(
           static_cast<float>(iConfig.getParameter<double>("isoDRMin") * iConfig.getParameter<double>("isoDRMin"))),
       isoDRMax2_(
@@ -87,7 +89,6 @@ L1CandPfIsoProducer<T>::L1CandPfIsoProducer(const edm::ParameterSet& iConfig)
       isoCut_(static_cast<float>(iConfig.getParameter<double>("isoCut"))),
       relIso_(iConfig.getParameter<bool>("relativeIsolation")),
       bFieldZ_(0.) {
-  produces<T>(label_);
 }
 
 template <typename T>
@@ -113,7 +114,7 @@ void L1CandPfIsoProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& 
     return;
   }
 
-  auto outColl = std::make_unique<T>();
+  T outColl;
 
   // loop over L1 objects in the collection
   for (const auto& l1Cand : *l1CandColl) {
@@ -136,16 +137,16 @@ void L1CandPfIsoProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& 
     // write to the output collection
     if (isoCut_ <= 0.) {
       // irrespective of its relative isolation
-      outColl->emplace_back(l1CandWithPfIso);
+      outColl.emplace_back(l1CandWithPfIso);
     } else {
       // if it passes the isolation cut
       if (iso <= isoCut_) {
-        outColl->emplace_back(l1CandWithPfIso);
+        outColl.emplace_back(l1CandWithPfIso);
       }
     }
   }
 
-  iEvent.put(std::move(outColl), label_);
+  iEvent.emplace(resultToken_, std::move(outColl));
 }
 
 template <typename T>
@@ -162,7 +163,7 @@ void L1CandPfIsoProducer<T>::fillDescriptions(edm::ConfigurationDescriptions& de
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("l1CandInputTag");
   desc.add<edm::InputTag>("l1PfCandidateInputTag");
-  desc.add<std::string>("label", "");
+  desc.add<std::string>("instance", "");
   desc.add<double>("isoDRMin", 0.03);
   desc.add<double>("isoDRMax", 0.2);
   desc.add<double>("isoPTMin", 1.);
