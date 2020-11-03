@@ -15,6 +15,7 @@
 <use   name="clhep"/>
 <use   name="hls"/>
 <use   name="EbSpikeTaggerHLS"/>
+<use   name="EbSwissCrossHLS"/>
 <export>
   <use   name="CondFormats/EcalObjects"/>
   <lib   name="1"/>
