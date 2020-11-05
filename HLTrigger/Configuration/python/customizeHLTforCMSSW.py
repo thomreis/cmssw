@@ -202,6 +202,16 @@ def customiseFor31263(process):
 
     return process
 
+def customiseFor3xxxx(process):
+    """Add the ESSource and ESProducer for the mustache SC and the dynamic dphi parameters records"""
+
+    # create the EcalMustacheSCParameters record
+    process.load('RecoEcal.EgammaCoreTools.EcalMustacheSCParametersESProducer_cff')
+    # create the EcalSCDynamicDPhiParameters record
+    process.load('RecoEcal.EgammaCoreTools.EcalSCDynamicDPhiParametersESProducer_cff')
+
+    return process
+
 
 # CMSSW version specific customizations
 def customizeHLTforCMSSW(process, menuType="GRun"):
@@ -210,5 +220,6 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
     # process = customiseFor12718(process)
     process = customiseFor31295(process)
     process = customiseFor31263(process)
+    process = customiseFor3xxxx(process)
 
     return process
