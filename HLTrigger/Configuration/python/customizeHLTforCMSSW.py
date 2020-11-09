@@ -202,7 +202,7 @@ def customiseFor31263(process):
 
     return process
 
-def customiseFor3xxxx(process):
+def customiseFor32066(process):
     """Add the ESSource and ESProducer for the mustache SC and the dynamic dphi parameters records"""
 
     # create the EcalMustacheSCParameters record
@@ -220,6 +220,6 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
     # process = customiseFor12718(process)
     process = customiseFor31295(process)
     process = customiseFor31263(process)
-    process = customiseFor3xxxx(process)
+    process = customiseFor32066(process)
 
     return process
