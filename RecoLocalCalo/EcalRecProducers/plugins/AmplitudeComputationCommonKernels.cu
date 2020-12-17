@@ -105,11 +105,6 @@ namespace ecal {
 
         //
         // pulse shape template
-        /*
-        for (int isample=sample; isample<EcalPulseShape::TEMPLATESAMPLES; 
-            isample+=nsamples)
-            shapes_out[ch](isample + 7) = shapes_in[hashedId].pdfval[isample];
-            */
 
         // will be used in the future for setting state
         auto const rmsForChecking = rms_x12[hashedId];
@@ -279,6 +274,10 @@ namespace ecal {
                                           //---- AM FIXME : no pedestal subtraction???
                                           //It should be "(4095. - pedestal) * gainratio"
 
+                                          // In this case "12" is the gain of the MGPA (MultiGainPreAmplifier), 
+                                          // while 4095 is the maximum ADC range. Thus 12 * 4095 is the actual maximum range, 
+                                          // that is what we set when we saturate.
+                                          
             // set state flag to terminate further processing of this channel
             acState[ch] = static_cast<char>(MinimizationState::Precomputed);
             flag |= 0x1 << EcalUncalibratedRecHit::kSaturated;
@@ -385,17 +384,11 @@ namespace ecal {
 
           // non-divergent branches
           if (gainidx == 0)
-            //noise_value = rms_x12[ch]*rms_x12[ch]*noisecorrs[0](ty, tx);
             noise_value = rms_x12[hashedId] * rms_x12[hashedId] * G12SamplesCorrelation[vidx];
           if (gainidx == 1)
-            //                noise_value = gain12Over6[ch]*gain12Over6[ch] * rms_x6[ch]*rms_x6[ch]
-            //                    *noisecorrs[1](ty, tx);
             noise_value = gain12Over6[hashedId] * gain12Over6[hashedId] * rms_x6[hashedId] * rms_x6[hashedId] *
                           G6SamplesCorrelation[vidx];
           if (gainidx == 2)
-            //                noise_value = gain12Over6[ch]*gain12Over6[ch]
-            //                    * gain6Over1[ch]*gain6Over1[ch] * rms_x1[ch]*rms_x1[ch]
-            //                    * noisecorrs[2](ty, tx);
             noise_value = gain12Over6[hashedId] * gain12Over6[hashedId] * gain6Over1[hashedId] * gain6Over1[hashedId] *
                           rms_x1[hashedId] * rms_x1[hashedId] * G1SamplesCorrelation[vidx];
           if (!dynamicPedestal && addPedestalUncertainty > 0.f)
@@ -404,10 +397,8 @@ namespace ecal {
           int gainidx = 0;
           char mask = gainidx;
           int pedestal = gainNoise[ch][ty] == mask ? 1 : 0;
-          //            noise_value += /* gainratio is 1*/ rms_x12[ch]*rms_x12[ch]
-          //                *pedestal*noisecorrs[0](ty, tx);
-          noise_value +=
-              /* gainratio is 1*/ rms_x12[hashedId] * rms_x12[hashedId] * pedestal * G12SamplesCorrelation[vidx];
+          //            NB: gainratio is 1, that is why it does not appear in the formula
+          noise_value += rms_x12[hashedId] * rms_x12[hashedId] * pedestal * G12SamplesCorrelation[vidx];
           // non-divergent branch
           if (!dynamicPedestal && addPedestalUncertainty > 0.f) {
             noise_value += /* gainratio is 1 */
@@ -473,7 +464,7 @@ namespace ecal {
       // indices
       int const tx = threadIdx.x + blockIdx.x * blockDim.x;
       int const ch = tx / nsamples;
-      int const iii = tx % nsamples;  // this is to address activeBXs
+      int const sampleidx = tx % nsamples;  // this is to address activeBXs
 
       if (ch >= nchannels)
         return;
@@ -486,11 +477,11 @@ namespace ecal {
       // configure shared memory and cp into it
       extern __shared__ char smem[];
       SampleVector::Scalar* values = reinterpret_cast<SampleVector::Scalar*>(smem);
-      values[threadIdx.x] = amplitudes[ch](iii);
+      values[threadIdx.x] = amplitudes[ch](sampleidx);
       __syncthreads();
 
       // get the sample for this bx
-      auto const sample = static_cast<int>(activeBXs[ch](iii)) + 5;
+      auto const sample = static_cast<int>(activeBXs[ch](sampleidx)) + 5;
 
       // store back to global
       amplitudes[ch](sample) = values[threadIdx.x];
