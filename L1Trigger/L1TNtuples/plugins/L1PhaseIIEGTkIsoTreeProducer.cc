@@ -86,6 +86,7 @@ class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::Watch
     edm::EDGetTokenT<std::vector<l1t::PFCandidate>> pfCandToken_;
 
     std::string trackerGeom_;
+    bool storeAllPFCands_;
 
     const TrackerGeometry* tGeom_;
     float bFieldZ_;
@@ -101,7 +102,8 @@ L1PhaseIIEGTkIsoTreeProducer::L1PhaseIIEGTkIsoTreeProducer(const edm::ParameterS
   egTokenHGC_(consumes<l1t::EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("l1EgHGC"))),
   tttrackToken_(consumes<L1TTTrackCollectionType>(iConfig.getParameter<edm::InputTag>("l1Tracks"))),
   pfCandToken_(consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PFCandidates"))),
-  trackerGeom_(iConfig.getParameter<std::string>("trackerGeometry"))
+  trackerGeom_(iConfig.getParameter<std::string>("trackerGeometry")),
+  storeAllPFCands_(iConfig.getParameter<bool>("storeAllPFCands"))
 {
   l1Phase2EGTkIsoData_ = l1Phase2EGTkIso_->GetData();
 
@@ -156,6 +158,9 @@ L1PhaseIIEGTkIsoTreeProducer::analyze(const edm::Event& iEvent, const edm::Event
 
   // set the branches
   l1Phase2EGTkIso_->SetEGWithTracks(egBarrel, egHGC, tttrack, tGeom_, pfCands, bFieldZ_);
+  if (storeAllPFCands_) {
+    l1Phase2EGTkIso_->SetPFCands(pfCands, bFieldZ_);
+  }
 
   //fill the tree
   tree_->Fill();
@@ -196,6 +201,7 @@ L1PhaseIIEGTkIsoTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& d
   desc.add<edm::InputTag>("l1Tracks");
   desc.add<edm::InputTag>("l1PFCandidates");
   desc.add<std::string>("trackerGeometry", "idealForDigi");
+  desc.add<bool>("storeAllPFCands", false);
   desc.add<double>("egBarrelMinEt", 5.);
   desc.add<double>("egHGCMinEt", 10.);
   desc.add<double>("trackMinPt", 0.);

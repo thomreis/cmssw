@@ -28,6 +28,7 @@ namespace L1Analysis {
     inline void Reset() { l1Phase2EGTkIso_.Reset(); }
 
     void SetEGWithTracks (const edm::Handle<l1t::EGammaBxCollection>& eg, const edm::Handle<l1t::EGammaBxCollection>& egHGC, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField);
+    void SetPFCands (const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField);
 
     inline L1AnalysisPhaseIIEGTkIsoDataFormat* GetData() { return &l1Phase2EGTkIso_; }
 
