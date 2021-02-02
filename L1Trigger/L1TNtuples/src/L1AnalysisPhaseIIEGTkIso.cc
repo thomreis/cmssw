@@ -52,6 +52,25 @@ void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetEGWithTracks(const edm::Handle<l1t
   }
 }
 
+void L1Analysis::L1AnalysisPhaseIIEGTkIso::SetPFCands(const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField)
+{
+  for (size_t i = 0; i < pfCands->size(); ++i) {
+    const auto pfCand = pfCands->at(i);
+    const auto vtx = math::XYZTLorentzVector(pfCand.vx(), pfCand.vy(), pfCand.vz(), 0.);
+    const auto charge = pfCand.charge();
+    const auto etaPhiAtCalo = l1tpf::propagateToCalo(pfCand.p4(), vtx, charge, bField);
+
+    // store PF cand info
+    l1Phase2EGTkIso_.pfId.push_back(pfCand.id());
+    l1Phase2EGTkIso_.pfEt.push_back(pfCand.pt());
+    l1Phase2EGTkIso_.pfEta.push_back(pfCand.eta());
+    l1Phase2EGTkIso_.pfPhi.push_back(pfCand.phi());
+    l1Phase2EGTkIso_.pfPuppiWeight.push_back(pfCand.puppiWeight());
+    l1Phase2EGTkIso_.pfEtaAtCalo.push_back(etaPhiAtCalo.first);
+    l1Phase2EGTkIso_.pfPhiAtCalo.push_back(etaPhiAtCalo.second);
+  }
+}
+
 void L1Analysis::L1AnalysisPhaseIIEGTkIso::setBranches(const l1t::EGammaBxCollection::const_iterator& it, const edm::Handle<L1TTTrackCollectionType>& tttrack, const TrackerGeometry* tGeom, const edm::Handle<vector<l1t::PFCandidate>> &pfCands, const float bField, const int bx, const bool isHGC)
 {
   //if (it->hwQual() == 5) {

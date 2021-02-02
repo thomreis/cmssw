@@ -65,6 +65,14 @@ namespace L1Analysis
       isoPFDR.clear();
       isoPFDEta.clear();
       isoPFDPhi.clear();
+
+      pfId.clear();
+      pfEt.clear();
+      pfEta.clear();
+      pfPhi.clear();
+      pfPuppiWeight.clear();
+      pfEtaAtCalo.clear();
+      pfPhiAtCalo.clear();
     }
  
     unsigned int nEG;
@@ -115,7 +123,15 @@ namespace L1Analysis
     std::vector<double> isoPFDR;
     std::vector<double> isoPFDEta;
     std::vector<double> isoPFDPhi;
-  }; 
+
+    std::vector<unsigned int> pfId;
+    std::vector<double> pfEt;
+    std::vector<double> pfEta;
+    std::vector<double> pfPhi;
+    std::vector<double> pfPuppiWeight;
+    std::vector<double> pfEtaAtCalo;
+    std::vector<double> pfPhiAtCalo;
+  };
 }
 #endif
 
