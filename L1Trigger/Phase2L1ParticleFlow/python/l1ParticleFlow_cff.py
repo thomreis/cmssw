@@ -6,6 +6,7 @@ from L1Trigger.Phase2L1ParticleFlow.pfClustersFromCombinedCalo_cff import pfClus
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromHGC3DClusters_cfi import pfClustersFromHGC3DClusters
 from L1Trigger.Phase2L1ParticleFlow.l1pfProducer_cfi import l1pfProducer
 from L1Trigger.Phase2L1ParticleFlow.l1TkEgAlgo_cfi import tkEgConfig
+from L1Trigger.Phase2L1ParticleFlow.l1ctLayer2_cff import *
 
 pfTracksFromL1TracksBarrel = pfTracksFromL1Tracks.clone(
     resolCalo = pfClustersFromCombinedCaloHCal.resol.clone(),
@@ -295,7 +296,9 @@ l1ParticleFlow_proper = cms.Sequence(
     l1ParticleFlow_pf_hgcal +
     l1ParticleFlow_pf_hf +
     l1pfCandidates +
-    l1tCorrelatorEG
+    l1tCorrelatorEG +
+    l1ctLayer2TkEmPuppiIso +
+    l1ctLayer2TkElePuppiIso
 )
 
 l1ParticleFlow = cms.Sequence(l1ParticleFlow_proper)
@@ -307,4 +310,6 @@ l1ParticleFlowTask = cms.Task(
     l1ParticleFlow_pf_hf_Task,
     cms.Task(l1pfCandidates),
     cms.Task(l1tCorrelatorEG),
+    cms.Task(l1ctLayer2TkEmPuppiIso),
+    cms.Task(l1ctLayer2TkElePuppiIso),
 )
