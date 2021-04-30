@@ -3,6 +3,7 @@
 #include "DataFormats/L1TCorrelator/interface/TkEm.h"
 #include "DataFormats/L1TCorrelator/interface/TkEmFwd.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
+#include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
@@ -15,6 +16,7 @@
 //#include "L1Trigger/Phase2L1ParticleFlow/src/newfirmware/egamma/l2egsorter_ref.cpp"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/egamma/l2egencoder_ref.h"
 //#include "L1Trigger/Phase2L1ParticleFlow/src/newfirmware/egamma/l2egencoder_ref.cpp"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/egamma/L1EGPuppiIsoAlgo.h"
 
 #include "L1Trigger/DemonstratorTools/interface/BoardDataWriter.h"
 #include "L1Trigger/DemonstratorTools/interface/utilities.h"
@@ -54,6 +56,7 @@ private:
 
   void convertToEmu(const l1t::TkElectron &tkele, RefRemapper &refRemapper, l1ct::OutputBoard &boarOut) const;
   void convertToEmu(const l1t::TkEm &tkele, RefRemapper &refRemapper, l1ct::OutputBoard &boarOut) const;
+  void convertToPuppi(const l1t::PFCandidateCollection &l1PFCands, l1ct::PuppiObjs &puppiObjs) const;
 
   template <class T>
   class PFInstanceInputs {
@@ -194,6 +197,9 @@ private:
   std::string tkEleInstanceLabel_;
   l1ct::L2EgSorterEmulator l2egsorter;
   l1ct::L2EgEncoderEmulator l2encoder;
+  edm::EDGetTokenT<std::vector<l1t::PFCandidate>> pfObjsToken_;
+  l1ct::L1EGPuppiIsoAlgo l2EgPuppiIsoAlgo_;
+  l1ct::L1EGPuppiIsoAlgo l2ElePuppiIsoAlgo_;
   bool doInPtrn_;
   bool doOutPtrn_;
   std::unique_ptr<PatternWriter> inPtrnWrt_;
@@ -209,6 +215,9 @@ L1TCtL2EgProducer::L1TCtL2EgProducer(const edm::ParameterSet &conf)
       tkEleInstanceLabel_(conf.getParameter<std::string>("tkEleInstanceLabel")),
       l2egsorter(conf.getParameter<edm::ParameterSet>("sorter")),
       l2encoder(conf.getParameter<edm::ParameterSet>("encoder")),
+      pfObjsToken_(consumes<std::vector<l1t::PFCandidate>>(conf.getParameter<edm::InputTag>("l1PFObjects"))),
+      l2EgPuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("egPFIso")),
+      l2ElePuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("elePFIso")),
       doInPtrn_(conf.getParameter<bool>("writeInPattern")),
       doOutPtrn_(conf.getParameter<bool>("writeOutPattern")),
       inPtrnWrt_(nullptr),
@@ -300,6 +309,13 @@ void L1TCtL2EgProducer::produce(edm::StreamID, edm::Event &iEvent, const edm::Ev
   std::vector<EGIsoEleObjEmu> out_eles_emu;
   l2egsorter.run(*boards, out_photons_emu, out_eles_emu);
 
+  // PUPPI isolation
+  auto &pfObjs = iEvent.get(pfObjsToken_);
+  l1ct::PuppiObjs puppiObjs;
+  convertToPuppi(pfObjs, puppiObjs);
+  l2EgPuppiIsoAlgo_.run(out_photons_emu, puppiObjs);
+  l2ElePuppiIsoAlgo_.run(out_eles_emu, puppiObjs);
+
   if (doOutPtrn_) {
     l1t::demo::EventData outData;
     outData.add({"eglayer2", 0}, l2encoder.encodeLayer2EgObjs(out_photons_emu, out_eles_emu));
@@ -334,6 +350,7 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkElectron &tkele,
   emu.sta_idx = refRemapper.origRefAndPtr.size() - 1;
   emu.setHwIso(EGIsoEleObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkele.trkIsol()));
   emu.setHwIso(EGIsoEleObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkele.pfIsol()));
+  emu.setHwIso(EGIsoEleObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkele.puppiIsol()));
   // std::cout << "[convertToEmu] TkEle pt: " << emu.hwPt << " eta: " << emu.hwEta << " phi: " << emu.hwPhi << " staidx: " << emu.sta_idx << std::endl;
 
   boarOut.egelectron.push_back(emu);
@@ -354,10 +371,20 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkEm &tkem,
   emu.sta_idx = refRemapper.origRefAndPtr.size() - 1;
   emu.setHwIso(EGIsoObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkem.trkIsol()));
   emu.setHwIso(EGIsoObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkem.pfIsol()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkem.puppiIsol()));
   emu.setHwIso(EGIsoObjEmu::IsoType::TkIsoPV, l1ct::Scales::makeIso(tkem.trkIsolPV()));
   emu.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, l1ct::Scales::makeIso(tkem.pfIsolPV()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIsoPV, l1ct::Scales::makeIso(tkem.puppiIsolPV()));
   // std::cout << "[convertToEmu] TkEM pt: " << emu.hwPt << " eta: " << emu.hwEta << " phi: " << emu.hwPhi << " staidx: " << emu.sta_idx << std::endl;
   boarOut.egphoton.push_back(emu);
+}
+
+void L1TCtL2EgProducer::convertToPuppi(const l1t::PFCandidateCollection &l1PFCands, l1ct::PuppiObjs &puppiObjs) const {
+  for (const auto &l1PFCand : l1PFCands) {
+    l1ct::PuppiObj obj;
+    obj.initFromBits(l1PFCand.encodedPuppi64());
+    puppiObjs.emplace_back(obj);
+  }
 }
 
 l1t::TkEm L1TCtL2EgProducer::convertFromEmu(const l1ct::EGIsoObjEmu &egiso, const RefRemapper &refRemapper) const {
@@ -372,6 +399,8 @@ l1t::TkEm L1TCtL2EgProducer::convertFromEmu(const l1ct::EGIsoObjEmu &egiso, cons
   tkem.setHwQual(egiso.hwQual);
   tkem.setPFIsol(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PfIso));
   tkem.setPFIsolPV(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PfIsoPV));
+  tkem.setPuppiIsol(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PuppiIso));
+  tkem.setPuppiIsolPV(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PuppiIsoPV));
   tkem.setEgBinaryWord(egiso.toGT().pack());
   return tkem;
 }
@@ -389,6 +418,7 @@ l1t::TkElectron L1TCtL2EgProducer::convertFromEmu(const l1ct::EGIsoEleObjEmu &eg
   // FIXME: need to define a global quality (barrel+endcap)?
   tkele.setHwQual(egele.hwQual);
   tkele.setPFIsol(egele.floatRelIso(l1ct::EGIsoEleObjEmu::IsoType::PfIso));
+  tkele.setPuppiIsol(egele.floatRelIso(l1ct::EGIsoEleObjEmu::IsoType::PuppiIso));
   tkele.setEgBinaryWord(egele.toGT().pack());
   return tkele;
 }
