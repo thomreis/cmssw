@@ -5,6 +5,7 @@ from L1Trigger.Phase2L1ParticleFlow.pfClustersFromL1EGClusters_cfi import pfClus
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromCombinedCalo_cfi import pfClustersFromCombinedCalo
 from L1Trigger.Phase2L1ParticleFlow.l1pfProducer_cfi import l1pfProducer
 from L1Trigger.Phase2L1ParticleFlow.l1TkEgAlgo_cfi import tkEgConfig
+from L1Trigger.Phase2L1ParticleFlow.l1ctLayer2_cff import *
 
 # Using phase2_hgcalV10 to customize the config for all 106X samples, since there's no other modifier for it
 from Configuration.Eras.Modifier_phase2_hgcalV10_cff import phase2_hgcalV10
@@ -362,7 +363,9 @@ l1ParticleFlow_proper = cms.Sequence(
     l1ParticleFlow_pf_hgcal +
     l1ParticleFlow_pf_hf +
     l1pfCandidates +
-    l1tCorrelatorEG
+    l1tCorrelatorEG +
+    l1ctLayer2TkEmPuppiIso +
+    l1ctLayer2TkElePuppiIso
 )
 
 l1ParticleFlow = cms.Sequence(l1ParticleFlow_proper)
@@ -374,4 +377,6 @@ l1ParticleFlowTask = cms.Task(
     l1ParticleFlow_pf_hf_Task,
     cms.Task(l1pfCandidates),
     cms.Task(l1tCorrelatorEG),
+    cms.Task(l1ctLayer2TkEmPuppiIso),
+    cms.Task(l1ctLayer2TkElePuppiIso),
 )
