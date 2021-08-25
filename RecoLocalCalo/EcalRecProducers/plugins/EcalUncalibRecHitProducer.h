@@ -13,6 +13,8 @@
 
 class EBDigiCollection;
 class EEDigiCollection;
+class EBDigiCollectionPh2;
+class EEDigiCollectionPh2;
 
 class EcalUncalibRecHitProducer : public edm::stream::EDProducer<> {
 public:
@@ -24,7 +26,9 @@ public:
 private:
   edm::EDGetTokenT<EBDigiCollection> ebDigiCollectionToken_;
   edm::EDGetTokenT<EEDigiCollection> eeDigiCollectionToken_;
+  edm::EDGetTokenT<EBDigiCollectionPh2> ebPh2DigiCollectionToken_;
 
+  bool isPhase2_;
   std::string ebHitCollection_;
   std::string eeHitCollection_;
 

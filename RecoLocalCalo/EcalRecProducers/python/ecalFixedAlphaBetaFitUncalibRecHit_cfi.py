@@ -6,6 +6,7 @@ ecalFixedAlphaBetaFitUncalibRecHit = cms.EDProducer("EcalUncalibRecHitProducer",
     EBdigiCollection = cms.InputTag("ecalDigis","ebDigis"),
     EEhitCollection = cms.string("EcalUncalibRecHitsEE"),
     EBhitCollection = cms.string("EcalUncalibRecHitsEB"),
+    IsPhase2 = cms.bool(False),
     algo = cms.string("EcalUncalibRecHitWorkerFixedAlphaBetaFit"), 
     algoPSet = cms.PSet(
       betaEB = cms.double(1.655),
