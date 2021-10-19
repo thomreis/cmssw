@@ -81,7 +81,9 @@ l1ctLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEMCALO_EGIN = 10,
         nEM_EGOUT = 10,
     ),
-    tkEgSorterParameters=tkEgSorterParameters.clone(),
+    tkEgSorterParameters=tkEgSorterParameters.clone(
+        nObjToSort = 10
+    ),
     caloSectors = cms.VPSet(
         cms.PSet( 
             etaBoundaries = cms.vdouble(-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5),
@@ -213,7 +215,9 @@ l1ctLayer1HGCal = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEM_EGOUT = 5,
         doBremRecovery=True,
         writeEGSta=True),
-    tkEgSorterParameters=tkEgSorterParameters.clone(),
+    tkEgSorterParameters=tkEgSorterParameters.clone(
+        nObjToSort = 5
+    ),
     caloSectors = _hgcalSectors,
     regions = cms.VPSet(
         cms.PSet( 
@@ -287,7 +291,9 @@ l1ctLayer1HGCalNoTK = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEM_EGOUT = 5,
         doBremRecovery=True,
         writeEGSta=True),
-    tkEgSorterParameters=tkEgSorterParameters.clone(),
+    tkEgSorterParameters=tkEgSorterParameters.clone(
+        nObjToSort=5
+    ),
     caloSectors = _hgcalSectors,
     regions = cms.VPSet(
         cms.PSet( 
@@ -362,7 +368,9 @@ l1ctLayer1HF = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEM_EGOUT = 5,        # to be defined
         doBremRecovery=True,
         writeEGSta=True),
-    tkEgSorterParameters=tkEgSorterParameters.clone(),
+    tkEgSorterParameters=tkEgSorterParameters.clone(
+        nObjToSort = 5
+    ),
     caloSectors = cms.VPSet(
         cms.PSet( 
             etaBoundaries = cms.vdouble(-5.5, -3.0),
