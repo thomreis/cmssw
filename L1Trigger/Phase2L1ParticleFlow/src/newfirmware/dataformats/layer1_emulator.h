@@ -315,7 +315,6 @@ namespace l1ct {
     unsigned int nObj(ObjType type, bool puppi) const;
   };
 
-
   struct OutputBoard {
     std::vector<unsigned int> region_index;
     std::vector<EGIsoObjEmu> egphoton;
@@ -324,9 +323,7 @@ namespace l1ct {
     bool read(std::fstream &from);
     bool write(std::fstream &to) const;
     void clear();
-
   };
-
 
   struct Event {
     enum { VERSION = 11 };
