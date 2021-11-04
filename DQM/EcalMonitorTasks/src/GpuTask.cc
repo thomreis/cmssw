@@ -8,24 +8,12 @@
 #include "DataFormats/EcalRawData/interface/EcalDCCHeaderBlock.h"
 
 namespace ecaldqm {
-  GpuTask::GpuTask() : DQWorkerTask(), runOnGpu_(false), EBCpuRecHits_(nullptr), EECpuRecHits_(nullptr) {}
+  GpuTask::GpuTask() : DQWorkerTask(), EBCpuRecHits_(nullptr), EECpuRecHits_(nullptr) {}
 
   void GpuTask::addDependencies(DependencySet& _dependencies) {
     // Ensure we run on CpuRecHits before GpuRecHits
-    if (runOnGpu_) {
-      _dependencies.push_back(Dependency(kEBGpuRecHit, kEBCpuRecHit));
-      _dependencies.push_back(Dependency(kEEGpuRecHit, kEECpuRecHit));
-    }
-  }
-
-  void GpuTask::setParams(edm::ParameterSet const& _params) {
-    runOnGpu_ = _params.getUntrackedParameter<bool>("runOnGpu");
-    if (!runOnGpu_) {
-      MEs_.erase(std::string("RecHitGpuCpu"));
-      MEs_.erase(std::string("RecHitGpuCpuEnergy"));
-      MEs_.erase(std::string("RecHitGpuCpuTime"));
-      MEs_.erase(std::string("RecHitGpuCpuFlags"));
-    }
+    _dependencies.push_back(Dependency(kEBGpuRecHit, kEBCpuRecHit));
+    _dependencies.push_back(Dependency(kEEGpuRecHit, kEECpuRecHit));
   }
 
   bool GpuTask::filterRunType(short const* _runType) {

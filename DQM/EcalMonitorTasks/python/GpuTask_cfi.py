@@ -16,9 +16,6 @@ deltaBins = 101
 delta = 0.2
 
 ecalGpuTask = cms.untracked.PSet(
-    params = cms.untracked.PSet(
-        runOnGpu = cms.untracked.bool(False)
-    ),
     MEs = cms.untracked.PSet(
         # CPU Plots
         RecHitCpu = cms.untracked.PSet(
