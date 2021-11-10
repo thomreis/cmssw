@@ -62,7 +62,7 @@ int l1ct::PFAlgo3Emulator::tk_best_match_ref(unsigned int dR2MAX,
                                              const std::vector<l1ct::EmCaloObjEmu>& calo,
                                              const l1ct::TkObjEmu& track) const {
   int drmin = dR2MAX, ibest = -1;
-  for (unsigned int ic = 0, nCAL = std::min<unsigned>(nEMCALO_,calo.size()); ic < nCAL; ++ic) {
+  for (unsigned int ic = 0, nCAL = std::min<unsigned>(nEMCALO_, calo.size()); ic < nCAL; ++ic) {
     if (calo[ic].hwPt <= 0)
       continue;
     int dr = dr2_int(track.hwEta, track.hwPhi, calo[ic].hwEta, calo[ic].hwPhi);
@@ -507,41 +507,47 @@ void l1ct::PFAlgo3Emulator::run(const PFInputRegion& in, OutputRegion& out) cons
     for (unsigned int i = 0; i < nTRACK; ++i) {
       if (out.pfcharged[i].hwPt == 0)
         continue;
-      dbgPrintf("FW  \t outch %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d\n",
-                i,
-                out.pfcharged[i].floatPt(),
-                out.pfcharged[i].intPt(),
-                out.pfcharged[i].floatEta(),
-                out.pfcharged[i].intEta(),
-                out.pfcharged[i].floatPhi(),
-                out.pfcharged[i].intPhi(),
-                out.pfcharged[i].intId());
+      dbgPrintf(
+          "FW  \t outch %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d  packed %s\n",
+          i,
+          out.pfcharged[i].floatPt(),
+          out.pfcharged[i].intPt(),
+          out.pfcharged[i].floatEta(),
+          out.pfcharged[i].intEta(),
+          out.pfcharged[i].floatPhi(),
+          out.pfcharged[i].intPhi(),
+          out.pfcharged[i].intId(),
+          out.pfcharged[i].pack().to_string(16).c_str());
     }
     for (unsigned int i = 0; i < nPHOTON; ++i) {
       if (out.pfphoton[i].hwPt == 0)
         continue;
-      dbgPrintf("FW  \t outph %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d\n",
-                i,
-                out.pfphoton[i].floatPt(),
-                out.pfphoton[i].intPt(),
-                out.pfphoton[i].floatEta(),
-                out.pfphoton[i].intEta(),
-                out.pfphoton[i].floatPhi(),
-                out.pfphoton[i].intPhi(),
-                out.pfphoton[i].intId());
+      dbgPrintf(
+          "FW  \t outph %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d  packed %s\n",
+          i,
+          out.pfphoton[i].floatPt(),
+          out.pfphoton[i].intPt(),
+          out.pfphoton[i].floatEta(),
+          out.pfphoton[i].intEta(),
+          out.pfphoton[i].floatPhi(),
+          out.pfphoton[i].intPhi(),
+          out.pfphoton[i].intId(),
+          out.pfphoton[i].pack().to_string(16).c_str());
     }
     for (unsigned int i = 0; i < nSELCALO; ++i) {
       if (out.pfneutral[i].hwPt == 0)
         continue;
-      dbgPrintf("FW  \t outne %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d\n",
-                i,
-                out.pfneutral[i].floatPt(),
-                out.pfneutral[i].intPt(),
-                out.pfneutral[i].floatEta(),
-                out.pfneutral[i].intEta(),
-                out.pfneutral[i].floatPhi(),
-                out.pfneutral[i].intPhi(),
-                out.pfneutral[i].intId());
+      dbgPrintf(
+          "FW  \t outne %3d: pt %8.2f [ %8d ]  calo eta %+5.2f [ %+5d ]  calo phi %+5.2f [ %+5d ]  pid %d  packed %s\n",
+          i,
+          out.pfneutral[i].floatPt(),
+          out.pfneutral[i].intPt(),
+          out.pfneutral[i].floatEta(),
+          out.pfneutral[i].intEta(),
+          out.pfneutral[i].floatPhi(),
+          out.pfneutral[i].intPhi(),
+          out.pfneutral[i].intId(),
+          out.pfneutral[i].pack().to_string(16).c_str());
     }
     dbgPrintf("FW\n");
   }
