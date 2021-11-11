@@ -30,7 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/eos/cms/store/group/dpg_ecal/comm_ecal/upgrade/Phase2CMSSW/step2_digi_cmssw_12_X.root'),
+    fileNames = cms.untracked.vstring('file:/nfshome0/treis/mc/step2_digi_cmssw_12_X.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -58,7 +58,7 @@ process.options = cms.untracked.PSet(
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(False)
+    wantSummary = cms.untracked.bool(True)
 )
 
 # Production Info
@@ -75,83 +75,12 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     fileName = cms.untracked.string('file:step3.root'),
-    outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
-    splitLevel = cms.untracked.int32(0)
-)
-
-process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
-    compressionAlgorithm = cms.untracked.string('LZMA'),
-    compressionLevel = cms.untracked.int32(4),
-    dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('MINIAODSIM'),
-        filterName = cms.untracked.string('')
-    ),
-    dropMetaData = cms.untracked.string('ALL'),
-    eventAutoFlushCompressedSize = cms.untracked.int32(-900),
-    fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:step3_inMINIAODSIM.root'),
-    outputCommands = process.MINIAODSIMEventContent.outputCommands,
-    overrideBranchesSplitLevel = cms.untracked.VPSet(
-        cms.untracked.PSet(
-            branch = cms.untracked.string('patPackedCandidates_packedPFCandidates__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('recoGenParticles_prunedGenParticles__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('patTriggerObjectStandAlones_slimmedPatTrigger__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('patPackedGenParticles_packedGenParticles__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('patJets_slimmedJets__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('recoVertexs_offlineSlimmedPrimaryVertices__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('recoCaloClusters_reducedEgamma_reducedESClusters_*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedEERecHits_*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('recoGenJets_slimmedGenJets__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('patJets_slimmedJetsPuppi__*'),
-            splitLevel = cms.untracked.int32(99)
-        ), 
-        cms.untracked.PSet(
-            branch = cms.untracked.string('EcalRecHitsSorted_reducedEgamma_reducedESRecHits_*'),
-            splitLevel = cms.untracked.int32(99)
-        )
-    ),
-    overrideInputFileSplitLevels = cms.untracked.bool(True),
-    splitLevel = cms.untracked.int32(0)
-)
-
-process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
-    dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('DQMIO'),
-        filterName = cms.untracked.string('')
-    ),
-    fileName = cms.untracked.string('file:step3_inDQM.root'),
-    outputCommands = process.DQMEventContent.outputCommands,
+    #outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
+    outputCommands = cms.untracked.vstring(
+        'drop *',
+        'keep EBDigiCollection*_*_*_*',
+        'keep Ecal*_*_*_*',
+        'keep *_ecal*_*_*'),
     splitLevel = cms.untracked.int32(0)
 )
 
@@ -172,10 +101,6 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.L1Reco_step,process.reconstruction_step,process.FEVTDEBUGHLToutput_step)
-from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
-associatePatAlgosToolsTask(process)
-
-
 
 # Customisation from command line
 
