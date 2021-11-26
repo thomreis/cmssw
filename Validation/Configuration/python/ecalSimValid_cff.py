@@ -9,7 +9,7 @@ from Validation.EcalClusters.ecalClustersValidationSequence_cff import *
 
 ecalSimValid = cms.Sequence(ecalSimHitsValidationSequence+ecalDigisValidationSequence+ecalRecHitsValidationSequence+ecalClustersValidationSequence)
 
-from DQM.EcalMonitorTasks.EcalMonitorTask_cfi import *
+from DQM.EcalMonitorTasks.EcalMonitorTask_cff import *
 from DQM.EcalMonitorTasks.EcalFEDMonitor_cfi import *
 from DQMOffline.Ecal.EcalZmassTask_cfi import *
 from DQMOffline.Ecal.EcalPileUpDepMonitor_cfi import *

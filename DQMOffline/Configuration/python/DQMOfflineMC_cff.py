@@ -12,7 +12,9 @@ SiPixelHLTSource.RawInput = 'rawDataCollector'
 dqmCSCClient.InputObjects = 'rawDataCollector'
 dtDataIntegrityUnpacker.inputLabel = 'rawDataCollector'
 #l1tfed.rawTag = 'rawDataCollector'
-ecalMonitorTask.collectionTags.TrigPrimEmulDigi = 'simEcalTriggerPrimitiveDigis'
+## changes for all cases that ecalMonitorTask has (it is a SwitchProducerCUDA)
+for case in ecalMonitorTask.parameterNames_():
+    getattr(ecalMonitorTask, case).collectionTags.TrigPrimEmulDigi = 'simEcalTriggerPrimitiveDigis'
 ecalPreshowerFEDIntegrityTask.FEDRawDataCollection = 'rawDataCollector'
 ecalPreshowerRawDataTask.FEDRawDataCollection = 'rawDataCollector'
 castorOfflineMonitor.rawLabel = 'rawDataCollector'

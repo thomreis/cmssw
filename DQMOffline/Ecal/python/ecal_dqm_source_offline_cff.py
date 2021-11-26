@@ -30,4 +30,6 @@ ecalOnly_dqm_source_offline = cms.Sequence(
     ecalzmasstask
 )
 
-ecalMonitorTask.workerParameters.TrigPrimTask.params.runOnEmul = False
+## changes for all cases that ecalMonitorTask has (it is a SwitchProducerCUDA)
+for case in ecalMonitorTask.parameterNames_():
+    getattr(ecalMonitorTask, case).workerParameters.TrigPrimTask.params.runOnEmul = False
