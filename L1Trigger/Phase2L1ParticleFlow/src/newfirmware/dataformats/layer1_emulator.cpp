@@ -390,6 +390,18 @@ unsigned int l1ct::OutputRegion::nObj(ObjType type, bool usePuppi) const {
   }
 }
 
+bool l1ct::OutputBoard::read(std::fstream& from) {
+  return readVar(from, eta) && readVar(from, phi) && readMany(from, egphoton) && readMany(from, egelectron);
+}
+bool l1ct::OutputBoard::write(std::fstream& to) const {
+  return writeVar(eta, to) && writeVar(phi, to) && writeMany(egphoton, to) && writeMany(egelectron, to);
+}
+
+void l1ct::OutputBoard::clear() {
+  egphoton.clear();
+  egelectron.clear();
+}
+
 bool l1ct::Event::read(std::fstream& from) {
   uint32_t version;
   if (!readVar(from, version))
@@ -402,13 +414,14 @@ bool l1ct::Event::read(std::fstream& from) {
     abort();
   }
   return readVar(from, run) && readVar(from, lumi) && readVar(from, event) && raw.read(from) && decoded.read(from) &&
-         readMany(from, pfinputs) && readMany(from, pvs) && readMany(from, pvs_emu) && readMany(from, out);
+         readMany(from, pfinputs) && readMany(from, pvs) && readMany(from, pvs_emu) && readMany(from, out) &&
+         readMany(from, board_out);
 }
 bool l1ct::Event::write(std::fstream& to) const {
   uint32_t version = VERSION;
   return writeVar(version, to) && writeVar(run, to) && writeVar(lumi, to) && writeVar(event, to) && raw.write(to) &&
          decoded.write(to) && writeMany(pfinputs, to) && writeMany(pvs, to) && writeMany(pvs_emu, to) &&
-         writeMany(out, to);
+         writeMany(out, to) && writeMany(board_out, to);
 }
 void l1ct::Event::init(uint32_t arun, uint32_t alumi, uint64_t anevent) {
   clear();
@@ -427,5 +440,7 @@ void l1ct::Event::clear() {
   pvs.clear();
   pvs_emu.clear();
   for (auto& i : out)
+    i.clear();
+  for (auto& i : board_out)
     i.clear();
 }

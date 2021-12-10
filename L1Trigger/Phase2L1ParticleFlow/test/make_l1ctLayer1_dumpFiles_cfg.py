@@ -1,6 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 from Configuration.StandardSequences.Eras import eras
 
+produceEGStage2Pattern = False
+
 process = cms.Process("RESP", eras.Phase2C9)
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -38,6 +40,14 @@ process.L1VertexFinderEmulator.l1TracksInputTag = cms.InputTag("L1GTTInputProduc
 
 process.l1ctLayer1Barrel9 = process.l1ctLayer1Barrel.clone()
 process.l1ctLayer1Barrel9.regions[0].etaBoundaries = [ -1.5, -0.5, 0.5, 1.5 ] 
+process.l1ctLayer1Barrel9.boards=cms.VPSet(
+        cms.PSet(
+            regions=cms.vuint32(range(0, 3) + [x+9 for x in range(0, 3)] + [x+18 for x in range(0, 3)])),
+        cms.PSet(
+            regions=cms.vuint32(range(3, 6) + [x+9 for x in range(3, 6)] + [x+18 for x in range(3, 6)])),
+        cms.PSet(
+            regions=cms.vuint32(range(6, 9) + [x+9 for x in range(6, 9)] + [x+18 for x in range(6, 9)])),
+    )
 
 process.runPF = cms.Path( 
         process.standaloneMuons +
@@ -50,8 +60,13 @@ process.runPF = cms.Path(
         process.l1ctLayer1HGCal +
         process.l1ctLayer1HGCalNoTK +
         process.l1ctLayer1HF +
-        process.l1ctLayer1
+        process.l1ctLayer1 +
+        process.l1ctLayer2EG
     )
+
+if produceEGStage2Pattern:
+    process.l1ctLayer2EG.writeInPattern = True
+    process.l1ctLayer2EG.writeOutPattern = True
 
 process.source.fileNames  = [ '/store/cmst3/group/l1tr/gpetrucc/11_1_0/NewInputs110X/110121.done/TTbar_PU200/inputs110X_%d.root' % i for i in (1,3,7,8,9) ]
 
