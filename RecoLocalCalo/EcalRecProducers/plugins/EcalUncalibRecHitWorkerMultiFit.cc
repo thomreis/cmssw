@@ -226,7 +226,7 @@ double EcalUncalibRecHitWorkerMultiFit::timeCorrection(float ampli,
 }
 
 void EcalUncalibRecHitWorkerMultiFit::run(const edm::Event& evt,
-                                          const EcalDigiCollection& digis,
+                                          const edm::DataFrameContainer& digis,
                                           EcalUncalibratedRecHitCollection& result) {
   if (digis.empty())
     return;

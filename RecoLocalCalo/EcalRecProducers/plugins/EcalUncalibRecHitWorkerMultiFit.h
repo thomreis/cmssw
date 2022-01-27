@@ -58,7 +58,9 @@ public:
 private:
   void set(const edm::EventSetup& es) override;
   void set(const edm::Event& evt) override;
-  void run(const edm::Event& evt, const EcalDigiCollection& digis, EcalUncalibratedRecHitCollection& result) override;
+  void run(const edm::Event& evt,
+           const edm::DataFrameContainer& digis,
+           EcalUncalibratedRecHitCollection& result) override;
 
 public:
   edm::ParameterSetDescription getAlgoDescription() override;
