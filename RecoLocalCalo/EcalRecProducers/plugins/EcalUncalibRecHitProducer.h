@@ -1,20 +1,16 @@
-#ifndef RecoLocalCalo_EcalRecProducers_EcalUncalibRecHitProducer_hh
-#define RecoLocalCalo_EcalRecProducers_EcalUncalibRecHitProducer_hh
+#ifndef RecoLocalCalo_EcalRecProducers_EcalUncalibRecHitProducer_h
+#define RecoLocalCalo_EcalRecProducers_EcalUncalibRecHitProducer_h
 
 #include "FWCore/Framework/interface/stream/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
-#include "DataFormats/EcalDigi/interface/EEDataFrame.h"
-#include "DataFormats/EcalDigi/interface/EBDataFrame.h"
-
 #include "RecoLocalCalo/EcalRecProducers/interface/EcalUncalibRecHitWorkerBaseClass.h"
 
 class EBDigiCollection;
 class EEDigiCollection;
 class EBDigiCollectionPh2;
-class EEDigiCollectionPh2;
 
 class EcalUncalibRecHitProducer : public edm::stream::EDProducer<> {
 public:
@@ -24,13 +20,13 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
+  const bool isPhase2_;
+
   edm::EDGetTokenT<EBDigiCollection> ebDigiCollectionToken_;
   edm::EDGetTokenT<EEDigiCollection> eeDigiCollectionToken_;
   edm::EDGetTokenT<EBDigiCollectionPh2> ebPh2DigiCollectionToken_;
-
-  bool isPhase2_;
-  std::string ebHitCollection_;
-  std::string eeHitCollection_;
+  const edm::EDPutTokenT<EBUncalibratedRecHitCollection> ebHitCollectionToken_;
+  edm::EDPutTokenT<EEUncalibratedRecHitCollection> eeHitCollectionToken_;
 
   std::unique_ptr<EcalUncalibRecHitWorkerBaseClass> worker_;
 };
