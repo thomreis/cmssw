@@ -40,6 +40,7 @@
 #include "CondFormats/DataRecord/interface/EcalSamplesCorrelationRcd.h"
 #include "CondFormats/DataRecord/interface/EcalPulseShapesRcd.h"
 #include "CondFormats/DataRecord/interface/EcalPulseCovariancesRcd.h"
+#include "DataFormats/EcalDigi/interface/EcalConstants.h"
 #include "RecoLocalCalo/EcalRecAlgos/interface/EcalUncalibRecHitTimingCCAlgo.h"
 
 namespace edm {
@@ -66,6 +67,13 @@ public:
   edm::ParameterSetDescription getAlgoDescription() override;
 
 private:
+  using SampleVector = typename EigenMatrixTypes<ecalPh1>::SampleVector;
+  using FullSampleVector = typename EigenMatrixTypes<ecalPh1>::FullSampleVector;
+  using SampleMatrix = typename EigenMatrixTypes<ecalPh1>::SampleMatrix;
+  using FullSampleMatrix = typename EigenMatrixTypes<ecalPh1>::FullSampleMatrix;
+  using SampleMatrixGainArray = typename EigenMatrixTypes<ecalPh1>::SampleMatrixGainArray;
+  using BXVector = typename EigenMatrixTypes<ecalPh1>::BXVector;
+
   edm::ESHandle<EcalPedestals> peds;
   edm::ESGetToken<EcalPedestals, EcalPedestalsRcd> pedsToken_;
   edm::ESHandle<EcalGainRatios> gains;
