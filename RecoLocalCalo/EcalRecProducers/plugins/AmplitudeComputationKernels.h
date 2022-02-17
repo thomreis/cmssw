@@ -4,10 +4,6 @@
 #include "DeclsForKernels.h"
 #include "EigenMatrixTypes_gpu.h"
 
-class EcalPulseShape;
-class EcalPulseCovariance;
-class EcalUncalibratedRecHit;
-
 namespace ecal {
   namespace multifit {
 
