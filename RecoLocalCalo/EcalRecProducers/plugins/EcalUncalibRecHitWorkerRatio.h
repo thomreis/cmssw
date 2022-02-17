@@ -65,8 +65,8 @@ protected:
   double EBtimeConstantTerm_;
   double EEtimeConstantTerm_;
 
-  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame> uncalibMaker_barrel_;
-  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame> uncalibMaker_endcap_;
+  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame, EcalSampleMask> uncalibMaker_barrel_;
+  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame, EcalSampleMask> uncalibMaker_endcap_;
 };
 
 #endif

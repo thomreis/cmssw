@@ -4,7 +4,6 @@
 #include <cuda.h>
 
 #include "CondFormats/EcalObjects/interface/EcalPulseCovariances.h"
-#include "CondFormats/EcalObjects/interface/EcalPulseShapes.h"
 #include "CondFormats/EcalObjects/interface/EcalSamplesCorrelation.h"
 #include "DataFormats/EcalDigi/interface/EcalDataFrame.h"
 #include "DataFormats/EcalDigi/interface/EcalMGPASample.h"

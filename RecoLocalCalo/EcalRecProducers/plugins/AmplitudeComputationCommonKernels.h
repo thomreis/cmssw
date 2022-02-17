@@ -1,12 +1,11 @@
 #ifndef RecoLocalCalo_EcalRecProducers_plugins_AmplitudeComputationCommonKernels_h
 #define RecoLocalCalo_EcalRecProducers_plugins_AmplitudeComputationCommonKernels_h
 
+#include "CondFormats/EcalObjects/interface/EcalPulseShapes.h"
 #include "DeclsForKernels.h"
 #include "EigenMatrixTypes_gpu.h"
 
-class EcalPulseShape;
 // this flag setting is applied to all of the cases
-class EcalPulseCovariance;
 class EcalUncalibratedRecHit;
 
 namespace ecal {

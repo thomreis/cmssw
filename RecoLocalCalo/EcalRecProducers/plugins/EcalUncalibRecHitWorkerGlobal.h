@@ -93,8 +93,8 @@ protected:
   std::pair<double, double> EBtimeFitLimits_;
   std::pair<double, double> EEtimeFitLimits_;
 
-  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame> ratioMethod_barrel_;
-  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame> ratioMethod_endcap_;
+  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame, EcalSampleMask> ratioMethod_barrel_;
+  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame, EcalSampleMask> ratioMethod_endcap_;
 
   double EBtimeConstantTerm_;
   double EBtimeNconst_;
