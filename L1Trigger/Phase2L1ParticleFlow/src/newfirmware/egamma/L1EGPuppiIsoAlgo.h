@@ -7,12 +7,15 @@
 #include <memory>
 
 #include "DataFormats/Math/interface/deltaR.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #ifdef CMSSW_GIT_HASH
+#include "../dataformats/datatypes.h"
 #include "../dataformats/layer1_emulator.h"
 #include "../dataformats/egamma.h"
 #include "../dataformats/puppi.h"
 #else
+#include "../../../dataformats/datatypes.h"
 #include "../../../dataformats/layer1_emulator.h"
 #include "../../../dataformats/egamma.h"
 #include "../../../dataformats/puppi.h"
@@ -20,105 +23,46 @@
 
 namespace l1ct {
 
-struct L1EGPuppiIsoAlgoConfig {
-  enum {kPFIso, kPuppiIso};
+  struct L1EGPuppiIsoAlgoConfig {
+    enum { kPFIso, kPuppiIso };
 
-  int pfIsoType_;
-  double pfMinPt_;
-  double dRMinIso_;
-  double dRMaxIso_;
-  double dRMaxDz_;
+    int pfIsoType_;
+    pt_t ptMin_;
+    ap_int<z0_t::width + 1> dZMax_;
+    int dRMin2_;
+    int dRMax2_;
 
-  L1EGPuppiIsoAlgoConfig(const std::string pfIsoTypeStr,
-                         const double pfMinPt,
-                         const double dRMinIso,
-                         const double dRMaxIso,
-                         const double dRMaxDz)
-    : pfIsoType_(pfIsoTypeStr == "PF" ? kPFIso : kPuppiIso),
-      pfMinPt_(pfMinPt),
-      dRMinIso_(dRMinIso),
-      dRMaxIso_(dRMaxIso),
-      dRMaxDz_(dRMaxDz) {}
-};
+    L1EGPuppiIsoAlgoConfig(const std::string &pfIsoTypeStr,
+                           const float ptMin,
+                           const float dZMax,
+                           const float dRMin,
+                           const float dRMax)
+        : pfIsoType_(pfIsoTypeStr == "PF" ? kPFIso : kPuppiIso),
+          ptMin_(Scales::makePtFromFloat(ptMin)),
+          dZMax_(Scales::makeZ0(dZMax)),
+          dRMin2_(Scales::makeDR2FromFloatDR(dRMin)),
+          dRMax2_(Scales::makeDR2FromFloatDR(dRMax)) {}
+  };
 
-typedef std::vector<EGIsoObjEmu> EGIsoObjsEmu;
-typedef std::vector<PuppiObj> PuppiObjs;
+  typedef std::vector<EGIsoObjEmu> EGIsoObjsEmu;
+  typedef std::vector<EGIsoEleObjEmu> EGIsoEleObjsEmu;
+  typedef std::vector<PuppiObj> PuppiObjs;
 
-class L1EGPuppiIsoAlgo {
- public:
-  L1EGPuppiIsoAlgo(const L1EGPuppiIsoAlgoConfig& config) : config_(config) {}
-  virtual ~L1EGPuppiIsoAlgo() = default;
+  class L1EGPuppiIsoAlgo {
+  public:
+    L1EGPuppiIsoAlgo(const L1EGPuppiIsoAlgoConfig& config) : config_(config) {}
+    L1EGPuppiIsoAlgo(const edm::ParameterSet& pSet);
+    virtual ~L1EGPuppiIsoAlgo() = default;
 
-  void run(const EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, EGIsoObjsEmu& outL1EGs) const;
+    void run(const EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, EGIsoObjsEmu& outL1EGs, z0_t z0 = 0) const;
+    void run(EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, z0_t z0 = 0) const;
+    void run(EGIsoEleObjsEmu& l1Eles, const PuppiObjs& l1PFCands) const;
 
- private:
-  float calcIso(const EGIsoObj& l1EG, std::list<std::shared_ptr<PuppiObj>>& workPFCands, float z0 = 0.) const;
+  private:
+    iso_t calcIso(const EGIsoObj& l1EG, std::list<std::shared_ptr<PuppiObj>>& workPFCands, z0_t z0 = 0) const;
 
-  const L1EGPuppiIsoAlgoConfig config_;
-};
-
-void L1EGPuppiIsoAlgo::run(const EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, EGIsoObjsEmu& outL1EGs) const {
-  outL1EGs.reserve(l1EGs.size());
-
-  // make a list of pointers to PF candidates
-  // the pointer will be removed from the list once the candidate has been used
-  std::list<std::shared_ptr<PuppiObj>> workPFCands;
-  std::list<std::shared_ptr<PuppiObj>> workPFCandsPV;
-  for (unsigned i = 0; i < l1PFCands.size(); ++i) {
-    workPFCands.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
-    workPFCandsPV.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
-  }
-
-  for (const auto &l1EG : l1EGs) {
-    auto outL1EG(l1EG);
-    float iso = 0.;
-    float isoPV = 0.;
-    if (!workPFCands.empty()) {
-      iso = calcIso(l1EG, workPFCands);
-      isoPV = calcIso(l1EG, workPFCandsPV); // FIXME calculate PV constrained iso
-    }
-
-    if (config_.pfIsoType_ == L1EGPuppiIsoAlgoConfig::kPFIso) {
-      outL1EG.setHwIso(EGIsoObjEmu::IsoType::PfIso, Scales::makeIso(iso));
-      outL1EG.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, Scales::makeIso(isoPV));
-    } else {
-      outL1EG.setHwIso(EGIsoObjEmu::IsoType::PfIso, Scales::makeIso(iso)); // Use PF iso type for lack of a dedicated PUPPI one for now
-      outL1EG.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, Scales::makeIso(isoPV));
-    }
-    outL1EGs.emplace_back(outL1EG);
-  }
-}
-
-float L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG, std::list<std::shared_ptr<PuppiObj>>& workPFCands, float z0) const {
-  float sumPt = 0.;
-
-  auto pfIt = workPFCands.cbegin();
-  while (pfIt != workPFCands.cend()) {
-    // use the PF candidate pT if it is within the cone and optional dz cut for charged PF candidates
-    // and then remove the candidate from the collection
-    const auto workPFCand = *pfIt;
-    float pfCandZ0 = 0.;
-    if (workPFCand->hwId.charged()) {
-      pfCandZ0 = workPFCand->floatZ0();
-    }
-    const auto dz = std::abs(z0 - pfCandZ0);
-    if (workPFCand->intCharge() == 0 || (workPFCand->intCharge() != 0 && dz < config_.dRMaxDz_)) {
-      const auto dR = reco::deltaR(l1EG.floatEta(), l1EG.floatPhi(), workPFCand->floatEta(), workPFCand->floatPhi());
-      if (dR >= config_.dRMinIso_ && dR < config_.dRMaxIso_ && workPFCand->floatPt() >= config_.pfMinPt_) {
-        sumPt += workPFCand->floatPt();
-        pfIt = workPFCands.erase(pfIt); // this returns an iterator to the next element already so no need to increase here
-      } else {
-        ++pfIt;
-      }
-    } else {
-      ++pfIt;
-    }
-  }
-
-  return sumPt / l1EG.floatPt();
-}
+    const L1EGPuppiIsoAlgoConfig config_;
+  };
 
 }  // namespace l1ct
-
 #endif
-
