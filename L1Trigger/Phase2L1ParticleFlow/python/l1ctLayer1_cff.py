@@ -6,6 +6,7 @@ from L1Trigger.Phase2L1ParticleFlow.pfTracksFromL1Tracks_cfi import pfTracksFrom
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromL1EGClusters_cfi import pfClustersFromL1EGClusters
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromCombinedCalo_cff import pfClustersFromCombinedCaloHCal, pfClustersFromCombinedCaloHF
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromHGC3DClusters_cfi import pfClustersFromHGC3DClusters
+from L1Trigger.Phase2L1ParticleFlow.DeregionizerProducer_cfi import DeregionizerProducer as l1ctLayer2Deregionizer
 
 from l1TkEgAlgoEmulator_cfi import tkEgAlgoParameters,tkEgSorterParameters
 
@@ -537,6 +538,7 @@ l1ctLayer2EG = cms.EDProducer(
             channels=cms.vint32(-1)
         ),
     ),
+    l1PFObjects = cms.InputTag("l1ctLayer2Deregionizer", "Puppi"),
     egStaInstanceLabel=cms.string("L1CtEgEE"),
     tkEmInstanceLabel=cms.string("L1CtTkEm"),
     tkEleInstanceLabel=cms.string("L1CtTkElectron"),
@@ -549,6 +551,20 @@ l1ctLayer2EG = cms.EDProducer(
     encoder=cms.PSet(
         nTKELE_OUT=cms.uint32(12),
         nTKPHO_OUT=cms.uint32(12),
+    ),
+    egPFIso = cms.PSet(
+        pfIsoType = cms.string("PUPPI"),
+        pfPtMin = cms.double(1.),
+        dZMax = cms.double(0.6),
+        dRMin = cms.double(0.07),
+        dRMax = cms.double(0.3)
+    ),
+    elePFIso = cms.PSet(
+        pfIsoType = cms.string("PUPPI"),
+        pfPtMin = cms.double(1.),
+        dZMax = cms.double(0.6),
+        dRMin = cms.double(0.03),
+        dRMax = cms.double(0.2)
     ),
     writeInPattern=cms.bool(False),
     writeOutPattern=cms.bool(False),
@@ -648,5 +664,6 @@ l1ctLayer1Task = cms.Task(
      l1ctLayer1HF,
      l1ctLayer1,
      l1ctLayer1EG,
+     l1ctLayer2Deregionizer,
      l1ctLayer2EG
 )
