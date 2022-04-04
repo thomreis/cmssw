@@ -102,27 +102,7 @@ void L1TEGPuppiIsoProducer<T>::prepareAlgoPuppiInput(const l1t::PFCandidateColle
                                                      l1ct::PuppiObjs &puppiObjs) {
   for (const auto &l1PFCand : l1PFCands) {
     l1ct::PuppiObj obj;
-    obj.hwPt = l1ct::Scales::makePtFromFloat(l1PFCand.pt());
-    obj.hwEta = l1ct::Scales::makeEta(l1PFCand.eta());
-    obj.hwPhi = l1ct::Scales::makePhi(l1PFCand.phi());
-    if (l1PFCand.id() == l1t::PFCandidate::Muon) {
-      obj.hwId = l1ct::ParticleID::mkMuon(l1PFCand.charge() > 0);
-    } else if (l1PFCand.id() == l1t::PFCandidate::Electron) {
-      obj.hwId = l1ct::ParticleID::mkElectron(l1PFCand.charge() > 0);
-    } else if (l1PFCand.id() == l1t::PFCandidate::ChargedHadron) {
-      obj.hwId = l1ct::ParticleID::mkChHad(l1PFCand.charge() > 0);
-    } else if (l1PFCand.id() == l1t::PFCandidate::Photon) {
-      obj.hwId = l1ct::ParticleID::PHOTON;
-    } else {
-      obj.hwId = l1ct::ParticleID::HADZERO;
-    }
-    if (obj.hwId.charged()) {
-      obj.setHwZ0(l1PFCand.hwZ0());
-      obj.setHwDxy(l1PFCand.hwDxy());
-      obj.setHwTkQuality(l1PFCand.hwTkQuality());
-    } else {
-      obj.setHwPuppiW(l1PFCand.hwPuppiWeight());
-    }
+    obj.initFromBits(l1PFCand.encodedPuppi64());
     puppiObjs.emplace_back(obj);
   }
 }

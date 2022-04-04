@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from L1Trigger.Phase2L1ParticleFlow.DeregionizerProducer_cfi import DeregionizerProducer as l1ctLayer2Deregionizer
+
 l1ctLayer2EG = cms.EDProducer(
     "L1TCtL2EgProducer",
     tkElectrons=cms.VPSet(
