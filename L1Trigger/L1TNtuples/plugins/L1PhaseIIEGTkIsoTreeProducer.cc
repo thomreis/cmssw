@@ -34,7 +34,6 @@
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 #include "DataFormats/L1TParticleFlow/interface/PFCandidate.h"
 
-#include "FWCore/Framework/interface/ESHandle.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
@@ -51,7 +50,7 @@
 //
 // class declaration
 //
-class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::WatchRuns, edm::one::SharedResources>  {
+class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   public:
     explicit L1PhaseIIEGTkIsoTreeProducer(const edm::ParameterSet&);
     ~L1PhaseIIEGTkIsoTreeProducer();
@@ -69,9 +68,6 @@ class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::Watch
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
 
-    virtual void beginRun(const edm::Run &run, const edm::EventSetup &setup) override;
-    virtual void endRun(edm::Run const&, edm::EventSetup const&) override {};
-
     // ----------member data ---------------------------
 
     // output file
@@ -84,12 +80,11 @@ class L1PhaseIIEGTkIsoTreeProducer : public edm::one::EDAnalyzer<edm::one::Watch
     edm::EDGetTokenT<l1t::EGammaBxCollection> egTokenHGC_;
     edm::EDGetTokenT<L1TTTrackCollectionType> tttrackToken_;
     edm::EDGetTokenT<std::vector<l1t::PFCandidate>> pfCandToken_;
+    edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> tGeomToken_;
+    edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> magFieldToken_;
 
     std::string trackerGeom_;
     bool storeAllPFCands_;
-
-    const TrackerGeometry* tGeom_;
-    float bFieldZ_;
 };
 
 //
@@ -102,6 +97,8 @@ L1PhaseIIEGTkIsoTreeProducer::L1PhaseIIEGTkIsoTreeProducer(const edm::ParameterS
   egTokenHGC_(consumes<l1t::EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("l1EgHGC"))),
   tttrackToken_(consumes<L1TTTrackCollectionType>(iConfig.getParameter<edm::InputTag>("l1Tracks"))),
   pfCandToken_(consumes<std::vector<l1t::PFCandidate>>(iConfig.getParameter<edm::InputTag>("l1PFCandidates"))),
+  tGeomToken_(esConsumes<TrackerGeometry, TrackerDigiGeometryRecord>()),
+  magFieldToken_(esConsumes<MagneticField, IdealMagneticFieldRecord>()),
   trackerGeom_(iConfig.getParameter<std::string>("trackerGeometry")),
   storeAllPFCands_(iConfig.getParameter<bool>("storeAllPFCands"))
 {
@@ -124,6 +121,11 @@ L1PhaseIIEGTkIsoTreeProducer::~L1PhaseIIEGTkIsoTreeProducer()
 void
 L1PhaseIIEGTkIsoTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  // geometry needed to call pTFrom2Stubs
+  const auto* tGeom = &iSetup.getData(tGeomToken_);
+  const float bFieldZ = iSetup.getData(magFieldToken_).inTesla(GlobalPoint(0, 0, 0)).z();
+
+
   // first reset the branch
   l1Phase2EGTkIso_->Reset();
 
@@ -157,27 +159,13 @@ L1PhaseIIEGTkIsoTreeProducer::analyze(const edm::Event& iEvent, const edm::Event
   }
 
   // set the branches
-  l1Phase2EGTkIso_->SetEGWithTracks(egBarrel, egHGC, tttrack, tGeom_, pfCands, bFieldZ_);
+  l1Phase2EGTkIso_->SetEGWithTracks(egBarrel, egHGC, tttrack, tGeom, pfCands, bFieldZ);
   if (storeAllPFCands_) {
-    l1Phase2EGTkIso_->SetPFCands(pfCands, bFieldZ_);
+    l1Phase2EGTkIso_->SetPFCands(pfCands, bFieldZ);
   }
 
   //fill the tree
   tree_->Fill();
-}
-
-
-void L1PhaseIIEGTkIsoTreeProducer::beginRun(const edm::Run &run, const edm::EventSetup &setup)
-{
-  // geometry needed to call pTFrom2Stubs
-  edm::ESHandle<TrackerGeometry> geomHandle;
-  setup.get<TrackerDigiGeometryRecord>().get(trackerGeom_, geomHandle);
-  tGeom_ = geomHandle.product();
-
-  // magnetic field for particle propagation
-  edm::ESHandle<MagneticField> magneticField;
-  setup.get<IdealMagneticFieldRecord>().get(magneticField);
-  bFieldZ_ = magneticField->inTesla(GlobalPoint(0., 0., 0.)).z();
 }
 
 // ------------ method called once each job just before starting event loop  ------------
