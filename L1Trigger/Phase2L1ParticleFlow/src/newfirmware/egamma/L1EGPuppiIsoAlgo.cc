@@ -7,9 +7,13 @@ L1EGPuppiIsoAlgo::L1EGPuppiIsoAlgo(const edm::ParameterSet& pSet)
               pSet.getParameter<double>("pfPtMin"),
               pSet.getParameter<double>("dZMax"),
               pSet.getParameter<double>("dRMin"),
-              pSet.getParameter<double>("dRMax")) {}
+              pSet.getParameter<double>("dRMax"),
+              pSet.getParameter<bool>("pfCandReuse")) {}
 
-void L1EGPuppiIsoAlgo::run(const EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, EGIsoObjsEmu& outL1EGs, z0_t z0) const {
+void L1EGPuppiIsoAlgo::run(const EGIsoObjsEmu& l1EGs,
+                           const PuppiObjs& l1PFCands,
+                           EGIsoObjsEmu& outL1EGs,
+                           z0_t z0) const {
   outL1EGs.reserve(l1EGs.size());
 
   // make a list of pointers to PF candidates
@@ -99,7 +103,6 @@ iso_t L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG,
   auto pfIt = workPFCands.cbegin();
   while (pfIt != workPFCands.cend()) {
     // use the PF candidate pT if it is within the cone and optional dz cut for charged PF candidates
-    // and then remove the candidate from the collection
     const auto workPFCand = *pfIt;
     z0_t pfCandZ0 = 0;
     if (workPFCand->hwId.charged()) {
@@ -116,8 +119,13 @@ iso_t L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG,
       const auto dR2 = dr2_int(l1EG.hwEta, l1EG.hwPhi, workPFCand->hwEta, workPFCand->hwPhi);
       if (dR2 >= config_.dRMin2_ && dR2 < config_.dRMax2_ && workPFCand->hwPt >= config_.ptMin_) {
         sumPt += workPFCand->hwPt;
-        // this returns an iterator to the next element already so no need to increase here
-        pfIt = workPFCands.erase(pfIt);
+        // remove the candidate from the collection if noReuse is true
+        if (!config_.pfCandReuse_) {
+          // this returns an iterator to the next element already so no need to increase here
+          pfIt = workPFCands.erase(pfIt);
+        } else {
+          ++pfIt;
+        }
       } else {
         ++pfIt;
       }

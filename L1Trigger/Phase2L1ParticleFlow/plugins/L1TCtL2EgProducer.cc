@@ -380,8 +380,7 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkEm &tkem,
   boarOut.egphoton.push_back(emu);
 }
 
-void L1TCtL2EgProducer::convertToPuppi(const l1t::PFCandidateCollection &l1PFCands,
-                                       l1ct::PuppiObjs &puppiObjs) const {
+void L1TCtL2EgProducer::convertToPuppi(const l1t::PFCandidateCollection &l1PFCands, l1ct::PuppiObjs &puppiObjs) const {
   for (const auto &l1PFCand : l1PFCands) {
     l1ct::PuppiObj obj;
     obj.initFromBits(l1PFCand.encodedPuppi64());
