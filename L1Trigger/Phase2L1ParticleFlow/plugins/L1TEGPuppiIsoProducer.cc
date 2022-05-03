@@ -45,7 +45,8 @@ L1TEGPuppiIsoProducer<T>::L1TEGPuppiIsoProducer(const edm::ParameterSet &iConfig
                                    iConfig.getParameter<double>("pfPtMin"),
                                    iConfig.getParameter<double>("dZMax"),
                                    iConfig.getParameter<double>("dRMin"),
-                                   iConfig.getParameter<double>("dRMax")));
+                                   iConfig.getParameter<double>("dRMax"),
+                                   iConfig.getParameter<bool>("pfCandReuse")));
 
   produces<std::vector<T>>(outInstanceName_);
 }
@@ -129,6 +130,7 @@ void L1TEGPuppiIsoProducer<T>::fillDescriptions(edm::ConfigurationDescriptions &
       ->setComment("Maximum distance to PV in cm for PF candidate to be considered in isolation");
   desc.add<double>("dRMin", 0.03)->setComment("Inner cone size for isolation");
   desc.add<double>("dRMax", 0.2)->setComment("Outer cone size for isolation");
+  desc.add<bool>("pfCandReuse", true)->setComment("Reuse isolation PF candidates in case of overlapping cones");
   descriptions.addWithDefaultLabel(desc);
 }
 

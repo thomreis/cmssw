@@ -31,17 +31,20 @@ namespace l1ct {
     ap_int<z0_t::width + 1> dZMax_;
     int dRMin2_;
     int dRMax2_;
+    bool pfCandReuse_;
 
-    L1EGPuppiIsoAlgoConfig(const std::string &pfIsoTypeStr,
+    L1EGPuppiIsoAlgoConfig(const std::string& pfIsoTypeStr,
                            const float ptMin,
                            const float dZMax,
                            const float dRMin,
-                           const float dRMax)
+                           const float dRMax,
+                           const bool pfCandReuse)
         : pfIsoType_(pfIsoTypeStr == "PF" ? kPFIso : kPuppiIso),
           ptMin_(Scales::makePtFromFloat(ptMin)),
           dZMax_(Scales::makeZ0(dZMax)),
           dRMin2_(Scales::makeDR2FromFloatDR(dRMin)),
-          dRMax2_(Scales::makeDR2FromFloatDR(dRMax)) {}
+          dRMax2_(Scales::makeDR2FromFloatDR(dRMax)),
+          pfCandReuse_(pfCandReuse) {}
   };
 
   typedef std::vector<EGIsoObjEmu> EGIsoObjsEmu;
