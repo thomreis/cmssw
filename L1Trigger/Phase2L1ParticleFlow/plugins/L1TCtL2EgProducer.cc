@@ -349,9 +349,10 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkElectron &tkele,
   }
   refRemapper.origRefAndPtr.push_back(std::make_pair(refEg, tkele.trkPtr()));
   emu.sta_idx = refRemapper.origRefAndPtr.size() - 1;
-  emu.setHwIso(EGIsoEleObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkele.trkIsol()));
-  emu.setHwIso(EGIsoEleObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkele.pfIsol()));
-  emu.setHwIso(EGIsoEleObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkele.puppiIsol()));
+  // NOTE: The emulator and FW data-format stores absolute iso while the CMSSW object stores relative iso
+  emu.setHwIso(EGIsoEleObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkele.trkIsol() * tkele.pt()));
+  emu.setHwIso(EGIsoEleObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkele.pfIsol() * tkele.pt()));
+  emu.setHwIso(EGIsoEleObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkele.puppiIsol() * tkele.pt()));
   // std::cout << "[convertToEmu] TkEle pt: " << emu.hwPt << " eta: " << emu.hwEta << " phi: " << emu.hwPhi << " staidx: " << emu.sta_idx << std::endl;
 
   boarOut.egelectron.push_back(emu);
@@ -370,12 +371,13 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkEm &tkem,
   }
   refRemapper.origRefAndPtr.push_back(std::make_pair(refEg, edm::Ptr<RefRemapper::L1TTTrackType>(nullptr, 0)));
   emu.sta_idx = refRemapper.origRefAndPtr.size() - 1;
-  emu.setHwIso(EGIsoObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkem.trkIsol()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkem.pfIsol()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkem.puppiIsol()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::TkIsoPV, l1ct::Scales::makeIso(tkem.trkIsolPV()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, l1ct::Scales::makeIso(tkem.pfIsolPV()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIsoPV, l1ct::Scales::makeIso(tkem.puppiIsolPV()));
+  // NOTE: The emulator and FW data-format stores absolute iso while the CMSSW object stores relative iso
+  emu.setHwIso(EGIsoObjEmu::IsoType::TkIso, l1ct::Scales::makeIso(tkem.trkIsol() * tkem.pt()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PfIso, l1ct::Scales::makeIso(tkem.pfIsol() * tkem.pt()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkem.puppiIsol() * tkem.pt()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::TkIsoPV, l1ct::Scales::makeIso(tkem.trkIsolPV() * tkem.pt()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, l1ct::Scales::makeIso(tkem.pfIsolPV() * tkem.pt()));
+  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIsoPV, l1ct::Scales::makeIso(tkem.puppiIsolPV() * tkem.pt()));
   // std::cout << "[convertToEmu] TkEM pt: " << emu.hwPt << " eta: " << emu.hwEta << " phi: " << emu.hwPhi << " staidx: " << emu.sta_idx << std::endl;
   boarOut.egphoton.push_back(emu);
 }
