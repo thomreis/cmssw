@@ -181,6 +181,10 @@ private:
 
   edm::EDGetTokenT<l1t::TkEtMissCollection> tkMetDisplacedToken_;
   edm::EDGetTokenT<std::vector<l1t::EtSum>> tkMhtDisplacedToken_;
+
+  // EG layer 2
+  edm::EDGetTokenT<l1t::TkElectronCollection> l2TkEleToken_;
+  edm::EDGetTokenT<l1t::TkEmCollection> l2TkEmToken_;
 };
 
 L1PhaseIITreeStep1Producer::L1PhaseIITreeStep1Producer(const edm::ParameterSet& iConfig) {
@@ -247,6 +251,9 @@ L1PhaseIITreeStep1Producer::L1PhaseIITreeStep1Producer(const edm::ParameterSet& 
   for (const auto& mhtdisplacedtoken : mhtdisplacedtokens) {
     tkMhtDisplacedToken_.push_back(consumes<l1t::TkHTMissCollection>(mhtdisplacedtoken));
   }*/
+
+  l2TkEleToken_ = consumes<l1t::TkElectronCollection>(iConfig.getParameter<edm::InputTag>("l2CtTkElectrons"));
+  l2TkEmToken_ = consumes<l1t::TkEmCollection>(iConfig.getParameter<edm::InputTag>("l2CtTkEms"));
 
   maxL1Extra_ = iConfig.getParameter<unsigned int>("maxL1Extra");
 
@@ -576,6 +583,22 @@ void L1PhaseIITreeStep1Producer::analyze(const edm::Event& iEvent, const edm::Ev
     l1Extra->SetNNTau2vtxs(l1NNTau2vtx, maxL1Extra_);
   } else {
     edm::LogWarning("MissingProduct") << "L1NNTau2vtxs missing" << std::endl;
+  }
+
+  edm::Handle<l1t::TkElectronCollection> l2CtTkEles;
+  iEvent.getByToken(l2TkEleToken_, l2CtTkEles);
+  if (l2CtTkEles.isValid()) {
+    l1Extra->SetL2CtEle(*l2CtTkEles, maxL1Extra_);
+  } else {
+    edm::LogWarning("MissingProduct") << "L1PhaseII L2 CT Electrons not found. Branch will not be filled";
+  }
+
+  edm::Handle<l1t::TkEmCollection> l2CtTkEms;
+  iEvent.getByToken(l2TkEmToken_, l2CtTkEms);
+  if (l2CtTkEms.isValid()) {
+    l1Extra->SetL2CtEm(*l2CtTkEms, maxL1Extra_);
+  } else {
+    edm::LogWarning("MissingProduct") << "L1PhaseII L2 CT EM collection not found. Branch will not be filled";
   }
 
   tree_->Fill();

@@ -13,7 +13,10 @@ def addHcalTriggerPrimitives(process):
     return process
 
 def addMenuNtuples(process):
+    process.load("L1Trigger.Phase2L1ParticleFlow.l1ctLayer2EG_cff")
     process.load("L1Trigger.L1TNtuples.l1PhaseIITreeStep1Producer_cfi")
+    process.load("L1Trigger.L1TNtuples.l1EventTree_cfi")
+    process.runmenutree *= process.l1EventTree
     process.TFileService = cms.Service("TFileService",
         fileName = cms.string('L1NtuplePhaseII_Step1.root')
     )

@@ -48,6 +48,9 @@ l1PhaseIITree = cms.EDAnalyzer("L1PhaseIITreeStep1Producer",
    L1NNTauToken = cms.InputTag("L1NNTauProducerPuppi","L1PFTausNN"), # default collection, emulated 
    L1NNTau2vtxToken = cms.InputTag("L1NNTauProducerPuppi2Vtx","L1PFTausNN"), # 2 vtx version 
 
+   l2CtTkElectrons = cms.InputTag("l1ctLayer2EG", "L1CtTkElectron"),
+   l2CtTkEms = cms.InputTag("l1ctLayer2EG", "L1CtTkEm"),
+
    tkTrackerJetToken = cms.InputTag("L1TrackJetsEmulation", "L1TrackJets"),  #these are emulated
    tkTrackerJetDisplacedToken = cms.InputTag("L1TrackJetsExtendedEmulation", "L1TrackJetsExtended"), #emulated
 	 
