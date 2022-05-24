@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 l1PhaseIIEGTkIsoTree = cms.EDAnalyzer("L1PhaseIIEGTkIsoTreeProducer",
     l1EgBarrel = cms.InputTag("L1EGammaClusterEmuProducer"),
     l1EgHGC = cms.InputTag("l1ctLayer1EG","L1EgEE"),
-    l1Tracks = cms.InputTag("pfTracksFromL1Tracks"),
+    l1Tracks = cms.InputTag("TTTracksFromTrackletEmulation","Level1TTTracks"),
     #l1PFCandidates = cms.InputTag("l1pfCandidates","PF"),
     l1PFCandidates = cms.InputTag("l1ctLayer2Deregionizer","Puppi"),
     storeAllPFCands = cms.bool(True),
