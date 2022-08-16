@@ -1,4 +1,4 @@
-#include "L1Trigger/Phase2L1ParticleFlow/src/newfirmware/egamma/L1EGPuppiIsoAlgo.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/egamma/L1EGPuppiIsoAlgo.h"
 
 using namespace l1ct;
 

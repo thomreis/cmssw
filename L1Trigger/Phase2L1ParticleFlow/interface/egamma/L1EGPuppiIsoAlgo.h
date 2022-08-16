@@ -7,19 +7,11 @@
 #include <memory>
 
 #include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/L1TParticleFlow/interface/datatypes.h"
+#include "DataFormats/L1TParticleFlow/interface/layer1_emulator.h"
+#include "DataFormats/L1TParticleFlow/interface/egamma.h"
+#include "DataFormats/L1TParticleFlow/interface/puppi.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
-#ifdef CMSSW_GIT_HASH
-#include "../dataformats/datatypes.h"
-#include "../dataformats/layer1_emulator.h"
-#include "../dataformats/egamma.h"
-#include "../dataformats/puppi.h"
-#else
-#include "../../../dataformats/datatypes.h"
-#include "../../../dataformats/layer1_emulator.h"
-#include "../../../dataformats/egamma.h"
-#include "../../../dataformats/puppi.h"
-#endif
 
 namespace l1ct {
 
