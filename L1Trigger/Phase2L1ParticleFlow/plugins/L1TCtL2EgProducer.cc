@@ -214,8 +214,8 @@ L1TCtL2EgProducer::L1TCtL2EgProducer(const edm::ParameterSet &conf)
       l2egsorter(conf.getParameter<edm::ParameterSet>("sorter")),
       l2encoder(conf.getParameter<edm::ParameterSet>("encoder")),
       pfObjsToken_(consumes<std::vector<l1t::PFCandidate>>(conf.getParameter<edm::InputTag>("l1PFObjects"))),
-      l2EgPuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("egPFIso")),
-      l2ElePuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("elePFIso")),
+      l2EgPuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("puppiIsoParametersTkEm")),
+      l2ElePuppiIsoAlgo_(conf.getParameter<edm::ParameterSet>("puppiIsoParametersTkEle")),
       doInPtrn_(conf.getParameter<bool>("writeInPattern")),
       doOutPtrn_(conf.getParameter<bool>("writeOutPattern")),
       inPtrnWrt_(nullptr),
@@ -374,7 +374,6 @@ void L1TCtL2EgProducer::convertToEmu(const l1t::TkEm &tkem,
   emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIso, l1ct::Scales::makeIso(tkem.puppiIsol() * tkem.pt()));
   emu.setHwIso(EGIsoObjEmu::IsoType::TkIsoPV, l1ct::Scales::makeIso(tkem.trkIsolPV() * tkem.pt()));
   emu.setHwIso(EGIsoObjEmu::IsoType::PfIsoPV, l1ct::Scales::makeIso(tkem.pfIsolPV() * tkem.pt()));
-  emu.setHwIso(EGIsoObjEmu::IsoType::PuppiIsoPV, l1ct::Scales::makeIso(tkem.puppiIsolPV() * tkem.pt()));
   // std::cout << "[convertToEmu] TkEM pt: " << emu.hwPt << " eta: " << emu.hwEta << " phi: " << emu.hwPhi << " staidx: " << emu.sta_idx << std::endl;
   boarOut.egphoton.push_back(emu);
 }
@@ -402,7 +401,6 @@ l1t::TkEm L1TCtL2EgProducer::convertFromEmu(const l1ct::EGIsoObjEmu &egiso, cons
   tkem.setPFIsol(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PfIso));
   tkem.setPFIsolPV(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PfIsoPV));
   tkem.setPuppiIsol(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PuppiIso));
-  tkem.setPuppiIsolPV(egiso.floatRelIso(l1ct::EGIsoObjEmu::IsoType::PuppiIsoPV));
   tkem.setEgBinaryWord(gteg.pack());
   return tkem;
 }

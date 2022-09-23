@@ -5,7 +5,7 @@ using namespace l1ct;
 L1EGPuppiIsoAlgo::L1EGPuppiIsoAlgo(const edm::ParameterSet& pSet)
     : config_(pSet.getParameter<std::string>("pfIsoType"),
               pSet.getParameter<double>("pfPtMin"),
-              pSet.getParameter<double>("dZMax"),
+              pSet.getParameter<double>("dZ"),
               pSet.getParameter<double>("dRMin"),
               pSet.getParameter<double>("dRMax"),
               pSet.getParameter<bool>("pfCandReuse")) {}

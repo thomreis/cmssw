@@ -52,18 +52,18 @@ l1ctLayer2EG = cms.EDProducer(
         nTKELE_OUT=cms.uint32(12),
         nTKPHO_OUT=cms.uint32(12),
     ),
-    egPFIso = cms.PSet(
+    puppiIsoParametersTkEm = cms.PSet(
         pfIsoType = cms.string("PUPPI"),
         pfPtMin = cms.double(1.),
-        dZMax = cms.double(0.6),
+        dZ = cms.double(0.6),
         dRMin = cms.double(0.07),
         dRMax = cms.double(0.3),
         pfCandReuse = cms.bool(True)
     ),
-    elePFIso = cms.PSet(
+    puppiIsoParametersTkEle = cms.PSet(
         pfIsoType = cms.string("PUPPI"),
         pfPtMin = cms.double(1.),
-        dZMax = cms.double(0.6),
+        dZ = cms.double(0.6),
         dRMin = cms.double(0.03),
         dRMax = cms.double(0.2),
         pfCandReuse = cms.bool(True)
