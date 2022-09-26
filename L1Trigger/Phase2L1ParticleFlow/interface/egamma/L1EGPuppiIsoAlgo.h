@@ -54,7 +54,7 @@ namespace l1ct {
     void run(EGIsoEleObjsEmu& l1Eles, const PuppiObjs& l1PFCands) const;
 
   private:
-    iso_t calcIso(const EGIsoObj& l1EG, std::list<std::shared_ptr<PuppiObj>>& workPFCands, z0_t z0 = 0) const;
+    iso_t calcIso(const EGIsoObj& l1EG, std::list<const PuppiObj*>& workPFCands, z0_t z0 = 0) const;
 
     const L1EGPuppiIsoAlgoConfig config_;
   };

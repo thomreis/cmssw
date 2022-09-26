@@ -17,12 +17,12 @@ void L1EGPuppiIsoAlgo::run(const EGIsoObjsEmu& l1EGs,
   outL1EGs.reserve(l1EGs.size());
 
   // make a list of pointers to PF candidates
-  // the pointer will be removed from the list once the candidate has been used
-  std::list<std::shared_ptr<PuppiObj>> workPFCands;
-  std::list<std::shared_ptr<PuppiObj>> workPFCandsPV;
-  for (unsigned i = 0; i < l1PFCands.size(); ++i) {
-    workPFCands.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
-    workPFCandsPV.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
+  // the pointer will be removed from the list once the candidate has been used and the the module is configured to to so
+  std::list<const PuppiObj*> workPFCands;
+  std::list<const PuppiObj*> workPFCandsPV;
+  for (const auto& l1PFCand : l1PFCands) {
+    workPFCands.emplace_back(&l1PFCand);
+    workPFCandsPV.emplace_back(&l1PFCand);
   }
 
   for (const auto& l1EG : l1EGs) {
@@ -47,12 +47,12 @@ void L1EGPuppiIsoAlgo::run(const EGIsoObjsEmu& l1EGs,
 
 void L1EGPuppiIsoAlgo::run(EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, z0_t z0) const {
   // make a list of pointers to PF candidates
-  // the pointer will be removed from the list once the candidate has been used
-  std::list<std::shared_ptr<PuppiObj>> workPFCands;
-  std::list<std::shared_ptr<PuppiObj>> workPFCandsPV;
-  for (unsigned i = 0; i < l1PFCands.size(); ++i) {
-    workPFCands.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
-    workPFCandsPV.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
+  // the pointer will be removed from the list once the candidate has been used and the the module is configured to to so
+  std::list<const PuppiObj*> workPFCands;
+  std::list<const PuppiObj*> workPFCandsPV;
+  for (const auto& l1PFCand : l1PFCands) {
+    workPFCands.emplace_back(&l1PFCand);
+    workPFCandsPV.emplace_back(&l1PFCand);
   }
 
   for (auto& l1EG : l1EGs) {
@@ -75,10 +75,10 @@ void L1EGPuppiIsoAlgo::run(EGIsoObjsEmu& l1EGs, const PuppiObjs& l1PFCands, z0_t
 
 void L1EGPuppiIsoAlgo::run(EGIsoEleObjsEmu& l1Eles, const PuppiObjs& l1PFCands) const {
   // make a list of pointers to PF candidates
-  // the pointer will be removed from the list once the candidate has been used
-  std::list<std::shared_ptr<PuppiObj>> workPFCands;
-  for (unsigned i = 0; i < l1PFCands.size(); ++i) {
-    workPFCands.emplace_back(std::make_shared<PuppiObj>(l1PFCands[i]));
+  // the pointer will be removed from the list once the candidate has been used and the the module is configured to to so
+  std::list<const PuppiObj*> workPFCands;
+  for (const auto& l1PFCand : l1PFCands) {
+    workPFCands.emplace_back(&l1PFCand);
   }
 
   for (auto& l1Ele : l1Eles) {
@@ -95,9 +95,7 @@ void L1EGPuppiIsoAlgo::run(EGIsoEleObjsEmu& l1Eles, const PuppiObjs& l1PFCands) 
   }
 }
 
-iso_t L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG,
-                                std::list<std::shared_ptr<PuppiObj>>& workPFCands,
-                                z0_t z0) const {
+iso_t L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG, std::list<const PuppiObj*>& workPFCands, z0_t z0) const {
   iso_t sumPt = 0;
 
   auto pfIt = workPFCands.cbegin();
@@ -119,19 +117,15 @@ iso_t L1EGPuppiIsoAlgo::calcIso(const EGIsoObj& l1EG,
       const auto dR2 = dr2_int(l1EG.hwEta, l1EG.hwPhi, workPFCand->hwEta, workPFCand->hwPhi);
       if (dR2 >= config_.dRMin2_ && dR2 < config_.dRMax2_ && workPFCand->hwPt >= config_.ptMin_) {
         sumPt += workPFCand->hwPt;
-        // remove the candidate from the collection if noReuse is true
+        // remove the candidate from the collection if the module is configured to not reuse them
         if (!config_.pfCandReuse_) {
           // this returns an iterator to the next element already so no need to increase here
           pfIt = workPFCands.erase(pfIt);
-        } else {
-          ++pfIt;
+          continue;
         }
-      } else {
-        ++pfIt;
       }
-    } else {
-      ++pfIt;
     }
+    ++pfIt;
   }
 
   return sumPt;
