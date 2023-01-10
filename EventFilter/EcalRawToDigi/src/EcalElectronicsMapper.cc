@@ -457,6 +457,9 @@ void EcalElectronicsMapper::fillMaps() {
           psInput_[tccId - 1][feChannel - 1][ps - 1]->setSample(0, EcalPseudoStripInputSample(0));
         }
 
+        std::cout << __FILE__ << ":" << __LINE__ << ": "
+                   << "(DCC,RU) = (" <<  smId << "," << feChannel
+                   << ") -> " << *ttDetId << "\n";
         // Buil SRP Flag
         srFlags_[smId - 1][feChannel - 1].push_back(new EBSrFlag(*ttDetId, 0));
 
@@ -521,9 +524,9 @@ void EcalElectronicsMapper::fillMaps() {
         scEleIds_[smId - 1][feChannel - 1] = new EcalElectronicsId(smId, feChannel, 1, 1);
 
         for (size_t i = 0; i < scDetIds.size(); ++i) {
-          // std::cout << __FILE__ << ":" << __LINE__ << ": "
-          //            << "(DCC,RU) = (" <<  smId << "," << feChannel
-          //            << ") -> " << scDetIds[i] << "\n";
+           std::cout << __FILE__ << ":" << __LINE__ << ": "
+                      << "(DCC,RU) = (" <<  smId << "," << feChannel
+                      << ") -> " << scDetIds[i] << "\n";
 
           srFlags_[smId - 1][feChannel - 1].push_back(new EESrFlag(EcalScDetId(scDetIds[i].rawId()), 0));
         }

@@ -153,6 +153,10 @@ namespace ecal {
                                        uint16_t* samplesEE,
                                        uint32_t* idsEB,
                                        uint32_t* idsEE,
+                                       uint8_t* srFlagsEB,
+                                       uint8_t* srFlagsEE,
+                                       uint32_t* srIdsEB,
+                                       uint32_t* srIdsEE,
                                        uint32_t* pChannelsCounterEBEE,
                                        uint32_t const* eid2did,
                                        uint32_t const nbytesTotal) {
@@ -163,11 +167,14 @@ namespace ecal {
       auto const offset = offsets[ifed];
       // fed id
       auto const fed = feds[ifed];
-      auto const isBarrel = is_barrel(static_cast<uint8_t>(fed - 600));
+      auto const dcc = fed2dcc(fed);
+      auto const isBarrel = is_barrel(dcc);
       // size
       auto const size = ifed == gridDim.x - 1 ? nbytesTotal - offset : offsets[ifed + 1] - offset;
       auto* samples = isBarrel ? samplesEB : samplesEE;
       auto* ids = isBarrel ? idsEB : idsEE;
+      auto* srs = isBarrel ? srFlagsEB : srFlagsEE;
+      auto* srIds = isBarrel ? srIdsEB : srIdsEE;
       auto* pChannelsCounter = isBarrel ? &pChannelsCounterEBEE[0] : &pChannelsCounterEBEE[1];
 
       // offset to the right raw buffer
@@ -208,7 +215,7 @@ namespace ecal {
       uint8_t exp_ttids[NUMB_FE + 2];  // FE + 2 MEM blocks
       uint8_t ch = 1;
       uint8_t nCh = 0;
-      for (uint8_t i = 4; i < 9; ++i) {           // data words with channel status info
+      for (uint8_t i = 4; i < HEADERLENGTH; ++i) {           // data words with channel status info
         for (uint8_t j = 0; j < 14; ++j, ++ch) {  // channel status fields in one data word
           const uint8_t shift = j * 4;            //each channel has 4 bits
           const int chStatus = (buffer[i] >> shift) & H_CHSTATUS_MASK;
@@ -227,7 +234,34 @@ namespace ecal {
       // print Tower block headers
       //
       uint8_t ntccblockwords = isBarrel ? 18 : 36;
-      auto const* tower_blocks_start = buffer + 9 + ntccblockwords + 6;
+
+      // selective readout block
+      auto const* srp_block = buffer + HEADERLENGTH + ntccblockwords;
+      auto const srp_header = *srp_block;
+      const uint8_t srp_id = srp_header & SRP_ID_MASK;
+      uint8_t n_sr_flags = (srp_header >> SRP_NFLAGS_B) & SRP_NFLAGS_MASK;
+      // handle the two jump DCCs
+      if (dcc == SECTOR_EEM_CCU_JUMP || dcc == SECTOR_EEP_CCU_JUMP) {
+	n_sr_flags += MAX_CCUID_JUMP - MIN_CCUID_JUMP + 1;
+      }
+      uint64_t word = 0;
+      for (uint8_t n = 0, i = 0; n < n_sr_flags; ++n) {
+        if (n % 16 == 0) {  // 16 SR flags per 64 bit word
+	  word = *(++srp_block);
+        } else if (n % 4) {  // four 16 bit words containing four SR flags each
+          word >>= 16;
+        }
+        ElectronicsIdGPU eid{dcc, n + 1, 0, 0};  // test: abuse ElectronicsIdGPU to store dcc and ccu (replacing as ttId)
+        const uint8_t flag = (word >> ((n - (n / 4) * 4) * 3)) & SRP_SRFLAG_MASK;
+	if (flag > 0) {
+          srs[i] = flag;
+          srIds[i] = eid.linearIndex();
+	  ++i;
+        }
+      }
+
+      // tower block
+      auto const* tower_blocks_start = buffer + HEADERLENGTH + ntccblockwords + SRP_BLOCKLENGTH;
       auto const* trailer = buffer + (size / 8 - 1);
       auto const* current_tower_block = tower_blocks_start;
       uint8_t iCh = 0;
@@ -283,7 +317,7 @@ namespace ecal {
           auto const wdata = current_tower_block[1 + i_to_access * 3];
           uint8_t const stripid = wdata & 0x7;
           uint8_t const xtalid = (wdata >> 4) & 0x7;
-          ElectronicsIdGPU eid{fed2dcc(fed), ttid, stripid, xtalid};
+          ElectronicsIdGPU eid{dcc, ttid, stripid, xtalid};
           auto const didraw = isBarrel ? compute_ebdetid(eid) : eid2did[eid.linearIndex()];
           // FIXME: what kind of channels are these guys
           if (didraw == 0)
@@ -400,6 +434,10 @@ namespace ecal {
                                                                    outputGPU.digisEE.data.get(),
                                                                    outputGPU.digisEB.ids.get(),
                                                                    outputGPU.digisEE.ids.get(),
+                                                                   outputGPU.srFlagsEB.data.get(),
+                                                                   outputGPU.srFlagsEE.data.get(),
+                                                                   outputGPU.srFlagsEB.ids.get(),
+                                                                   outputGPU.srFlagsEE.ids.get(),
                                                                    scratchGPU.pChannelsCounter.get(),
                                                                    conditions.eMappingProduct.eid2did,
                                                                    nbytesTotal);

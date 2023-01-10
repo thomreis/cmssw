@@ -33,6 +33,7 @@ namespace ecal {
 
     struct OutputDataGPU {
       DigisCollection<::calo::common::DevStoragePolicy> digisEB, digisEE;
+      SrFlagCollection<::calo::common::DevStoragePolicy> srFlagsEB, srFlagsEE;
 
       void allocate(ConfigurationParameters const &config, cudaStream_t cudaStream) {
         digisEB.data =
@@ -41,6 +42,10 @@ namespace ecal {
             cms::cuda::make_device_unique<uint16_t[]>(config.maxChannelsEE * EcalDataFrame::MAXSAMPLES, cudaStream);
         digisEB.ids = cms::cuda::make_device_unique<uint32_t[]>(config.maxChannelsEB, cudaStream);
         digisEE.ids = cms::cuda::make_device_unique<uint32_t[]>(config.maxChannelsEE, cudaStream);
+        srFlagsEB.data = cms::cuda::make_device_unique<uint8_t[]>(SRP_EB_NUMBFLAGS, cudaStream);
+        srFlagsEE.data = cms::cuda::make_device_unique<uint8_t[]>(SRP_EE_NUMBFLAGS_MAX, cudaStream);
+        srFlagsEB.ids = cms::cuda::make_device_unique<uint32_t[]>(SRP_EB_NUMBFLAGS, cudaStream);
+        srFlagsEE.ids = cms::cuda::make_device_unique<uint32_t[]>(SRP_EE_NUMBFLAGS_MAX, cudaStream);
       }
     };
 

@@ -35,6 +35,8 @@ gpu.toModify(ecalDigis,
     cuda = _ecalCPUDigisProducer.clone(
         digisInLabelEB = ('ecalDigisGPU', 'ebDigis'),
         digisInLabelEE = ('ecalDigisGPU', 'eeDigis'),
+        srFlagsInLabelEB = ('ecalDigisGPU', 'ebSrFlags'),
+        srFlagsInLabelEE = ('ecalDigisGPU', 'eeSrFlags'),
         produceDummyIntegrityCollections = True
     )
 )

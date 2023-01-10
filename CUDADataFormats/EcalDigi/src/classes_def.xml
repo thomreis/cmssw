@@ -3,4 +3,9 @@
     <class name="cms::cuda::Product<ecal::DigisCollection<calo::common::DevStoragePolicy>>" persistent="false" />
     <class name="edm::Wrapper<cms::cuda::Product<ecal::DigisCollection<calo::common::ViewStoragePolicy>>>" persistent="false"/>
     <class name="edm::Wrapper<cms::cuda::Product<ecal::DigisCollection<calo::common::DevStoragePolicy>>>" persistent="false"/>
+
+    <class name="cms::cuda::Product<ecal::SrFlagCollection<calo::common::ViewStoragePolicy>>" persistent="false" />
+    <class name="cms::cuda::Product<ecal::SrFlagCollection<calo::common::DevStoragePolicy>>" persistent="false" />
+    <class name="edm::Wrapper<cms::cuda::Product<ecal::SrFlagCollection<calo::common::ViewStoragePolicy>>>" persistent="false"/>
+    <class name="edm::Wrapper<cms::cuda::Product<ecal::SrFlagCollection<calo::common::DevStoragePolicy>>>" persistent="false"/>
 </lcgdict>

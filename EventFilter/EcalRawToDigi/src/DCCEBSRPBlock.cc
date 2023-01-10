@@ -43,6 +43,7 @@ void DCCEBSRPBlock::addSRFlagToCollection() {
       std::vector<EcalSrFlag *> srs = mapper_->getSrFlagPointer(theSRPi + 1);
 
       for (size_t i = 0; i < srs.size(); ++i) {
+	std::cout << "DCCEBSRPBlock: ActiveSM=" << mapper_->getActiveSM() << ", theSRPi=" << theSRPi << ", i=" << i << ", srFlag=" << srFlag << ", srs.id().hashedIndex()=" << ((EBSrFlag *)srs[i])->id().hashedIndex() << ", ieta, iphi " << ((EBSrFlag *)srs[i])->id().ieta() << "," << ((EBSrFlag *)srs[i])->id().iphi() << std::endl;
         srs[i]->setValue(srFlag);
         (*ebSrFlagsDigis_)->push_back(*((EBSrFlag *)srs[i]));
       }

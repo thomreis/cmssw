@@ -28,7 +28,9 @@ private:
 private:
   edm::EDGetTokenT<FEDRawDataCollection> rawDataToken_;
   using OutputProduct = cms::cuda::Product<ecal::DigisCollection<calo::common::DevStoragePolicy>>;
+  using SrOutputProduct = cms::cuda::Product<ecal::SrFlagCollection<calo::common::DevStoragePolicy>>;
   edm::EDPutTokenT<OutputProduct> digisEBToken_, digisEEToken_;
+  edm::EDPutTokenT<SrOutputProduct> srFlagsEBToken_, srFlagsEEToken_;
   edm::ESGetToken<ecal::raw::ElectronicsMappingGPU, EcalMappingElectronicsRcd> eMappingToken_;
 
   cms::cuda::ContextState cudaState_;
@@ -61,6 +63,8 @@ EcalRawToDigiGPU::EcalRawToDigiGPU(const edm::ParameterSet& ps)
     : rawDataToken_{consumes<FEDRawDataCollection>(ps.getParameter<edm::InputTag>("InputLabel"))},
       digisEBToken_{produces<OutputProduct>(ps.getParameter<std::string>("digisLabelEB"))},
       digisEEToken_{produces<OutputProduct>(ps.getParameter<std::string>("digisLabelEE"))},
+      srFlagsEBToken_{produces<SrOutputProduct>("ebSrFlags")},
+      srFlagsEEToken_{produces<SrOutputProduct>("eeSrFlags")},
       eMappingToken_{esConsumes<ecal::raw::ElectronicsMappingGPU, EcalMappingElectronicsRcd>()},
       fedsToUnpack_{ps.getParameter<std::vector<int>>("FEDs")} {
   config_.maxChannelsEB = ps.getParameter<uint32_t>("maxChannelsEB");
@@ -121,6 +125,8 @@ void EcalRawToDigiGPU::acquire(edm::Event const& event,
   // output gpu
   outputGPU_.allocate(config_, ctx.stream());
 
+  std::cout << "sizes aquire: outputGPU_.digisEB.size: " << outputGPU_.digisEB.size << ", outputGPU_.digisEE.size: " << outputGPU_.digisEE.size << ", outputGPU_.srFlagsEB.size: " << outputGPU_.srFlagsEB.size << ", outputGPU_.srFlagsEE.size: " << outputGPU_.srFlagsEE.size << std::endl;
+
   // iterate over FEDs to fill the cpu buffer
   uint32_t currentCummOffset = 0;
   uint32_t counter = 0;
@@ -158,9 +164,16 @@ void EcalRawToDigiGPU::produce(edm::Event& event, edm::EventSetup const& setup) 
   // get the number of channels
   outputGPU_.digisEB.size = outputCPU_.nchannels[0];
   outputGPU_.digisEE.size = outputCPU_.nchannels[1];
+  // set the number of SR flags
+  outputGPU_.srFlagsEB.size = SRP_EB_NUMBFLAGS;
+  outputGPU_.srFlagsEE.size = SRP_EE_NUMBFLAGS_MAX;
+
+  std::cout << "sizes produce: outputGPU_.digisEB.size: " << outputGPU_.digisEB.size << ", outputGPU_.digisEE.size: " << outputGPU_.digisEE.size << ", outputGPU_.srFlagsEB.size: " << outputGPU_.srFlagsEB.size << ", outputGPU_.srFlagsEE.size: " << outputGPU_.srFlagsEE.size << std::endl;
 
   ctx.emplace(event, digisEBToken_, std::move(outputGPU_.digisEB));
   ctx.emplace(event, digisEEToken_, std::move(outputGPU_.digisEE));
+  ctx.emplace(event, srFlagsEBToken_, std::move(outputGPU_.srFlagsEB));
+  ctx.emplace(event, srFlagsEEToken_, std::move(outputGPU_.srFlagsEE));
 
   // reset ptrs that are carried as members
   outputCPU_.nchannels.reset();

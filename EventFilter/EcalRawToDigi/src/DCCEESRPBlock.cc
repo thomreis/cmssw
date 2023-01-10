@@ -25,6 +25,7 @@ void DCCEESRPBlock::addSRFlagToCollection() {
     if (unpackInternalData_) {
       std::vector<EcalSrFlag *> srs = mapper_->getSrFlagPointer(n + 1);
       for (size_t i = 0; i < srs.size(); ++i) {
+	std::cout << "DCCEESRPBlock: ActiveSM=" << mapper_->getActiveSM() << ", n=" << n << ", i=" << i << ", srFlag=" << srFlag << ", srs.id().hashedIndex()=" << ((EESrFlag *)srs[i])->id().hashedIndex() << ", ix, iy " << ((EESrFlag *)srs[i])->id().ix() << "," << ((EESrFlag *)srs[i])->id().iy() << std::endl;
         srs[i]->setValue(srFlag);
         (*eeSrFlagsDigis_)->push_back(*((EESrFlag *)srs[i]));
       }

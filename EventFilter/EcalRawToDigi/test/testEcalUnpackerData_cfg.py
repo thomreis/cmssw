@@ -2,12 +2,12 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TESTECALUNPACKERDATA")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 process.source = cms.Source("PoolSource",
  fileNames = 
 #cms.untracked.vstring('file:/tmp/nalmeida/1A1C4478-5866-DE11-A907-001D09F27067.root')
- cms.untracked.vstring('/store/relval/CMSSW_7_4_0/RelValProdTTbar/GEN-SIM-RAW/MCRUN1_74_V4-v1/00000/2C6CC5C9-D0DA-E411-ABF3-0025905B85EE.root')
+ cms.untracked.vstring('/store/data/Run2022C/EGamma/RAW/v1/000/356/613/00000/391a3ac5-ad79-47bb-8374-0991c1f95fd9.root')
 
 )
 
@@ -15,6 +15,7 @@ process.load("Geometry.EcalMapping.EcalMapping_cfi")
 process.load("Geometry.EcalMapping.EcalMappingRecord_cfi")
 
 
+process.load("EventFilter.EcalRawToDigi.EcalDumpRaw_cfi")
 process.load("EventFilter.EcalRawToDigi.EcalUnpackerMapping_cfi")
 process.load("EventFilter.EcalRawToDigi.EcalUnpackerData_cfi")
 
@@ -38,7 +39,7 @@ process.ecalEBunpacker.silentMode = False
 
 process.ecalEBunpacker.syncCheck = True 
 
-process.ecalDataSequence = cms.Sequence(process.ecalEBunpacker)
+process.ecalDataSequence = cms.Sequence(process.dumpRaw)
 
 process.p = cms.Path(process.ecalDataSequence)
 
