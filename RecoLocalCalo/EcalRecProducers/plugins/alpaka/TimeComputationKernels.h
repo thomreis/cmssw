@@ -25,8 +25,6 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
   namespace ecal {
     namespace multifit {
 
-      using namespace cms::alpakatools;
-
       ALPAKA_FN_ACC ALPAKA_FN_INLINE bool use_sample(unsigned int sample_mask, unsigned int sample) {
         return sample_mask & (0x1 << (EcalDataFrame::MAXSAMPLES - (sample + 1)));
       }

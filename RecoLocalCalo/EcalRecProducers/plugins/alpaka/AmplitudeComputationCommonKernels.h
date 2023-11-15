@@ -25,7 +25,6 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
   namespace ecal {
     namespace multifit {
 
-      using namespace cms::alpakatools;
       ///
       /// assume kernel launch configuration is
       /// (MAXSAMPLES * nchannels, blocks)
