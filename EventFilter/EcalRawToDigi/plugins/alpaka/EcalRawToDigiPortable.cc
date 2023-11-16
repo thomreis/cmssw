@@ -88,25 +88,23 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       ++feds;
     }
 
+    auto queue = event.queue();
+
     // input host buffers
-    ecal::raw::InputDataHost inputHost;
-    inputHost.initialize(size, feds);
+    ecal::raw::InputDataHost inputHost(queue, size, feds);
 
     // input device buffers
-    ecal::raw::InputDataDevice inputDevice;
-    inputDevice.initialize(event.queue(), size, feds);
+    ecal::raw::InputDataDevice inputDevice(queue, size, feds);
 
     // output device collections
-    OutputProduct digisDevEB{static_cast<int32_t>(config_.maxChannelsEB), event.queue()};
-    OutputProduct digisDevEE{static_cast<int32_t>(config_.maxChannelsEE), event.queue()};
+    OutputProduct digisDevEB{static_cast<int32_t>(config_.maxChannelsEB), queue};
+    OutputProduct digisDevEE{static_cast<int32_t>(config_.maxChannelsEE), queue};
     // reset the size scalar of the SoA
     // memset takes an alpaka view that is created from the scalar in a view to the device collection
-    auto digiViewEB =
-        cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(event.queue()), digisDevEB.view().size());
-    auto digiViewEE =
-        cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(event.queue()), digisDevEE.view().size());
-    alpaka::memset(event.queue(), digiViewEB, 0);
-    alpaka::memset(event.queue(), digiViewEE, 0);
+    auto digiViewEB = cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(queue), digisDevEB.view().size());
+    auto digiViewEE = cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(queue), digisDevEE.view().size());
+    alpaka::memset(queue, digiViewEB, 0);
+    alpaka::memset(queue, digiViewEE, 0);
 
     // iterate over FEDs to fill the host buffer
     uint32_t currentCummOffset = 0;
@@ -135,7 +133,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     // unpack if at least one FED has data
     if (fedCounter > 0) {
       ecal::raw::unpackRaw(
-          event.queue(), inputHost, inputDevice, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
+          queue, inputHost, inputDevice, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
     }
 
     event.emplace(digisDevEBToken_, std::move(digisDevEB));
