@@ -33,8 +33,7 @@
 #include "CondFormats/EcalObjects/interface/EcalTimeOffsetConstant.h"
 #include "CondFormats/EcalObjects/interface/EcalWeightSet.h"
 #include "HeterogeneousCore/CUDAUtilities/interface/cudaCheck.h"
-
-#include "EigenMatrixTypes_gpu.h"
+#include "RecoLocalCalo/EcalRecProducers/interface/EigenMatrixTypes_gpu.h"
 
 struct EcalPulseShape;
 class EcalSampleMask;

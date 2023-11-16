@@ -13,9 +13,9 @@
 #include "DataFormats/Math/interface/approx_exp.h"
 #include "DataFormats/Math/interface/approx_log.h"
 #include "FWCore/Utilities/interface/CMSUnrollLoop.h"
+#include "RecoLocalCalo/EcalRecProducers/interface/EigenMatrixTypes_gpu.h"
 
 #include "DeclsForKernels.h"
-#include "../EigenMatrixTypes_gpu.h"
 #include "KernelHelpers.h"
 
 //#define ECAL_RECO_ALPAKA_DEBUG

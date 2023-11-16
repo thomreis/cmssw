@@ -15,9 +15,9 @@
 #include "FWCore/Utilities/interface/CMSUnrollLoop.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/config.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/traits.h"
+#include "RecoLocalCalo/EcalRecProducers/interface/EigenMatrixTypes_gpu.h"
 
 #include "DeclsForKernels.h"
-#include "../EigenMatrixTypes_gpu.h"
 #include "KernelHelpers.h"
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {

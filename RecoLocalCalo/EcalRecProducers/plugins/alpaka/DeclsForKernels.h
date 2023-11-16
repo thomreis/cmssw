@@ -5,8 +5,7 @@
 
 #include "CondFormats/EcalObjects/interface/EcalTimeOffsetConstant.h"
 #include "DataFormats/EcalDigi/interface/EcalDataFrame.h"
-
-#include "../EigenMatrixTypes_gpu.h"
+#include "RecoLocalCalo/EcalRecProducers/interface/EigenMatrixTypes_gpu.h"
 
 class EcalSampleMask;
 

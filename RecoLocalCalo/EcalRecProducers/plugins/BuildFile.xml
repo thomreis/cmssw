@@ -1,4 +1,3 @@
-<use name="CUDADataFormats/EcalRecHitSoA"/>
 <use name="CalibCalorimetry/EcalLaserCorrection"/>
 <use name="CalibCalorimetry/EcalTPGTools"/>
 <use name="CondFormats/DataRecord"/>
