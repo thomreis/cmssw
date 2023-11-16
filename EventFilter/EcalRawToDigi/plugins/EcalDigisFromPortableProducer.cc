@@ -145,20 +145,30 @@ void EcalDigisFromPortableProducer::produce(edm::Event& event, edm::EventSetup c
   auto& digisEBSoAView = digisEBSoAHostColl.view();
   auto& digisEESoAView = digisEESoAHostColl.view();
 
-  digisEB->resize(digisEBSoAView.size());
-  digisEE->resize(digisEESoAView.size());
+  auto const digisEBSize = digisEBSoAView.size();
+  auto const digisEESize = digisEESoAView.size();
+  auto const digisEBDataSize = digisEBSize * ecalPh1::sampleSize;
+  auto const digisEEDataSize = digisEESize * ecalPh1::sampleSize;
 
-  // cast constness away
-  auto* dataEB = const_cast<uint16_t*>(digisEB->data().data());
-  auto* dataEE = const_cast<uint16_t*>(digisEE->data().data());
-  auto* idsEB = const_cast<uint32_t*>(digisEB->ids().data());
-  auto* idsEE = const_cast<uint32_t*>(digisEE->ids().data());
+  // Intermediate containers because the DigiCollection containers are accessible only as const
+  EBDigiCollection::IdContainer digisIdsEB;
+  EEDigiCollection::IdContainer digisIdsEE;
+  EBDigiCollection::DataContainer digisDataEB;
+  EEDigiCollection::DataContainer digisDataEE;
+
+  digisIdsEB.resize(digisEBSize);
+  digisIdsEE.resize(digisEESize);
+  digisDataEB.resize(digisEBDataSize);
+  digisDataEE.resize(digisEEDataSize);
 
   // copy data
-  std::memcpy(dataEB, digisEBSoAView.data()->data(), digisEBSoAView.size() * ecalPh1::sampleSize * sizeof(uint16_t));
-  std::memcpy(dataEE, digisEESoAView.data()->data(), digisEESoAView.size() * ecalPh1::sampleSize * sizeof(uint16_t));
-  std::memcpy(idsEB, digisEBSoAView.id(), digisEBSoAView.size() * sizeof(uint32_t));
-  std::memcpy(idsEE, digisEESoAView.id(), digisEESoAView.size() * sizeof(uint32_t));
+  std::memcpy(digisIdsEB.data(), digisEBSoAView.id(), digisEBSize * sizeof(uint32_t));
+  std::memcpy(digisIdsEE.data(), digisEESoAView.id(), digisEESize * sizeof(uint32_t));
+  std::memcpy(digisDataEB.data(), digisEBSoAView.data()->data(), digisEBDataSize * sizeof(uint16_t));
+  std::memcpy(digisDataEE.data(), digisEESoAView.data()->data(), digisEEDataSize * sizeof(uint16_t));
+
+  digisEB->swap(digisIdsEB, digisDataEB);
+  digisEE->swap(digisIdsEE, digisDataEE);
 
   digisEB->sort();
   digisEE->sort();
