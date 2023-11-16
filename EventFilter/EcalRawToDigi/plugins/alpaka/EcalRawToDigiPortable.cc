@@ -118,10 +118,10 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         continue;
 
       // copy raw data into host buffer
-      std::memcpy(inputHost.data.value().data() + currentCummOffset, data.data(), nbytes);
+      std::memcpy(inputHost.data.data() + currentCummOffset, data.data(), nbytes);
       // set the offset in bytes from the start
-      inputHost.offsets.value()[fedCounter] = currentCummOffset;
-      inputHost.feds.value()[fedCounter] = fed;
+      inputHost.offsets[fedCounter] = currentCummOffset;
+      inputHost.feds[fedCounter] = fed;
 
       // this is the current offset into the buffer
       currentCummOffset += nbytes;

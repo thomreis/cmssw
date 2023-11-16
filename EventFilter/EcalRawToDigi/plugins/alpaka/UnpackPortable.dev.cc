@@ -423,17 +423,17 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                  uint32_t const nfedsWithData,
                  uint32_t const nbytesTotal) {
     // transfer the raw data
-    alpaka::memcpy(queue, *inputDevice.data, *inputHost.data);
-    alpaka::memcpy(queue, *inputDevice.offsets, *inputHost.offsets);
-    alpaka::memcpy(queue, *inputDevice.feds, *inputHost.feds);
+    alpaka::memcpy(queue, inputDevice.data, inputHost.data);
+    alpaka::memcpy(queue, inputDevice.offsets, inputHost.offsets);
+    alpaka::memcpy(queue, inputDevice.feds, inputHost.feds);
 
     auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
     alpaka::exec<Acc1D>(queue,
                         workDiv,
                         Kernel_unpack{},
-                        inputDevice.data.value().data(),
-                        inputDevice.offsets.value().data(),
-                        inputDevice.feds.value().data(),
+                        inputDevice.data.data(),
+                        inputDevice.offsets.data(),
+                        inputDevice.feds.data(),
                         digisDevEB.view(),
                         digisDevEE.view(),
                         mapping.const_view(),
