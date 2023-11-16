@@ -1,6 +1,5 @@
 #include <cassert>
 
-#include "FWCore/Framework/interface/EventSetupRecordIntervalFinder.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "CondFormats/EcalObjects/interface/alpaka/EcalMultifitParametersDevice.h"
@@ -17,18 +16,13 @@
 #include "HeterogeneousCore/AlpakaInterface/interface/memory.h"
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {
-  class EcalMultifitParametersHostESProducer : public ESProducer, public edm::EventSetupRecordIntervalFinder {
+  class EcalMultifitParametersHostESProducer : public ESProducer {
   public:
     EcalMultifitParametersHostESProducer(edm::ParameterSet const&);
     ~EcalMultifitParametersHostESProducer() override = default;
 
     static void fillDescriptions(edm::ConfigurationDescriptions&);
     std::unique_ptr<EcalMultifitParametersHost> produce(EcalMultifitParametersRcd const&);
-
-  protected:
-    void setIntervalFor(const edm::eventsetup::EventSetupRecordKey&,
-                        const edm::IOVSyncValue&,
-                        edm::ValidityInterval&) override;
 
   private:
     edm::ParameterSet const pset_;
@@ -93,12 +87,6 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         view.amplitudeFitParamsEE().data(), eeAmplitudeFitParameters.data(), sizeof(float) * kNAmplitudeFitParams);
 
     return product;
-  }
-
-  void EcalMultifitParametersHostESProducer::setIntervalFor(const edm::eventsetup::EventSetupRecordKey& iKey,
-                                                            const edm::IOVSyncValue& iTime,
-                                                            edm::ValidityInterval& oInterval) {
-    oInterval = edm::ValidityInterval(edm::IOVSyncValue::beginOfTime(), edm::IOVSyncValue::endOfTime());
   }
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
