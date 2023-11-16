@@ -35,8 +35,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
     auto const ebSize = static_cast<uint32_t>(uncalibRecHitsDevEB.const_view().metadata().size());
     auto const totalChannels = ebSize + static_cast<uint32_t>(uncalibRecHitsDevEE.const_view().metadata().size());
 
-    EventDataForScratchDevice scratch;
-    scratch.allocate(configParams, totalChannels, queue);
+    EventDataForScratchDevice scratch(configParams, totalChannels, queue);
 
     //
     // 1d preparation kernel
@@ -53,13 +52,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
                         uncalibRecHitsDevEB.view(),
                         uncalibRecHitsDevEE.view(),
                         conditionsDev.const_view(),
-                        reinterpret_cast<::ecal::multifit::SampleVector*>(scratch.samplesDevBuf.value().data()),
-                        reinterpret_cast<::ecal::multifit::SampleGainVector*>(scratch.gainsNoiseDevBuf.value().data()),
-                        scratch.hasSwitchToGain6DevBuf.value().data(),
-                        scratch.hasSwitchToGain1DevBuf.value().data(),
-                        scratch.isSaturatedDevBuf.value().data(),
-                        scratch.acStateDevBuf.value().data(),
-                        reinterpret_cast<::ecal::multifit::BXVectorType*>(scratch.activeBXsDevBuf.value().data()),
+                        reinterpret_cast<::ecal::multifit::SampleVector*>(scratch.samplesDevBuf.data()),
+                        reinterpret_cast<::ecal::multifit::SampleGainVector*>(scratch.gainsNoiseDevBuf.data()),
+                        scratch.hasSwitchToGain6DevBuf.data(),
+                        scratch.hasSwitchToGain1DevBuf.data(),
+                        scratch.isSaturatedDevBuf.data(),
+                        scratch.acStateDevBuf.data(),
+                        reinterpret_cast<::ecal::multifit::BXVectorType*>(scratch.activeBXsDevBuf.data()),
                         gainSwitchUseMaxSampleEB,
                         gainSwitchUseMaxSampleEE);
 
@@ -75,12 +74,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
                         digisDevEB.const_view(),
                         digisDevEE.const_view(),
                         conditionsDev.const_view(),
-                        reinterpret_cast<::ecal::multifit::SampleGainVector*>(scratch.gainsNoiseDevBuf.value().data()),
-                        reinterpret_cast<::ecal::multifit::SampleMatrix*>(scratch.noisecovDevBuf.value().data()),
-                        reinterpret_cast<::ecal::multifit::PulseMatrixType*>(scratch.pulse_matrixDevBuf.value().data()),
-                        scratch.hasSwitchToGain6DevBuf.value().data(),
-                        scratch.hasSwitchToGain1DevBuf.value().data(),
-                        scratch.isSaturatedDevBuf.value().data());
+                        reinterpret_cast<::ecal::multifit::SampleGainVector*>(scratch.gainsNoiseDevBuf.data()),
+                        reinterpret_cast<::ecal::multifit::SampleMatrix*>(scratch.noisecovDevBuf.data()),
+                        reinterpret_cast<::ecal::multifit::PulseMatrixType*>(scratch.pulse_matrixDevBuf.data()),
+                        scratch.hasSwitchToGain6DevBuf.data(),
+                        scratch.hasSwitchToGain1DevBuf.data(),
+                        scratch.isSaturatedDevBuf.data());
 
     // run minimization kernels
     minimization_procedure(queue,
