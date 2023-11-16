@@ -7,22 +7,17 @@
 #include "HeterogeneousCore/AlpakaInterface/interface/traits.h"
 #include "DeclsForKernels.h"
 
-namespace ALPAKA_ACCELERATOR_NAMESPACE {
+namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
-  namespace ecal {
-    namespace raw {
+  void unpackRaw(Queue&,
+                 InputDataHost const&,
+                 InputDataDevice&,
+                 EcalDigiDeviceCollection&,
+                 EcalDigiDeviceCollection&,
+                 EcalElectronicsMappingDevice const&,
+                 uint32_t const,
+                 uint32_t const);
 
-      void unpackRaw(InputDataHost const&,
-                     InputDataDevice&,
-                     EcalDigiDeviceCollection&,
-                     EcalDigiDeviceCollection&,
-                     EcalElectronicsMappingDevice const&,
-                     Queue&,
-                     uint32_t const,
-                     uint32_t const);
-
-    }  // namespace raw
-  }    // namespace ecal
-}  // namespace ALPAKA_ACCELERATOR_NAMESPACE
+}  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw
 
 #endif  // EventFilter_EcalRawToDigi_plugins_alpaka_UnpackPortable_h

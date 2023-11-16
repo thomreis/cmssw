@@ -135,7 +135,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     // unpack if at least one FED has data
     if (fedCounter > 0) {
       ecal::raw::unpackRaw(
-          inputHost, inputDevice, digisDevEB, digisDevEE, eMappingProduct, event.queue(), fedCounter, currentCummOffset);
+          event.queue(), inputHost, inputDevice, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
     }
 
     event.emplace(digisDevEBToken_, std::move(digisDevEB));

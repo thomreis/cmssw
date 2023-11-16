@@ -20,7 +20,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       using namespace ::ecal::raw;
       using namespace cms::alpakatools;
 
-      class kernel_unpack_test {
+      class Kernel_unpack {
       public:
         template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
         ALPAKA_FN_ACC void operator()(TAcc const& acc,
@@ -147,13 +147,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
             // go through all the channels
             // get the next channel coordinates
-            uint32_t nchannels = (block_length - 1) / 3;
+            uint32_t const nchannels = (block_length - 1) / 3;
 
             bool bad_block = false;
             auto& ch_with_bad_block = alpaka::declareSharedVar<uint32_t, __COUNTER__>(acc);
+            auto const threadsPerBlock = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u];
             // 1 threads per channel in this block
-            for (uint32_t ich = 0; ich < nchannels;
-                 ich += alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u]) {
+            for (uint32_t ich = 0; ich < nchannels; ich += threadsPerBlock) {
               auto const i_to_access = ich + threadIdx;
               if (i_to_access == 0) {
                 ch_with_bad_block = std::numeric_limits<uint32_t>::max();
@@ -227,7 +227,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
               // check gain
               bool isSaturation = true;
               short firstGainZeroSampID{-1}, firstGainZeroSampADC{-1};
-              for (uint32_t si = 0; si < 10; si++) {
+              for (uint32_t si = 0; si < 10; ++si) {
                 if (gainId(sampleValues[si]) == 0) {
                   firstGainZeroSampID = si;
                   firstGainZeroSampADC = adc(sampleValues[si]);
@@ -237,9 +237,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
               if (firstGainZeroSampID != -1) {
                 unsigned int plateauEnd = std::min(10u, (unsigned int)(firstGainZeroSampID + 5));
                 for (unsigned int s = firstGainZeroSampID; s < plateauEnd; s++) {
-                  if (gainId(sampleValues[s]) == 0 && adc(sampleValues[s]) == firstGainZeroSampADC) {
-                    ;
-                  } else {
+                  if (!(gainId(sampleValues[s]) == 0 && adc(sampleValues[s]) == firstGainZeroSampADC)) {
                     isSaturation = false;
                     break;
                   }  //it's not saturation
@@ -254,7 +252,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
                 // gain switch check
                 short numGain = 1;
                 bool gainSwitchError = false;
-                for (unsigned int si = 1; si < 10; si++) {
+                for (unsigned int si = 1; si < 10; ++si) {
                   if ((gainId(sampleValues[si - 1]) > gainId(sampleValues[si])) && numGain < 5)
                     gainSwitchError = true;
                   if (gainId(sampleValues[si - 1]) == gainId(sampleValues[si]))
@@ -290,7 +288,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         ALPAKA_FN_INLINE ALPAKA_FN_ACC void print_raw_buffer(uint8_t const* const buffer,
                                                              uint32_t const nbytes,
                                                              uint32_t const nbytes_per_row = 20) const {
-          for (uint32_t i = 0; i < nbytes; i++) {
+          for (uint32_t i = 0; i < nbytes; ++i) {
             if (i % nbytes_per_row == 0 && i > 0)
               printf("\n");
             printf("%02X ", buffer[i]);
@@ -356,11 +354,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
         ALPAKA_FN_INLINE ALPAKA_FN_ACC bool right_tower_for_eb(int tower) const {
           // for EB, two types of tower (LVRB top/bottom)
-          if ((tower > 12 && tower < 21) || (tower > 28 && tower < 37) || (tower > 44 && tower < 53) ||
-              (tower > 60 && tower < 69))
-            return true;
-          else
-            return false;
+          return (tower > 12 && tower < 21) || (tower > 28 && tower < 37) || (tower > 44 && tower < 53) ||
+                 (tower > 60 && tower < 69);
         }
 
         ALPAKA_FN_INLINE ALPAKA_FN_ACC uint32_t compute_ebdetid(ElectronicsIdGPU const& eid) const {
@@ -427,12 +422,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         ALPAKA_FN_INLINE ALPAKA_FN_ACC int gainId(uint16_t sample) const { return (sample >> 12) & 0x3; }
       };
 
-      void unpackRaw(InputDataHost const& inputHost,
+      void unpackRaw(Queue& queue,
+                     InputDataHost const& inputHost,
                      InputDataDevice& inputDevice,
                      EcalDigiDeviceCollection& digisDevEB,
                      EcalDigiDeviceCollection& digisDevEE,
                      EcalElectronicsMappingDevice const& mapping,
-                     Queue& queue,
                      uint32_t const nfedsWithData,
                      uint32_t const nbytesTotal) {
         // transfer the raw data
@@ -443,7 +438,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
         alpaka::exec<Acc1D>(queue,
                             workDiv,
-                            kernel_unpack_test{},
+                            Kernel_unpack{},
                             inputDevice.data.value().data(),
                             inputDevice.offsets.value().data(),
                             inputDevice.feds.value().data(),
