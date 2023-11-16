@@ -281,8 +281,8 @@ def customizeHLTfor43257(process):
         process.load("EventFilter.EcalRawToDigi.ecalElectronicsMappingHostESProducer_cfi")
         process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerTask.add(process.ecalElectronicsMappingHostESProducer)
 
-        process.__delattr__('hltEcalDigisGPU')
-        process.__delattr__('ecalElectronicsMappingGPUESProducer')
+        delattr(process, 'hltEcalDigisGPU')
+        delattr(process, 'ecalElectronicsMappingGPUESProducer')
 
     if hasattr(process, 'hltEcalDigisFromGPU'):
         process.hltEcalDigisFromGPU = cms.EDProducer( "EcalDigisFromPortableProducer",
@@ -337,7 +337,7 @@ def customizeHLTfor43257(process):
         process.load("RecoLocalCalo.EcalRecProducers.ecalMultifitParametersHostESProducer_cfi")
         process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerTask.add(process.ecalMultifitParametersHostESProducer)
 
-        process.__delattr__('hltEcalUncalibRecHitGPU')
+        delattr(process, 'hltEcalUncalibRecHitGPU')
 
         if hasattr(process, 'hltEcalUncalibRecHitFromSoA'):
             process.hltEcalUncalibRecHitFromSoA = cms.EDProducer("EcalUncalibRecHitConvertPortable2CPUFormat",
@@ -350,7 +350,7 @@ def customizeHLTfor43257(process):
             )
 
         if hasattr(process, 'hltEcalUncalibRecHitSoA'):
-            process.__delattr__('hltEcalUncalibRecHitSoA')
+            delattr(process, 'hltEcalUncalibRecHitSoA')
 
     return process
 

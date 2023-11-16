@@ -16,9 +16,6 @@ ecalDigisTask = cms.Task(
 # process modifier to run on GPUs
 from Configuration.ProcessModifiers.gpu_cff import gpu
 
-from Configuration.StandardSequences.Accelerators_cff import *
-from HeterogeneousCore.AlpakaCore.ProcessAcceleratorAlpaka_cfi import ProcessAcceleratorAlpaka
-
 # ECAL conditions used by the portable unpacker
 from EventFilter.EcalRawToDigi.ecalElectronicsMappingHostESProducer_cfi import ecalElectronicsMappingHostESProducer
 
