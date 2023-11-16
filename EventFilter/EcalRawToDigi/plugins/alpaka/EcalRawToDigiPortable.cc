@@ -88,7 +88,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       ++feds;
     }
 
-    auto queue = event.queue();
+    auto& queue = event.queue();
 
     // input host buffers
     ecal::raw::InputDataHost inputHost(queue, size, feds);

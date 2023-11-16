@@ -1,8 +1,3 @@
-// Check that ALPAKA_HOST_ONLY is not defined during device compilation:
-#ifdef ALPAKA_HOST_ONLY
-#error ALPAKA_HOST_ONLY defined in device compilation
-#endif
-
 #include <iostream>
 #include <limits>
 #include <alpaka/alpaka.hpp>
@@ -24,14 +19,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
       using namespace cms::alpakatools;
 
-      void entryPoint(InputProduct const& digisDevEB,
+      void entryPoint(Queue& queue,
+                      InputProduct const& digisDevEB,
                       InputProduct const& digisDevEE,
                       OutputProduct& uncalibRecHitsDevEB,
                       OutputProduct& uncalibRecHitsDevEE,
                       EcalMultifitConditionsDevice const& conditionsDev,
                       EcalMultifitParametersDevice const& paramsDev,
-                      ConfigurationParameters const& configParams,
-                      Queue& queue) {
+                      ConfigurationParameters const& configParams) {
         using digis_type = std::vector<uint16_t>;
         using dids_type = std::vector<uint32_t>;
         // according to the cpu setup  //----> hardcoded
@@ -56,7 +51,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         alpaka::exec<Acc1D>(
             queue,
             workDivPrep1D,
-            kernel_prep_1d_and_initialize{},
+            Kernel_prep_1d_and_initialize{},
             digisDevEB.const_view(),
             digisDevEE.const_view(),
             uncalibRecHitsDevEB.view(),
@@ -81,7 +76,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         alpaka::exec<Acc2D>(
             queue,
             workDivPrep2D,
-            kernel_prep_2d{},
+            Kernel_prep_2d{},
             digisDevEB.const_view(),
             digisDevEE.const_view(),
             conditionsDev.const_view(),
@@ -93,15 +88,15 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
             scratch.isSaturatedDevBuf.value().data());
 
         // run minimization kernels
-        v1::minimization_procedure(digisDevEB,
-                                   digisDevEE,
-                                   uncalibRecHitsDevEB,
-                                   uncalibRecHitsDevEE,
-                                   scratch,
-                                   conditionsDev,
-                                   configParams,
-                                   totalChannels,
-                                   queue);
+        minimization_procedure(queue,
+                               digisDevEB,
+                               digisDevEE,
+                               uncalibRecHitsDevEB,
+                               uncalibRecHitsDevEE,
+                               scratch,
+                               conditionsDev,
+                               configParams,
+                               totalChannels);
 
         if (configParams.shouldRunTimingComputation) {
           //
@@ -113,7 +108,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           auto workDivTimeCompInit1D = cms::alpakatools::make_workdiv<Acc1D>(blocks_time_init, threads_time_init);
           alpaka::exec<Acc1D>(queue,
                               workDivTimeCompInit1D,
-                              kernel_time_computation_init{},
+                              Kernel_time_computation_init{},
                               digisDevEB.const_view(),
                               digisDevEE.const_view(),
                               conditionsDev.const_view(),
@@ -134,7 +129,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           auto workDivTimeFixMGPAslew1D = cms::alpakatools::make_workdiv<Acc1D>(blocksFixMGPA, threadsFixMGPA);
           alpaka::exec<Acc1D>(queue,
                               workDivTimeFixMGPAslew1D,
-                              kernel_time_compute_fixMGPAslew{},
+                              Kernel_time_compute_fixMGPAslew{},
                               digisDevEB.const_view(),
                               digisDevEE.const_view(),
                               conditionsDev.const_view(),
@@ -147,7 +142,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           auto workDivTimeNullhypot1D = cms::alpakatools::make_workdiv<Acc1D>(blocks_nullhypot, threads_nullhypot);
           alpaka::exec<Acc1D>(queue,
                               workDivTimeNullhypot1D,
-                              kernel_time_compute_nullhypot{},
+                              Kernel_time_compute_nullhypot{},
                               scratch.sample_valuesDevBuf.value().data(),
                               scratch.sample_value_errorsDevBuf.value().data(),
                               scratch.useless_sample_valuesDevBuf.value().data(),
@@ -165,7 +160,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           auto workDivTimeMakeRatio1D = cms::alpakatools::make_workdiv<Acc1D>(blocks_makeratio, threads_makeratio);
           alpaka::exec<Acc1D>(queue,
                               workDivTimeMakeRatio1D,
-                              kernel_time_compute_makeratio{},
+                              Kernel_time_compute_makeratio{},
                               digisDevEB.const_view(),
                               digisDevEE.const_view(),
                               scratch.sample_valuesDevBuf.value().data(),
@@ -191,7 +186,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
               cms::alpakatools::make_workdiv<Acc1D>(blocks_findamplchi2, threads_findamplchi2);
           alpaka::exec<Acc1D>(queue,
                               workDivTimeFindAmplChi21D,
-                              kernel_time_compute_findamplchi2_and_finish{},
+                              Kernel_time_compute_findamplchi2_and_finish{},
                               digisDevEB.const_view(),
                               digisDevEE.const_view(),
                               scratch.sample_valuesDevBuf.value().data(),
@@ -216,7 +211,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           auto workDivCorrFinal1D = cms::alpakatools::make_workdiv<Acc1D>(blocks_timecorr, threads_timecorr);
           alpaka::exec<Acc1D>(queue,
                               workDivCorrFinal1D,
-                              kernel_time_correction_and_finalize{},
+                              Kernel_time_correction_and_finalize{},
                               digisDevEB.const_view(),
                               digisDevEE.const_view(),
                               uncalibRecHitsDevEB.view(),

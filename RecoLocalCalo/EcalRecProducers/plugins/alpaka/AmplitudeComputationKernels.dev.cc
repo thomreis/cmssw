@@ -1,8 +1,3 @@
-// Check that ALPAKA_HOST_ONLY is not defined during device compilation:
-#ifdef ALPAKA_HOST_ONLY
-#error ALPAKA_HOST_ONLY defined in device compilation
-#endif
-
 #include <cmath>
 #include <limits>
 #include <alpaka/alpaka.hpp>
@@ -61,14 +56,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       ///   - passive constraint - satisfied constraint
       ///   - active constraint - unsatisfied (yet) constraint
       ///
-      class kernel_minimize {
+      class Kernel_minimize {
       public:
         template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
         ALPAKA_FN_ACC void operator()(TAcc const& acc,
-                                      v1::InputProduct::ConstView const& digisDevEB,
-                                      v1::InputProduct::ConstView const& digisDevEE,
-                                      v1::OutputProduct::View uncalibRecHitsEB,
-                                      v1::OutputProduct::View uncalibRecHitsEE,
+                                      InputProduct::ConstView const& digisDevEB,
+                                      InputProduct::ConstView const& digisDevEE,
+                                      OutputProduct::View uncalibRecHitsEB,
+                                      OutputProduct::View uncalibRecHitsEE,
                                       EcalMultifitConditionsDevice::ConstView conditionsDev,
                                       ::ecal::multifit::SampleMatrix const* noisecov,
                                       ::ecal::multifit::PulseMatrixType const* pulse_matrix,
@@ -275,58 +270,55 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         }
       };
 
-      namespace v1 {
+      void minimization_procedure(Queue& queue,
+                                  InputProduct const& digisDevEB,
+                                  InputProduct const& digisDevEE,
+                                  OutputProduct& uncalibRecHitsDevEB,
+                                  OutputProduct& uncalibRecHitsDevEE,
+                                  EventDataForScratchDevice& scratch,
+                                  EcalMultifitConditionsDevice const& conditionsDev,
+                                  ConfigurationParameters const& configParams,
+                                  uint32_t const totalChannels) {
+        using DataType = SampleVector::Scalar;
+        // TODO: configure from python
+        auto threads_min = configParams.kernelMinimizeThreads[0];
+        auto blocks_min = cms::alpakatools::divide_up_by(totalChannels, threads_min);
 
-        void minimization_procedure(InputProduct const& digisDevEB,
-                                    InputProduct const& digisDevEE,
-                                    OutputProduct& uncalibRecHitsDevEB,
-                                    OutputProduct& uncalibRecHitsDevEE,
-                                    EventDataForScratchDevice& scratch,
-                                    EcalMultifitConditionsDevice const& conditionsDev,
-                                    ConfigurationParameters const& configParams,
-                                    uint32_t const totalChannels,
-                                    Queue& queue) {
-          using DataType = SampleVector::Scalar;
-          // TODO: configure from python
-          auto threads_min = configParams.kernelMinimizeThreads[0];
-          auto blocks_min = cms::alpakatools::divide_up_by(totalChannels, threads_min);
+        auto workDivMinimize = cms::alpakatools::make_workdiv<Acc1D>(blocks_min, threads_min);
+        alpaka::exec<Acc1D>(
+            queue,
+            workDivMinimize,
+            Kernel_minimize{},
+            digisDevEB.const_view(),
+            digisDevEE.const_view(),
+            uncalibRecHitsDevEB.view(),
+            uncalibRecHitsDevEE.view(),
+            conditionsDev.const_view(),
+            reinterpret_cast<::ecal::multifit::SampleMatrix*>(scratch.noisecovDevBuf.value().data()),
+            reinterpret_cast<::ecal::multifit::PulseMatrixType*>(scratch.pulse_matrixDevBuf.value().data()),
+            reinterpret_cast<::ecal::multifit::BXVectorType*>(scratch.activeBXsDevBuf.value().data()),
+            reinterpret_cast<::ecal::multifit::SampleVector*>(scratch.samplesDevBuf.value().data()),
+            scratch.hasSwitchToGain6DevBuf.value().data(),
+            scratch.hasSwitchToGain1DevBuf.value().data(),
+            scratch.isSaturatedDevBuf.value().data(),
+            scratch.acStateDevBuf.value().data(),
+            50);
+      }
 
-          auto workDivMinimize = cms::alpakatools::make_workdiv<Acc1D>(blocks_min, threads_min);
-          alpaka::exec<Acc1D>(
-              queue,
-              workDivMinimize,
-              kernel_minimize{},
-              digisDevEB.const_view(),
-              digisDevEE.const_view(),
-              uncalibRecHitsDevEB.view(),
-              uncalibRecHitsDevEE.view(),
-              conditionsDev.const_view(),
-              reinterpret_cast<::ecal::multifit::SampleMatrix*>(scratch.noisecovDevBuf.value().data()),
-              reinterpret_cast<::ecal::multifit::PulseMatrixType*>(scratch.pulse_matrixDevBuf.value().data()),
-              reinterpret_cast<::ecal::multifit::BXVectorType*>(scratch.activeBXsDevBuf.value().data()),
-              reinterpret_cast<::ecal::multifit::SampleVector*>(scratch.samplesDevBuf.value().data()),
-              scratch.hasSwitchToGain6DevBuf.value().data(),
-              scratch.hasSwitchToGain1DevBuf.value().data(),
-              scratch.isSaturatedDevBuf.value().data(),
-              scratch.acStateDevBuf.value().data(),
-              50);
-        }
-
-      }  // namespace v1
-    }    // namespace multifit
-  }      // namespace ecal
+    }  // namespace multifit
+  }    // namespace ecal
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
 
 namespace alpaka::trait {
   using namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit;
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_minimize.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_minimize.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_minimize, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_minimize, TAcc> {
     //! \return The size of the shared memory allocated for a block.
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_minimize const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_minimize const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {

@@ -30,7 +30,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       /// (MAXSAMPLES * nchannels, blocks)
       /// TODO: is there a point to split this kernel further to separate reductions
       ///
-      class kernel_prep_1d_and_initialize {
+      class Kernel_prep_1d_and_initialize {
       public:
         template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
         ALPAKA_FN_ACC void operator()(TAcc const& acc,
@@ -339,7 +339,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       /// assume kernel launch configuration is
       /// ([MAXSAMPLES, MAXSAMPLES], nchannels)
       ///
-      class kernel_prep_2d {
+      class Kernel_prep_2d {
       public:
         template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
         ALPAKA_FN_ACC void operator()(TAcc const& acc,
@@ -483,12 +483,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 namespace alpaka::trait {
   using namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit;
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_prep_1d_and_initialize.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_prep_1d_and_initialize.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_prep_1d_and_initialize, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_prep_1d_and_initialize, TAcc> {
     //! \return The size of the shared memory allocated for a block.
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_prep_1d_and_initialize const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_prep_1d_and_initialize const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {

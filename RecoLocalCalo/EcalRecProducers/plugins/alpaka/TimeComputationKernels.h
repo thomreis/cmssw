@@ -32,7 +32,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       ALPAKA_FN_ACC constexpr float fast_expf(float x) { return unsafe_expf<6>(x); }
       ALPAKA_FN_ACC constexpr float fast_logf(float x) { return unsafe_logf<7>(x); }
 
-      class kernel_time_compute_nullhypot {
+      class Kernel_time_compute_nullhypot {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -119,7 +119,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       // 45 comes from: 10 samples for i <- 0 to 9 and for j <- i+1 to 9
       // TODO: it might be much beter to use 32 threads per channel instead of 45
       // to simplify the synchronization
-      class kernel_time_compute_makeratio {
+      class Kernel_time_compute_makeratio {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -521,7 +521,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         }
       };
 
-      class kernel_time_compute_findamplchi2_and_finish {
+      class Kernel_time_compute_findamplchi2_and_finish {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -729,7 +729,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         }
       };
 
-      class kernel_time_compute_fixMGPAslew {
+      class Kernel_time_compute_fixMGPAslew {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -776,7 +776,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       };
 
       //#define ECAL_RECO_ALPAKA_TC_INIT_DEBUG
-      class kernel_time_computation_init {
+      class Kernel_time_computation_init {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -959,7 +959,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       /// launch context parameters: 1 thread per channel
       ///
       //#define DEBUG_TIME_CORRECTION
-      class kernel_time_correction_and_finalize {
+      class Kernel_time_correction_and_finalize {
         using ScalarType = ::ecal::multifit::SampleVector::Scalar;
 
       public:
@@ -1102,12 +1102,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 namespace alpaka::trait {
   using namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit;
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_time_compute_nullhypot.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_time_compute_nullhypot.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_time_compute_nullhypot, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_time_compute_nullhypot, TAcc> {
     //! \return The size of the shared memory allocated for a block.
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_time_compute_nullhypot const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_time_compute_nullhypot const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {
@@ -1119,11 +1119,11 @@ namespace alpaka::trait {
     }
   };
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_time_compute_makeratio.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_time_compute_makeratio.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_time_compute_makeratio, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_time_compute_makeratio, TAcc> {
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_time_compute_makeratio const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_time_compute_makeratio const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {
@@ -1134,11 +1134,11 @@ namespace alpaka::trait {
     }
   };
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_time_compute_findamplchi2_and_finish.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_time_compute_findamplchi2_and_finish.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_time_compute_findamplchi2_and_finish, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_time_compute_findamplchi2_and_finish, TAcc> {
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_time_compute_findamplchi2_and_finish const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_time_compute_findamplchi2_and_finish const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {
@@ -1149,11 +1149,11 @@ namespace alpaka::trait {
     }
   };
 
-  //! The trait for getting the size of the block shared dynamic memory for kernel_time_computation_init.
+  //! The trait for getting the size of the block shared dynamic memory for Kernel_time_computation_init.
   template <typename TAcc>
-  struct BlockSharedMemDynSizeBytes<kernel_time_computation_init, TAcc> {
+  struct BlockSharedMemDynSizeBytes<Kernel_time_computation_init, TAcc> {
     template <typename TVec, typename... TArgs>
-    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(kernel_time_computation_init const&,
+    ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(Kernel_time_computation_init const&,
                                                                  TVec const& threadsPerBlock,
                                                                  TVec const& elemsPerThread,
                                                                  TArgs const&...) -> std::size_t {

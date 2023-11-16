@@ -8,30 +8,21 @@
 #include "HeterogeneousCore/AlpakaInterface/interface/traits.h"
 #include "DeclsForKernels.h"
 
-namespace ALPAKA_ACCELERATOR_NAMESPACE {
+namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
 
-  namespace ecal {
-    namespace multifit {
+  using InputProduct = EcalDigiDeviceCollection;
+  using OutputProduct = EcalUncalibratedRecHitDeviceCollection;
 
-      namespace v1 {
+  void minimization_procedure(Queue&,
+                              InputProduct const&,
+                              InputProduct const&,
+                              OutputProduct&,
+                              OutputProduct&,
+                              EventDataForScratchDevice&,
+                              EcalMultifitConditionsDevice const&,
+                              ConfigurationParameters const&,
+                              uint32_t const);
 
-        using InputProduct = EcalDigiDeviceCollection;
-        using OutputProduct = EcalUncalibratedRecHitDeviceCollection;
-
-        void minimization_procedure(InputProduct const&,
-                                    InputProduct const&,
-                                    OutputProduct&,
-                                    OutputProduct&,
-                                    EventDataForScratchDevice&,
-                                    EcalMultifitConditionsDevice const&,
-                                    ConfigurationParameters const&,
-                                    uint32_t const,
-                                    Queue&);
-
-      }  // namespace v1
-
-    }  // namespace multifit
-  }    // namespace ecal
-}  // namespace ALPAKA_ACCELERATOR_NAMESPACE
+}  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit
 
 #endif  // RecoLocalCalo_EcalRecProducers_plugins_AmplitudeComputationKernels_h
