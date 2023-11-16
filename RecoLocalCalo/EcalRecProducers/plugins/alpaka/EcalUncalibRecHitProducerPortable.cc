@@ -11,20 +11,21 @@
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/EDPutToken.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/Event.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/EventSetup.h"
-#include "HeterogeneousCore/AlpakaCore/interface/alpaka/global/EDProducer.h"
+#include "HeterogeneousCore/AlpakaCore/interface/alpaka/stream/SynchronizingEDProducer.h"
 
 #include "DeclsForKernels.h"
 #include "EcalUncalibRecHitMultiFitAlgoPortable.h"
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
-  class EcalUncalibRecHitProducerPortable : public global::EDProducer<> {
+  class EcalUncalibRecHitProducerPortable : public stream::SynchronizingEDProducer<> {
   public:
     explicit EcalUncalibRecHitProducerPortable(edm::ParameterSet const& ps);
     ~EcalUncalibRecHitProducerPortable() override = default;
     static void fillDescriptions(edm::ConfigurationDescriptions&);
 
-    void produce(edm::StreamID, device::Event&, device::EventSetup const&) const override;
+    void acquire(device::Event const&, device::EventSetup const&) override;
+    void produce(device::Event&, device::EventSetup const&) override;
 
   private:
     using InputProduct = EcalDigiDeviceCollection;
@@ -40,6 +41,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     // configuration parameters
     ecal::multifit::ConfigurationParameters configParameters_;
+
+    cms::alpakatools::host_buffer<uint32_t> ebDigisSizeHostBuf_;
+    cms::alpakatools::host_buffer<uint32_t> eeDigisSizeHostBuf_;
   };
 
   void EcalUncalibRecHitProducerPortable::fillDescriptions(edm::ConfigurationDescriptions& confDesc) {
@@ -80,7 +84,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
         uncalibRecHitsTokenEB_{produces(ps.getParameter<std::string>("recHitsLabelEB"))},
         uncalibRecHitsTokenEE_{produces(ps.getParameter<std::string>("recHitsLabelEE"))},
         multifitConditionsToken_{esConsumes()},
-        multifitParametersToken_{esConsumes()} {
+        multifitParametersToken_{esConsumes()},
+        ebDigisSizeHostBuf_{cms::alpakatools::make_host_buffer<uint32_t>()},
+        eeDigisSizeHostBuf_{cms::alpakatools::make_host_buffer<uint32_t>()} {
     std::pair<double, double> EBtimeFitLimits, EEtimeFitLimits;
     EBtimeFitLimits.first = ps.getParameter<double>("EBtimeFitLimits_Lower");
     EBtimeFitLimits.second = ps.getParameter<double>("EBtimeFitLimits_Upper");
@@ -147,9 +153,23 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     configParameters_.outOfTimeThreshG61mEE = outOfTimeThreshG61mEE;
   }
 
-  void EcalUncalibRecHitProducerPortable::produce(edm::StreamID sid,
-                                                  device::Event& event,
-                                                  device::EventSetup const& setup) const {
+  void EcalUncalibRecHitProducerPortable::acquire(device::Event const& event, device::EventSetup const& setup) {
+    auto& queue = event.queue();
+
+    // get device collections from event
+    auto const& ebDigisDev = event.get(digisTokenEB_);
+    auto const& eeDigisDev = event.get(digisTokenEE_);
+
+    // copy the actual numbers of digis in the collections to host
+    auto ebDigisSizeDevConstView =
+        cms::alpakatools::make_device_view<const uint32_t>(alpaka::getDev(queue), ebDigisDev.const_view().size());
+    auto eeDigisSizeDevConstView =
+        cms::alpakatools::make_device_view<const uint32_t>(alpaka::getDev(queue), eeDigisDev.const_view().size());
+    alpaka::memcpy(queue, ebDigisSizeHostBuf_, ebDigisSizeDevConstView);
+    alpaka::memcpy(queue, eeDigisSizeHostBuf_, eeDigisSizeDevConstView);
+  }
+
+  void EcalUncalibRecHitProducerPortable::produce(device::Event& event, device::EventSetup const& setup) {
     auto& queue = event.queue();
 
     // get device collections from event
@@ -157,17 +177,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     auto const& eeDigisDev = event.get(digisTokenEE_);
 
     // get the actual numbers of digis in the collections
-    auto ebDigisSizeHostBuf = cms::alpakatools::make_host_buffer<uint32_t>();
-    auto eeDigisSizeHostBuf = cms::alpakatools::make_host_buffer<uint32_t>();
-    auto ebDigisSizeDevConstView =
-        cms::alpakatools::make_device_view<const uint32_t>(alpaka::getDev(queue), ebDigisDev.const_view().size());
-    auto eeDigisSizeDevConstView =
-        cms::alpakatools::make_device_view<const uint32_t>(alpaka::getDev(queue), eeDigisDev.const_view().size());
-    alpaka::memcpy(queue, ebDigisSizeHostBuf, ebDigisSizeDevConstView);
-    alpaka::memcpy(queue, eeDigisSizeHostBuf, eeDigisSizeDevConstView);
-    alpaka::wait(queue);
-    auto const ebDigisSize = static_cast<int>(*ebDigisSizeHostBuf.data());
-    auto const eeDigisSize = static_cast<int>(*eeDigisSizeHostBuf.data());
+    auto const ebDigisSize = static_cast<int>(*ebDigisSizeHostBuf_.data());
+    auto const eeDigisSize = static_cast<int>(*eeDigisSizeHostBuf_.data());
 
     // output device collections
     OutputProduct uncalibRecHitsDevEB{ebDigisSize, queue};
