@@ -1,6 +1,7 @@
 #include <alpaka/alpaka.hpp>
 
 #include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/EcalDigi/interface/EcalConstants.h"
 #include "EventFilter/EcalRawToDigi/interface/ElectronicsIdGPU.h"
 #include "EventFilter/EcalRawToDigi/interface/DCCRawDataDefinitions.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/workdivision.h"
@@ -23,6 +24,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                                   EcalDigiDeviceCollection::View digisDevEE,
                                   EcalElectronicsMappingDevice::ConstView eid2did,
                                   uint32_t const nbytesTotal) const {
+      constexpr auto kSampleSize = ecalPh1::sampleSize;
+
       // indices
       auto const ifed = alpaka::getIdx<alpaka::Grid, alpaka::Blocks>(acc)[0u];
       auto const threadIdx = alpaka::getIdx<alpaka::Block, alpaka::Threads>(acc)[0u];
@@ -202,7 +205,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
             continue;
 
           // get samples
-          uint16_t sampleValues[10];
+          uint16_t sampleValues[kSampleSize];
           sampleValues[0] = (wdata >> 16) & 0x3fff;
           sampleValues[1] = (wdata >> 32) & 0x3fff;
           sampleValues[2] = (wdata >> 48) & 0x3fff;
@@ -219,7 +222,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
           // check gain
           bool isSaturation = true;
           short firstGainZeroSampID{-1}, firstGainZeroSampADC{-1};
-          for (uint32_t si = 0; si < 10; ++si) {
+          for (uint32_t si = 0; si < kSampleSize; ++si) {
             if (gainId(sampleValues[si]) == 0) {
               firstGainZeroSampID = si;
               firstGainZeroSampADC = adc(sampleValues[si]);
@@ -227,7 +230,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
             }
           }
           if (firstGainZeroSampID != -1) {
-            unsigned int plateauEnd = std::min(10u, (unsigned int)(firstGainZeroSampID + 5));
+            unsigned int plateauEnd = std::min(kSampleSize, (unsigned int)(firstGainZeroSampID + 5));
             for (unsigned int s = firstGainZeroSampID; s < plateauEnd; s++) {
               if (!(gainId(sampleValues[s]) == 0 && adc(sampleValues[s]) == firstGainZeroSampADC)) {
                 isSaturation = false;
@@ -244,7 +247,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
             // gain switch check
             short numGain = 1;
             bool gainSwitchError = false;
-            for (unsigned int si = 1; si < 10; ++si) {
+            for (unsigned int si = 1; si < kSampleSize; ++si) {
               if ((gainId(sampleValues[si - 1]) > gainId(sampleValues[si])) && numGain < 5)
                 gainSwitchError = true;
               if (gainId(sampleValues[si - 1]) == gainId(sampleValues[si]))
@@ -260,16 +263,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
           // store to global
           ids[pos] = didraw;
-          samples[pos * 10] = sampleValues[0];
-          samples[pos * 10 + 1] = sampleValues[1];
-          samples[pos * 10 + 2] = sampleValues[2];
-          samples[pos * 10 + 3] = sampleValues[3];
-          samples[pos * 10 + 4] = sampleValues[4];
-          samples[pos * 10 + 5] = sampleValues[5];
-          samples[pos * 10 + 6] = sampleValues[6];
-          samples[pos * 10 + 7] = sampleValues[7];
-          samples[pos * 10 + 8] = sampleValues[8];
-          samples[pos * 10 + 9] = sampleValues[9];
+          std::memcpy(&samples[pos * kSampleSize], sampleValues, kSampleSize * sizeof(uint16_t));
         }
 
         current_tower_block += block_length;
