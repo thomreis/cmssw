@@ -13,9 +13,6 @@ ecalMultiFitUncalibRecHitTask = cms.Task(
   ecalMultiFitUncalibRecHit
 )
 
-from Configuration.StandardSequences.Accelerators_cff import *
-from HeterogeneousCore.AlpakaCore.ProcessAcceleratorAlpaka_cfi import ProcessAcceleratorAlpaka
-
 # ECAL conditions used by the multifit running on the accelerator
 from RecoLocalCalo.EcalRecProducers.ecalMultifitConditionsHostESProducer_cfi import ecalMultifitConditionsHostESProducer
 from RecoLocalCalo.EcalRecProducers.ecalMultifitParametersHostESProducer_cfi import ecalMultifitParametersHostESProducer
