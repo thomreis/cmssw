@@ -53,13 +53,13 @@ process.load("DQM.EcalMonitorClient.EcalMonitorClient_cfi")
 ### Individual module setups ###
 
 # Use the ratio timing method for the online DQM
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.timealgo = "RatioMethod"
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.outOfTimeThresholdGain12pEB = 5.
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.outOfTimeThresholdGain12mEB = 5.
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.outOfTimeThresholdGain61pEB = 5.
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.outOfTimeThresholdGain61mEB = 5.
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.timeCalibTag = ':'
-process.ecalMultiFitUncalibRecHit.cpu.algoPSet.timeOffsetTag = ':'
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.timealgo = "RatioMethod"
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.outOfTimeThresholdGain12pEB = 5.
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.outOfTimeThresholdGain12mEB = 5.
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.outOfTimeThresholdGain61pEB = 5.
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.outOfTimeThresholdGain61mEB = 5.
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.timeCalibTag = ':'
+process.ecalMultiFitUncalibRecHitCPU.algoPSet.timeOffsetTag = ':'
 
 process.ecalPhysicsFilter = cms.EDFilter("EcalMonitorPrescaler",
     cosmics = cms.untracked.uint32(1),
@@ -196,7 +196,7 @@ elif (runTypeName == 'cosmic_run' or runTypeName == 'cosmic_run_stage1'):
     process.ecalMonitorTask.workerParameters.PresampleTask.params.doPulseMaxCheck = False 
 elif runTypeName == 'hi_run':
     process.ecalMonitorTask.collectionTags.Source = "rawDataRepacker"
-    process.ecalDigis.cpu.InputLabel = 'rawDataRepacker'
+    process.ecalDigisCPU.InputLabel = 'rawDataRepacker'
 elif runTypeName == 'hpu_run':
     if not unitTest:
         process.source.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('*'))
