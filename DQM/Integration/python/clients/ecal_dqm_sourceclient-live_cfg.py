@@ -67,31 +67,26 @@ process.ecalPhysicsFilter = cms.EDFilter("EcalMonitorPrescaler",
     EcalRawDataCollection = cms.InputTag("ecalDigis")
 )
 
-process.MessageLogger = cms.Service("MessageLogger",
-    cerr = cms.untracked.PSet(
-        default = cms.untracked.PSet(
-            limit = cms.untracked.int32(-1)
-        ),
-        EcalLaserDbService = cms.untracked.PSet(
-            limit = cms.untracked.int32(10)
-        ),
-        noTimeStamps = cms.untracked.bool(True),
-        threshold = cms.untracked.string('WARNING'),
-        noLineBreaks = cms.untracked.bool(True)
+process.load('FWCore.MessageService.MessageLogger_cfi')
+process.MessageLogger.cerr = cms.untracked.PSet(
+    default = cms.untracked.PSet(
+        limit = cms.untracked.int32(-1)
     ),
-    cout = cms.untracked.PSet(
-        default = cms.untracked.PSet(
-            limit = cms.untracked.int32(0)
-        ),
-        EcalDQM = cms.untracked.PSet(
-            limit = cms.untracked.int32(-1)
-        ),
-        threshold = cms.untracked.string('INFO')
+    EcalLaserDbService = cms.untracked.PSet(
+        limit = cms.untracked.int32(10)
     ),
-    categories = cms.untracked.vstring('EcalDQM', 
-        'EcalLaserDbService'),
-    destinations = cms.untracked.vstring('cerr', 
-        'cout')
+    noTimeStamps = cms.untracked.bool(True),
+    threshold = cms.untracked.string('WARNING'),
+    noLineBreaks = cms.untracked.bool(True)
+)
+process.MessageLogger.cout = cms.untracked.PSet(
+    default = cms.untracked.PSet(
+        limit = cms.untracked.int32(0)
+    ),
+    EcalDQM = cms.untracked.PSet(
+        limit = cms.untracked.int32(-1)
+    ),
+    threshold = cms.untracked.string('INFO')
 )
 
 process.maxEvents = cms.untracked.PSet(

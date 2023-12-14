@@ -9,15 +9,13 @@ else:
   from Configuration.Eras.Era_Run3_cff import Run3
   process = cms.Process("SiStripApproxMonitor", Run3)
 
-process.MessageLogger = cms.Service("MessageLogger",
-                                    debugModules = cms.untracked.vstring('siStripDigis',
-                                                                         'siStripClusters',
-                                                                         'siStripZeroSuppression',
-                                                                         'SiStripClusterizer',
-                                                                         'siStripApproximateClusterComparator'),
-                                    cout = cms.untracked.PSet(threshold = cms.untracked.string('ERROR')),
-                                    destinations = cms.untracked.vstring('cout')
-                                    )
+process.load('FWCore.MessageService.MessageLogger_cfi')
+process.MessageLogger.debugModules = cms.untracked.vstring('siStripDigis',
+                                                           'siStripClusters',
+                                                           'siStripZeroSuppression',
+                                                           'SiStripClusterizer',
+                                                           'siStripApproximateClusterComparator')
+process.MessageLogger.cout = cms.untracked.PSet(threshold = cms.untracked.string('ERROR'))
 
 live=True
 unitTest=False
