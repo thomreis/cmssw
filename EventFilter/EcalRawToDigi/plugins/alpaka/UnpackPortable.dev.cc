@@ -154,8 +154,10 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
         auto const threadsPerBlock = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u];
         // 1 threads per channel in this block
-        for (uint32_t ich = 0; ich < nchannels; ich += threadsPerBlock) {
-          auto const i_to_access = ich + threadIdx;
+        // All threads enter the loop regardless if the will treat channel indices i_to_access >= nchannels.
+        // The threads with excess indices perform no operations but also reach the syncBlockThreads() inside the loop.
+        for (uint32_t i = 0; i < nchannels; i += threadsPerBlock) {
+          auto const i_to_access = i + threadIdx;
 
           uint64_t wdata;
           uint8_t stripid;
