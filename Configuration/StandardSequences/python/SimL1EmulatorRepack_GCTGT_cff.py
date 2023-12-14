@@ -30,6 +30,7 @@ from Configuration.ProcessModifiers.gpu_cff import gpu
 from Configuration.ProcessModifiers.alpaka_cff import alpaka
 
 from L1Trigger.L1TCalorimeter.L1TCaloStage1_PPFromRaw_cff import *
+from EventFilter.EcalRawToDigi.ecalDigis_cff import ecalDigisCPU, ecalDigisGPU, ecalDigisPortable
 ecalDigisCPU.InputLabel = cms.InputTag('rawDataCollector', processName=cms.InputTag.skipCurrentProcess())
 gpu.toModify(ecalDigisGPU, InputLabel = cms.InputTag('rawDataCollector', processName=cms.InputTag.skipCurrentProcess()))
 alpaka.toModify(ecalDigisPortable, InputLabel = cms.InputTag('rawDataCollector', processName=cms.InputTag.skipCurrentProcess()))
