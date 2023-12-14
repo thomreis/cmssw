@@ -93,9 +93,6 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     // input host buffers
     ecal::raw::InputDataHost inputHost(queue, size, feds);
 
-    // input device buffers
-    ecal::raw::InputDataDevice inputDevice(queue, size, feds);
-
     // output device collections
     OutputProduct digisDevEB{static_cast<int32_t>(config_.maxChannelsEB), queue};
     OutputProduct digisDevEE{static_cast<int32_t>(config_.maxChannelsEE), queue};
@@ -132,8 +129,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     // unpack if at least one FED has data
     if (fedCounter > 0) {
-      ecal::raw::unpackRaw(
-          queue, inputHost, inputDevice, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
+      ecal::raw::unpackRaw(queue, inputHost, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
     }
 
     event.emplace(digisDevEBToken_, std::move(digisDevEB));

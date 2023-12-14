@@ -146,16 +146,16 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
         bool bad_block = false;
         auto& ch_with_bad_block = alpaka::declareSharedVar<uint32_t, __COUNTER__>(acc);
+        if (once_per_block(acc)) {
+          ch_with_bad_block = std::numeric_limits<uint32_t>::max();
+        }
+        // make sure the shared memory is initialised for all threads
+        alpaka::syncBlockThreads(acc);
+
         auto const threadsPerBlock = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u];
         // 1 threads per channel in this block
         for (uint32_t ich = 0; ich < nchannels; ich += threadsPerBlock) {
           auto const i_to_access = ich + threadIdx;
-          if (i_to_access == 0) {
-            ch_with_bad_block = std::numeric_limits<uint32_t>::max();
-          }
-
-          // make sure the shared memory is initialised for all threads
-          alpaka::syncBlockThreads(acc);
 
           uint64_t wdata;
           uint8_t stripid;
@@ -410,12 +410,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
   void unpackRaw(Queue& queue,
                  InputDataHost const& inputHost,
-                 InputDataDevice& inputDevice,
                  EcalDigiDeviceCollection& digisDevEB,
                  EcalDigiDeviceCollection& digisDevEE,
                  EcalElectronicsMappingDevice const& mapping,
                  uint32_t const nfedsWithData,
                  uint32_t const nbytesTotal) {
+    // input device buffers
+    ecal::raw::InputDataDevice inputDevice(queue, nbytesTotal, nfedsWithData);
+
     // transfer the raw data
     alpaka::memcpy(queue, inputDevice.data, inputHost.data);
     alpaka::memcpy(queue, inputDevice.offsets, inputHost.offsets);
