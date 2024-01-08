@@ -154,19 +154,19 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
         auto const threadsPerBlock = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u];
         // 1 threads per channel in this block
-        // All threads enter the loop regardless if the will treat channel indices i_to_access >= nchannels.
+        // All threads enter the loop regardless if they will treat channel indices channel >= nchannels.
         // The threads with excess indices perform no operations but also reach the syncBlockThreads() inside the loop.
         for (uint32_t i = 0; i < nchannels; i += threadsPerBlock) {
-          auto const i_to_access = i + threadIdx;
+          auto const channel = i + threadIdx;
 
           uint64_t wdata;
           uint8_t stripid;
           uint8_t xtalid;
 
           // threads must be inside the range (no break here because of syncBlockThreads() afterwards)
-          if (i_to_access < nchannels && i_to_access < ch_with_bad_block) {
+          if (channel < nchannels && channel < ch_with_bad_block) {
             // inc the channel's counter and get the pos where to store
-            wdata = current_tower_block[1 + i_to_access * 3];
+            wdata = current_tower_block[1 + channel * 3];
             stripid = wdata & 0x7;
             xtalid = (wdata >> 4) & 0x7;
 
@@ -175,10 +175,10 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                 xtalid < ElectronicsIdGPU::MIN_XTALID || xtalid > ElectronicsIdGPU::MAX_XTALID) {
               bad_block = true;
             }
-            if (i_to_access > 0) {
+            if (channel > 0) {
               // check if the stripid has increased or that the xtalid has increased from the previous data word. If not something is wrong and the rest of the block is skipped.
-              auto const prev_i_to_access = i_to_access - 1;
-              auto const prevwdata = current_tower_block[1 + prev_i_to_access * 3];
+              auto const prev_channel = channel - 1;
+              auto const prevwdata = current_tower_block[1 + prev_channel * 3];
               uint8_t const laststripid = prevwdata & 0x7;
               uint8_t const lastxtalid = (prevwdata >> 4) & 0x7;
               if ((stripid == laststripid && xtalid <= lastxtalid) || (stripid < laststripid)) {
@@ -188,15 +188,15 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
           }
 
           // check if this thread has the lowest bad block
-          if (bad_block && i_to_access < ch_with_bad_block) {
-            alpaka::atomicMin(acc, &ch_with_bad_block, i_to_access, alpaka::hierarchy::Threads{});
+          if (bad_block && channel < ch_with_bad_block) {
+            alpaka::atomicMin(acc, &ch_with_bad_block, channel, alpaka::hierarchy::Threads{});
           }
 
           // make sure that all threads that have to have set the ch_with_bad_block shared memory
           alpaka::syncBlockThreads(acc);
 
           // threads outside of the range or bad block detected in this thread or one working on a lower block -> stop this loop iteration here
-          if (i_to_access >= nchannels || i_to_access >= ch_with_bad_block) {
+          if (channel >= nchannels || channel >= ch_with_bad_block) {
             continue;
           }
 
@@ -211,12 +211,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
           sampleValues[0] = (wdata >> 16) & 0x3fff;
           sampleValues[1] = (wdata >> 32) & 0x3fff;
           sampleValues[2] = (wdata >> 48) & 0x3fff;
-          auto const wdata1 = current_tower_block[2 + i_to_access * 3];
+          auto const wdata1 = current_tower_block[2 + channel * 3];
           sampleValues[3] = wdata1 & 0x3fff;
           sampleValues[4] = (wdata1 >> 16) & 0x3fff;
           sampleValues[5] = (wdata1 >> 32) & 0x3fff;
           sampleValues[6] = (wdata1 >> 48) & 0x3fff;
-          auto const wdata2 = current_tower_block[3 + i_to_access * 3];
+          auto const wdata2 = current_tower_block[3 + channel * 3];
           sampleValues[7] = wdata2 & 0x3fff;
           sampleValues[8] = (wdata2 >> 16) & 0x3fff;
           sampleValues[9] = (wdata2 >> 32) & 0x3fff;
