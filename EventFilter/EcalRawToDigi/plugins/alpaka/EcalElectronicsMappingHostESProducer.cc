@@ -33,7 +33,6 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       auto product = std::make_unique<EcalElectronicsMappingHost>(size, cms::alpakatools::host());
 
       // fill in eb
-      // TODO: EB vector is actually empty
       auto const& barrelValues = mapping.barrelItems();
       for (unsigned int i = 0; i < barrelValues.size(); ++i) {
         EcalElectronicsId eid{barrelValues[i].electronicsid};

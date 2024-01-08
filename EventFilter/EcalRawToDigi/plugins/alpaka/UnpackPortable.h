@@ -9,13 +9,13 @@
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
 
-  void unpackRaw(Queue&,
-                 InputDataHost const&,
-                 EcalDigiDeviceCollection&,
-                 EcalDigiDeviceCollection&,
-                 EcalElectronicsMappingDevice const&,
-                 uint32_t const,
-                 uint32_t const);
+  void unpackRaw(Queue& queue,
+                 InputDataHost const& inputHost,
+                 EcalDigiDeviceCollection& digisDevEB,
+                 EcalDigiDeviceCollection& digisDevEE,
+                 EcalElectronicsMappingDevice const& mapping,
+                 uint32_t const nfedsWithData,
+                 uint32_t const nbytesTotal);
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw
 

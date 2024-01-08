@@ -26,10 +26,10 @@ from EventFilter.EcalRawToDigi.ecalElectronicsMappingGPUESProducer_cfi import ec
 from EventFilter.EcalRawToDigi.ecalRawToDigiGPU_cfi import ecalRawToDigiGPU as _ecalRawToDigiGPU
 ecalDigisGPU = _ecalRawToDigiGPU.clone()
 
-# extend the SwitchProducer to add a case to copy the ECAL digis from GPU to CPU and covert them from SoA to legacy format
+# extend the SwitchProducer to add a case to copy the ECAL digis from GPU to CPU and convert them from SoA to legacy format
 from EventFilter.EcalRawToDigi.ecalCPUDigisProducer_cfi import ecalCPUDigisProducer as _ecalCPUDigisProducer
 gpu.toModify(ecalDigis,
-    # copy the ECAL digis from GPU to CPU and covert them from SoA to legacy format
+    # copy the ECAL digis from GPU to CPU and convert them from SoA to legacy format
     cuda = _ecalCPUDigisProducer.clone(
         digisInLabelEB = ('ecalDigisGPU', 'ebDigis'),
         digisInLabelEE = ('ecalDigisGPU', 'eeDigis'),
@@ -42,7 +42,7 @@ gpu.toReplaceWith(ecalDigisTask, cms.Task(
     ecalElectronicsMappingGPUESProducer,
     # run the ECAL unpacker on GPU
     ecalDigisGPU,
-    # run the ECAL unpacker on CPU, or copy the ECAL digis from GPU to CPU and covert them from SoA to legacy format
+    # run the ECAL unpacker on CPU, or copy the ECAL digis from GPU to CPU and convert them from SoA to legacy format
     ecalDigis
 ))
 
@@ -58,18 +58,15 @@ ecalDigisPortable = _ecalRawToDigiPortable.clone()
 
 from EventFilter.EcalRawToDigi.ecalDigisFromPortableProducer_cfi import ecalDigisFromPortableProducer as _ecalDigisFromPortableProducer
 
-# replace the SwitchProducer branches with a module to copy the ECAL digis from the accelerator to CPU and covert them from SoA to legacy format
+# replace the SwitchProducer branches with a module to copy the ECAL digis from the accelerator to CPU (if needed) and convert them from SoA to legacy format
+_ecalDigisFromPortable = _ecalDigisFromPortableProducer.clone(
+    digisInLabelEB = 'ecalDigisPortable:ebDigis',
+    digisInLabelEE = 'ecalDigisPortable:eeDigis',
+    produceDummyIntegrityCollections = True
+)
 alpaka.toModify(ecalDigis,
-    cpu = _ecalDigisFromPortableProducer.clone(
-        digisInLabelEB = 'ecalDigisPortable:ebDigis',
-        digisInLabelEE = 'ecalDigisPortable:eeDigis',
-        produceDummyIntegrityCollections = True
-    ),
-    cuda = _ecalDigisFromPortableProducer.clone(
-        digisInLabelEB = 'ecalDigisPortable:ebDigis',
-        digisInLabelEE = 'ecalDigisPortable:eeDigis',
-        produceDummyIntegrityCollections = True
-    )
+    cpu = _ecalDigisFromPortable.clone(),
+    cuda = _ecalDigisFromPortable.clone()
 )
 
 alpaka.toReplaceWith(ecalDigisTask, cms.Task(
@@ -77,6 +74,6 @@ alpaka.toReplaceWith(ecalDigisTask, cms.Task(
     ecalElectronicsMappingHostESProducer,
     # run the portable ECAL unpacker
     ecalDigisPortable,
-    # run the ECAL unpacker on CPU, or copy the ECAL digis from GPU to CPU and covert them from SoA to legacy format
+    # copy the ECAL digis from GPU to CPU (if needed) and convert them from SoA to legacy format
     ecalDigis
 ))
