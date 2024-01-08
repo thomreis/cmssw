@@ -10,9 +10,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::reconstruction {
 
   ALPAKA_FN_ACC uint32_t hashedIndexEE(uint32_t id);
 
-  ALPAKA_FN_ACC int laser_monitoring_region_EB(uint32_t id);
+  ALPAKA_FN_ACC int32_t laserMonitoringRegionEB(uint32_t id);
 
-  ALPAKA_FN_ACC int laser_monitoring_region_EE(uint32_t id);
+  ALPAKA_FN_ACC int32_t laserMonitoringRegionEE(uint32_t id);
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::reconstruction
 

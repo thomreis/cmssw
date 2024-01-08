@@ -105,7 +105,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::reconstruction {
   // https://cmssdt.cern.ch/lxr/source/CalibCalorimetry/EcalLaserAnalyzer/src/MEEBGeom.cc
   //  function: "lmr"
 
-  ALPAKA_FN_ACC int laser_monitoring_region_EB(uint32_t id) {
+  ALPAKA_FN_ACC int32_t laserMonitoringRegionEB(uint32_t id) {
     using namespace internal::barrel;
 
     int ieta;
@@ -237,7 +237,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::reconstruction {
   // https://github.com/cms-sw/cmssw/blob/master/CalibCalorimetry/EcalLaserCorrection/src/EcalLaserDbService.cc
   //
 
-  ALPAKA_FN_ACC int laser_monitoring_region_EE(uint32_t id) {
+  ALPAKA_FN_ACC int32_t laserMonitoringRegionEE(uint32_t id) {
     using namespace internal::endcap;
 
     // SuperCrysCoord
