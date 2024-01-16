@@ -201,14 +201,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       //
       // schedule algorithms
       //
-      ecal::multifit::entryPoint(queue,
-                                 ebDigisDev,
-                                 eeDigisDev,
-                                 uncalibRecHitsDevEB,
-                                 uncalibRecHitsDevEE,
-                                 multifitConditionsDev,
-                                 multifitParametersDev,
-                                 configParameters_);
+      ecal::multifit::launchKernels(queue,
+                                    ebDigisDev,
+                                    eeDigisDev,
+                                    uncalibRecHitsDevEB,
+                                    uncalibRecHitsDevEE,
+                                    multifitConditionsDev,
+                                    multifitParametersDev,
+                                    configParameters_);
     }
 
     // put into the event

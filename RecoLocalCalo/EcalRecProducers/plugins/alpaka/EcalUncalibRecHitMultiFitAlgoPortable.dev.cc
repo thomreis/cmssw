@@ -16,14 +16,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
 
   using namespace cms::alpakatools;
 
-  void entryPoint(Queue& queue,
-                  InputProduct const& digisDevEB,
-                  InputProduct const& digisDevEE,
-                  OutputProduct& uncalibRecHitsDevEB,
-                  OutputProduct& uncalibRecHitsDevEE,
-                  EcalMultifitConditionsDevice const& conditionsDev,
-                  EcalMultifitParametersDevice const& paramsDev,
-                  ConfigurationParameters const& configParams) {
+  void launchKernels(Queue& queue,
+                     InputProduct const& digisDevEB,
+                     InputProduct const& digisDevEE,
+                     OutputProduct& uncalibRecHitsDevEB,
+                     OutputProduct& uncalibRecHitsDevEE,
+                     EcalMultifitConditionsDevice const& conditionsDev,
+                     EcalMultifitParametersDevice const& paramsDev,
+                     ConfigurationParameters const& configParams) {
     using digis_type = std::vector<uint16_t>;
     using dids_type = std::vector<uint32_t>;
     // according to the cpu setup  //----> hardcoded
