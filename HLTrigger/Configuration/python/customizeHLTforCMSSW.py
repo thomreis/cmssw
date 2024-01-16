@@ -340,7 +340,7 @@ def customizeHLTfor43257(process):
         delattr(process, 'hltEcalUncalibRecHitGPU')
 
         if hasattr(process, 'hltEcalUncalibRecHitFromSoA'):
-            process.hltEcalUncalibRecHitFromSoA = cms.EDProducer("EcalUncalibRecHitConvertPortable2CPUFormat",
+            process.hltEcalUncalibRecHitFromSoA = cms.EDProducer("EcalUncalibRecHitSoAToLegacy",
                 isPhase2 = process.hltEcalUncalibRecHitFromSoA.isPhase2,
                 mightGet = cms.optional.untracked.vstring,
                 recHitsLabelCPUEB = process.hltEcalUncalibRecHitFromSoA.recHitsLabelCPUEB,

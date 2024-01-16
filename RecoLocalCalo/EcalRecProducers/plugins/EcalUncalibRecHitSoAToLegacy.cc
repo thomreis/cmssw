@@ -42,7 +42,7 @@ void EcalUncalibRecHitSoAToLegacy::fillDescriptions(edm::ConfigurationDescriptio
                              true) and
                          edm::ParameterDescription<std::string>("recHitsLabelCPUEE", "EcalUncalibRecHitsEE", true)) or
                    true >> edm::EmptyGroupDescription());
-  confDesc.add("ecalUncalibRecHitConvertPortable2CPUFormat", desc);
+  confDesc.add("ecalUncalibRecHitSoAToLegacy", desc);
 }
 
 EcalUncalibRecHitSoAToLegacy::EcalUncalibRecHitSoAToLegacy(edm::ParameterSet const &ps)
