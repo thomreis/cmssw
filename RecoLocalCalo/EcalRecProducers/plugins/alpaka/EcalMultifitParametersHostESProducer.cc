@@ -25,12 +25,31 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     std::unique_ptr<EcalMultifitParametersHost> produce(EcalMultifitParametersRcd const&);
 
   private:
-    edm::ParameterSet const pset_;
+    std::vector<float> ebTimeFitParameters_;
+    std::vector<float> eeTimeFitParameters_;
+    std::vector<float> ebAmplitudeFitParameters_;
+    std::vector<float> eeAmplitudeFitParameters_;
   };
 
   EcalMultifitParametersHostESProducer::EcalMultifitParametersHostESProducer(edm::ParameterSet const& iConfig)
-      : ESProducer(iConfig), pset_{iConfig} {
+      : ESProducer(iConfig) {
     setWhatProduced(this);
+
+    auto const ebTimeFitParamsFromPSet = iConfig.getParameter<std::vector<double>>("EBtimeFitParameters");
+    auto const eeTimeFitParamsFromPSet = iConfig.getParameter<std::vector<double>>("EEtimeFitParameters");
+    // Assert that there are as many parameters as the EcalMultiFitParametersSoA expects
+    assert(ebTimeFitParamsFromPSet.size() == kNTimeFitParams);
+    assert(eeTimeFitParamsFromPSet.size() == kNTimeFitParams);
+    ebTimeFitParameters_.assign(ebTimeFitParamsFromPSet.begin(), ebTimeFitParamsFromPSet.end());
+    eeTimeFitParameters_.assign(eeTimeFitParamsFromPSet.begin(), eeTimeFitParamsFromPSet.end());
+
+    auto const ebAmplFitParamsFromPSet = iConfig.getParameter<std::vector<double>>("EBamplitudeFitParameters");
+    auto const eeAmplFitParamsFromPSet = iConfig.getParameter<std::vector<double>>("EEamplitudeFitParameters");
+    // Assert that there are as many parameters as the EcalMultiFitParametersSoA expects
+    assert(ebAmplFitParamsFromPSet.size() == kNAmplitudeFitParams);
+    assert(eeAmplFitParamsFromPSet.size() == kNAmplitudeFitParams);
+    ebAmplitudeFitParameters_.assign(ebAmplFitParamsFromPSet.begin(), ebAmplFitParamsFromPSet.end());
+    eeAmplitudeFitParameters_.assign(eeAmplFitParamsFromPSet.begin(), eeAmplFitParamsFromPSet.end());
   }
 
   void EcalMultifitParametersHostESProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
@@ -64,27 +83,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     auto product = std::make_unique<EcalMultifitParametersHost>(sizeone, cms::alpakatools::host());
     auto view = product->view();
 
-    auto const ebTimeFitParamsFromPSet = pset_.getParameter<std::vector<double>>("EBtimeFitParameters");
-    auto const eeTimeFitParamsFromPSet = pset_.getParameter<std::vector<double>>("EEtimeFitParameters");
-    // Assert that there are as many parameters as the EcalMultiFitParametersSoA expects
-    assert(ebTimeFitParamsFromPSet.size() == kNTimeFitParams);
-    assert(eeTimeFitParamsFromPSet.size() == kNTimeFitParams);
-    std::vector<float> ebTimeFitParameters(ebTimeFitParamsFromPSet.begin(), ebTimeFitParamsFromPSet.end());
-    std::vector<float> eeTimeFitParameters(eeTimeFitParamsFromPSet.begin(), eeTimeFitParamsFromPSet.end());
-    std::memcpy(view.timeFitParamsEB().data(), ebTimeFitParameters.data(), sizeof(float) * kNTimeFitParams);
-    std::memcpy(view.timeFitParamsEE().data(), eeTimeFitParameters.data(), sizeof(float) * kNTimeFitParams);
+    std::memcpy(view.timeFitParamsEB().data(), ebTimeFitParameters_.data(), sizeof(float) * kNTimeFitParams);
+    std::memcpy(view.timeFitParamsEE().data(), eeTimeFitParameters_.data(), sizeof(float) * kNTimeFitParams);
 
-    auto const ebAmplFitParamsFromPSet = pset_.getParameter<std::vector<double>>("EBamplitudeFitParameters");
-    auto const eeAmplFitParamsFromPSet = pset_.getParameter<std::vector<double>>("EEamplitudeFitParameters");
-    // Assert that there are as many parameters as the EcalMultiFitParametersSoA expects
-    assert(ebAmplFitParamsFromPSet.size() == kNAmplitudeFitParams);
-    assert(eeAmplFitParamsFromPSet.size() == kNAmplitudeFitParams);
-    std::vector<float> ebAmplitudeFitParameters(ebAmplFitParamsFromPSet.begin(), ebAmplFitParamsFromPSet.end());
-    std::vector<float> eeAmplitudeFitParameters(eeAmplFitParamsFromPSet.begin(), eeAmplFitParamsFromPSet.end());
     std::memcpy(
-        view.amplitudeFitParamsEB().data(), ebAmplitudeFitParameters.data(), sizeof(float) * kNAmplitudeFitParams);
+        view.amplitudeFitParamsEB().data(), ebAmplitudeFitParameters_.data(), sizeof(float) * kNAmplitudeFitParams);
     std::memcpy(
-        view.amplitudeFitParamsEE().data(), eeAmplitudeFitParameters.data(), sizeof(float) * kNAmplitudeFitParams);
+        view.amplitudeFitParamsEE().data(), eeAmplitudeFitParameters_.data(), sizeof(float) * kNAmplitudeFitParams);
 
     return product;
   }
