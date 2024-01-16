@@ -11,10 +11,10 @@
 #include "FWCore/Utilities/interface/EDPutToken.h"
 #include "DataFormats/EcalRecHit/interface/EcalUncalibratedRecHitHostCollection.h"
 
-class EcalUncalibRecHitConvertPortable2CPUFormat : public edm::stream::EDProducer<> {
+class EcalUncalibRecHitSoAToLegacy : public edm::stream::EDProducer<> {
 public:
-  explicit EcalUncalibRecHitConvertPortable2CPUFormat(edm::ParameterSet const &ps);
-  ~EcalUncalibRecHitConvertPortable2CPUFormat() override;
+  explicit EcalUncalibRecHitSoAToLegacy(edm::ParameterSet const &ps);
+  ~EcalUncalibRecHitSoAToLegacy() override = default;
   static void fillDescriptions(edm::ConfigurationDescriptions &);
 
 private:
@@ -29,7 +29,7 @@ private:
   const edm::EDPutTokenT<EEUncalibratedRecHitCollection> uncalibRecHitsCPUEEToken_;
 };
 
-void EcalUncalibRecHitConvertPortable2CPUFormat::fillDescriptions(edm::ConfigurationDescriptions &confDesc) {
+void EcalUncalibRecHitSoAToLegacy::fillDescriptions(edm::ConfigurationDescriptions &confDesc) {
   edm::ParameterSetDescription desc;
 
   desc.add<edm::InputTag>("uncalibRecHitsPortableEB",
@@ -45,7 +45,7 @@ void EcalUncalibRecHitConvertPortable2CPUFormat::fillDescriptions(edm::Configura
   confDesc.add("ecalUncalibRecHitConvertPortable2CPUFormat", desc);
 }
 
-EcalUncalibRecHitConvertPortable2CPUFormat::EcalUncalibRecHitConvertPortable2CPUFormat(edm::ParameterSet const &ps)
+EcalUncalibRecHitSoAToLegacy::EcalUncalibRecHitSoAToLegacy(edm::ParameterSet const &ps)
     : isPhase2_{ps.getParameter<bool>("isPhase2")},
       uncalibRecHitsPortableEB_{consumes<InputProduct>(ps.getParameter<edm::InputTag>("uncalibRecHitsPortableEB"))},
       uncalibRecHitsPortableEE_{
@@ -57,9 +57,7 @@ EcalUncalibRecHitConvertPortable2CPUFormat::EcalUncalibRecHitConvertPortable2CPU
           isPhase2_ ? edm::EDPutTokenT<EEUncalibratedRecHitCollection>{}
                     : produces<EEUncalibratedRecHitCollection>(ps.getParameter<std::string>("recHitsLabelCPUEE"))} {}
 
-EcalUncalibRecHitConvertPortable2CPUFormat::~EcalUncalibRecHitConvertPortable2CPUFormat() {}
-
-void EcalUncalibRecHitConvertPortable2CPUFormat::produce(edm::Event &event, edm::EventSetup const &setup) {
+void EcalUncalibRecHitSoAToLegacy::produce(edm::Event &event, edm::EventSetup const &setup) {
   auto const &uncalRecHitsEBColl = event.get(uncalibRecHitsPortableEB_);
   auto const &uncalRecHitsEBCollView = uncalRecHitsEBColl.const_view();
   auto recHitsCPUEB = std::make_unique<EBUncalibratedRecHitCollection>();
@@ -80,6 +78,7 @@ void EcalUncalibRecHitConvertPortable2CPUFormat::produce(edm::Event &event, edm:
       (*recHitsCPUEB)[i].setOutOfTimeAmplitude(sample, uncalRecHitsEBCollView.outOfTimeAmplitudes()[i][sample]);
     }
   }
+  event.put(uncalibRecHitsCPUEBToken_, std::move(recHitsCPUEB));
 
   if (!isPhase2_) {
     auto const &uncalRecHitsEEColl = event.get(uncalibRecHitsPortableEE_);
@@ -101,7 +100,6 @@ void EcalUncalibRecHitConvertPortable2CPUFormat::produce(edm::Event &event, edm:
     }
     event.put(uncalibRecHitsCPUEEToken_, std::move(recHitsCPUEE));
   }
-  event.put(uncalibRecHitsCPUEBToken_, std::move(recHitsCPUEB));
 }
 
-DEFINE_FWK_MODULE(EcalUncalibRecHitConvertPortable2CPUFormat);
+DEFINE_FWK_MODULE(EcalUncalibRecHitSoAToLegacy);

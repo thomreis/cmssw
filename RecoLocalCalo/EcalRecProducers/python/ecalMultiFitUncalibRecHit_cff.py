@@ -89,10 +89,9 @@ ecalMultiFitUncalibRecHitPortable = _ecalUncalibRecHitProducerPortable.clone(
 )
 
 # replace the SwitchProducerCUDA branches with the module to convert the uncalibrated rechits from SoA to legacy format
-from RecoLocalCalo.EcalRecProducers.ecalUncalibRecHitConvertPortable2CPUFormat_cfi import ecalUncalibRecHitConvertPortable2CPUFormat as _ecalUncalibRecHitConvertPortable2CPUFormat
+from RecoLocalCalo.EcalRecProducers.ecalUncalibRecHitSoAToLegacy_cfi import ecalUncalibRecHitSoAToLegacy as _ecalUncalibRecHitSoAToLegacy
 alpaka.toModify(ecalMultiFitUncalibRecHit,
-    cpu = _ecalUncalibRecHitConvertPortable2CPUFormat.clone(),
-    cuda = _ecalUncalibRecHitConvertPortable2CPUFormat.clone()
+    cpu = _ecalUncalibRecHitSoAToLegacy.clone()
 )
 
 alpaka.toReplaceWith(ecalMultiFitUncalibRecHitTask, cms.Task(
