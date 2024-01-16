@@ -145,7 +145,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
                           scratch.sumAAsNullHypotDevBuf.value().data(),
                           totalChannels);
 
-      constexpr uint32_t nchannels_per_block_makeratio = 10;
+      constexpr uint32_t nchannels_per_block_makeratio = kMaxSamples;
       constexpr auto nthreads_per_channel =
           nchannels_per_block_makeratio * (nchannels_per_block_makeratio - 1) / 2;  // n(n-1)/2
       constexpr auto threads_makeratio = nthreads_per_channel * nchannels_per_block_makeratio;

@@ -16,14 +16,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit {
   using InputProduct = EcalDigiDeviceCollection;
   using OutputProduct = EcalUncalibratedRecHitDeviceCollection;
 
-  void entryPoint(Queue&,
-                  InputProduct const&,
-                  InputProduct const&,
-                  OutputProduct&,
-                  OutputProduct&,
-                  EcalMultifitConditionsDevice const&,
-                  EcalMultifitParametersDevice const&,
-                  ConfigurationParameters const&);
+  void entryPoint(Queue& queue,
+                  InputProduct const& digisDevEB,
+                  InputProduct const& digisDevEE,
+                  OutputProduct& uncalibRecHitsDevEB,
+                  OutputProduct& uncalibRecHitsDevEE,
+                  EcalMultifitConditionsDevice const& conditionsDev,
+                  EcalMultifitParametersDevice const& paramsDev,
+                  ConfigurationParameters const& configParams);
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::multifit
 
