@@ -4,3 +4,5 @@
 #include "DataFormats/EcalDigi/interface/alpaka/EcalDigiDeviceCollection.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiPhase2SoA.h"
 #include "DataFormats/EcalDigi/interface/alpaka/EcalDigiPhase2DeviceCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalSrFlagSoA.h"
+#include "DataFormats/EcalDigi/interface/alpaka/EcalSrFlagDeviceCollection.h"
