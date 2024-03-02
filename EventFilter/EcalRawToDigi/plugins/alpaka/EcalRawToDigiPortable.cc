@@ -1,6 +1,9 @@
 #include "CondFormats/DataRecord/interface/EcalMappingElectronicsRcd.h"
 #include "CondFormats/EcalObjects/interface/alpaka/EcalElectronicsMappingDevice.h"
+#include "DataFormats/EcalDetId/interface/EcalScDetId.h"
+#include "DataFormats/EcalDetId/interface/EcalTrigTowerDetId.h"
 #include "DataFormats/EcalDigi/interface/alpaka/EcalDigiDeviceCollection.h"
+#include "DataFormats/EcalDigi/interface/alpaka/EcalSrFlagDeviceCollection.h"
 #include "DataFormats/FEDRawData/interface/FEDRawDataCollection.h"
 #include "EventFilter/EcalRawToDigi/interface/DCCRawDataDefinitions.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
@@ -33,6 +36,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     using OutputProduct = EcalDigiDeviceCollection;
     device::EDPutToken<OutputProduct> digisDevEBToken_;
     device::EDPutToken<OutputProduct> digisDevEEToken_;
+    device::EDPutToken<EcalSrFlagDeviceCollection> srFlagsDevEBToken_;
+    device::EDPutToken<EcalSrFlagDeviceCollection> srFlagsDevEEToken_;
     device::ESGetToken<EcalElectronicsMappingDevice, EcalMappingElectronicsRcd> eMappingToken_;
 
     std::vector<int> fedsToUnpack_;
@@ -52,6 +57,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     desc.add<uint32_t>("maxChannelsEE", 14648);
     desc.add<std::string>("digisLabelEB", "ebDigis");
     desc.add<std::string>("digisLabelEE", "eeDigis");
+    desc.add<std::string>("srFlagsLabelEB", "ebSrFlags");
+    desc.add<std::string>("srFlagsLabelEE", "eeSrFlags");
 
     confDesc.addWithDefaultLabel(desc);
   }
@@ -60,6 +67,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       : rawDataToken_{consumes<FEDRawDataCollection>(ps.getParameter<edm::InputTag>("InputLabel"))},
         digisDevEBToken_{produces(ps.getParameter<std::string>("digisLabelEB"))},
         digisDevEEToken_{produces(ps.getParameter<std::string>("digisLabelEE"))},
+        srFlagsDevEBToken_{produces(ps.getParameter<std::string>("srFlagsLabelEB"))},
+        srFlagsDevEEToken_{produces(ps.getParameter<std::string>("srFlagsLabelEE"))},
         eMappingToken_{esConsumes()},
         fedsToUnpack_{ps.getParameter<std::vector<int>>("FEDs")} {
     config_.maxChannelsEB = ps.getParameter<uint32_t>("maxChannelsEB");
@@ -96,7 +105,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     // output device collections
     OutputProduct digisDevEB{static_cast<int32_t>(config_.maxChannelsEB), queue};
     OutputProduct digisDevEE{static_cast<int32_t>(config_.maxChannelsEE), queue};
-    // reset the size scalar of the SoA
+
+    // TODO check if number of SR flags is fixed in raw data format
+    EcalSrFlagDeviceCollection srFlagsDevEB{EcalTrigTowerDetId::kEBTotalTowers, queue};
+    EcalSrFlagDeviceCollection srFlagsDevEE{2 * EcalScDetId::SC_PER_EE_CNT, queue};
+
+    // reset the size scalar of the digi SoAs
     // memset takes an alpaka view that is created from the scalar in a view to the device collection
     auto digiViewEB = cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(queue), digisDevEB.view().size());
     auto digiViewEE = cms::alpakatools::make_device_view<uint32_t>(alpaka::getDev(queue), digisDevEE.view().size());
@@ -129,11 +143,21 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     // unpack if at least one FED has data
     if (fedCounter > 0) {
-      ecal::raw::unpackRaw(queue, inputHost, digisDevEB, digisDevEE, eMappingProduct, fedCounter, currentCummOffset);
+      ecal::raw::unpackRaw(queue,
+                           inputHost,
+                           digisDevEB,
+                           digisDevEE,
+                           srFlagsDevEB,
+                           srFlagsDevEE,
+                           eMappingProduct,
+                           fedCounter,
+                           currentCummOffset);
     }
 
     event.emplace(digisDevEBToken_, std::move(digisDevEB));
     event.emplace(digisDevEEToken_, std::move(digisDevEE));
+    event.emplace(srFlagsDevEBToken_, std::move(srFlagsDevEB));
+    event.emplace(srFlagsDevEEToken_, std::move(srFlagsDevEE));
   }
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
