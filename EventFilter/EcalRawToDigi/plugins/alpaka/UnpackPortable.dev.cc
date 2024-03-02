@@ -22,6 +22,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                                   int const* __restrict__ feds,
                                   EcalDigiDeviceCollection::View digisDevEB,
                                   EcalDigiDeviceCollection::View digisDevEE,
+                                  EcalSrFlagDeviceCollection::View srFlagsDevEB,
+                                  EcalSrFlagDeviceCollection::View srFlagsDevEE,
                                   EcalElectronicsMappingDevice::ConstView eid2did,
                                   uint32_t const nbytesTotal) const {
       constexpr auto kSampleSize = ecalPh1::sampleSize;
@@ -34,12 +36,15 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
       auto const offset = offsets[ifed];
       // fed id
       auto const fed = feds[ifed];
-      auto const isBarrel = is_barrel(static_cast<uint8_t>(fed - 600));
+      auto const dcc = fed2dcc(fed);
+      auto const isBarrel = is_barrel(dcc);
       // size
       auto const gridDim = alpaka::getWorkDiv<alpaka::Grid, alpaka::Blocks>(acc)[0u];
       auto const size = ifed == gridDim - 1 ? nbytesTotal - offset : offsets[ifed + 1] - offset;
       auto* samples = isBarrel ? digisDevEB.data()->data() : digisDevEE.data()->data();
       auto* ids = isBarrel ? digisDevEB.id() : digisDevEE.id();
+      auto* srs = isBarrel ? srFlagsDevEB.flag() : srFlagsDevEE.flag();
+      auto* srIds = isBarrel ? srFlagsDevEB.id() : srFlagsDevEE.id();
       auto* pChannelsCounter = isBarrel ? &digisDevEB.size() : &digisDevEE.size();
 
       // offset to the right raw buffer
@@ -80,9 +85,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
       uint8_t exp_ttids[NUMB_FE + 2];  // FE + 2 MEM blocks
       uint8_t ch = 1;
       uint8_t nCh = 0;
-      for (uint8_t i = 4; i < 9; ++i) {           // data words with channel status info
-        for (uint8_t j = 0; j < 14; ++j, ++ch) {  // channel status fields in one data word
-          const uint8_t shift = j * 4;            //each channel has 4 bits
+      for (uint8_t i = 4; i < HEADERLENGTH; ++i) {  // data words with channel status info
+        for (uint8_t j = 0; j < 14; ++j, ++ch) {    // channel status fields in one data word
+          const uint8_t shift = j * 4;              //each channel has 4 bits
           const int chStatus = (buffer[i] >> shift) & H_CHSTATUS_MASK;
           const bool regular = (chStatus == CH_DISABLED || chStatus == CH_SUPPRESS);
           const bool problematic =
@@ -96,10 +101,40 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
       }
 
       //
-      // print Tower block headers
+      // print block headers
       //
       uint8_t ntccblockwords = isBarrel ? 18 : 36;
-      auto const* tower_blocks_start = buffer + 9 + ntccblockwords + 6;
+
+      // selective readout block
+      auto const* srp_block = buffer + HEADERLENGTH + ntccblockwords;
+      auto const srp_header = *srp_block;
+      const uint8_t srp_id = srp_header & SRP_ID_MASK;
+      uint8_t n_sr_flags = (srp_header >> SRP_NFLAGS_B) & SRP_NFLAGS_MASK;
+      // handle the two jump DCCs
+      if (dcc == SECTOR_EEM_CCU_JUMP || dcc == SECTOR_EEP_CCU_JUMP) {
+        n_sr_flags += MAX_CCUID_JUMP - MIN_CCUID_JUMP + 1;
+      }
+      uint64_t word = 0;
+      for (uint8_t n = 0, i = 0; n < n_sr_flags; ++n) {
+        if (n % 16 == 0) {  // 16 SR flags per 64 bit word
+          word = *(++srp_block);
+        } else if (n % 4) {  // four 16 bit words containing four SR flags each
+          word >>= 16;
+        }
+        ElectronicsIdGPU eid{dcc,
+                             static_cast<uint8_t>(n + 1u),
+                             0,
+                             0};  // test: abuse ElectronicsIdGPU to store dcc and ccu (replacing a ttId)
+        const uint8_t flag = (word >> ((n - (n / 4) * 4) * 3)) & SRP_SRFLAG_MASK;
+        if (flag > 0) {
+          srs[i] = flag;
+          srIds[i] = eid.linearIndex();
+          ++i;
+        }
+      }
+
+      // tower block
+      auto const* tower_blocks_start = buffer + HEADERLENGTH + ntccblockwords + SRP_BLOCKLENGTH;
       auto const* trailer = buffer + (size / 8 - 1);
       auto const* current_tower_block = tower_blocks_start;
       uint8_t iCh = 0;
@@ -200,7 +235,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
             continue;
           }
 
-          ElectronicsIdGPU eid{fed2dcc(fed), ttid, stripid, xtalid};
+          ElectronicsIdGPU eid{dcc, ttid, stripid, xtalid};
           auto const didraw = isBarrel ? compute_ebdetid(eid) : eid2did[eid.linearIndex()].rawid();
           // skip channels with an invalid detid
           if (didraw == 0)
@@ -414,6 +449,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                  InputDataHost const& inputHost,
                  EcalDigiDeviceCollection& digisDevEB,
                  EcalDigiDeviceCollection& digisDevEE,
+                 EcalSrFlagDeviceCollection& srFlagsDevEB,
+                 EcalSrFlagDeviceCollection& srFlagsDevEE,
                  EcalElectronicsMappingDevice const& mapping,
                  uint32_t const nfedsWithData,
                  uint32_t const nbytesTotal) {
@@ -434,6 +471,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                         inputDevice.feds.data(),
                         digisDevEB.view(),
                         digisDevEE.view(),
+                        srFlagsDevEB.view(),
+                        srFlagsDevEE.view(),
                         mapping.const_view(),
                         nbytesTotal);
   }

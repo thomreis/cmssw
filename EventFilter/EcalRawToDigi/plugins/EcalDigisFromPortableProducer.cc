@@ -4,6 +4,7 @@
 #include "DataFormats/EcalDigi/interface/EcalConstants.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiHostCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalSrFlagHostCollection.h"
 #include "DataFormats/EcalRawData/interface/EcalRawDataCollections.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -33,16 +34,20 @@ private:
   edm::EDGetTokenT<InputProduct> digisInEBToken_;
   edm::EDGetTokenT<InputProduct> digisInEEToken_;
 
+  // input SR flag collections on host in SoA format
+  edm::EDGetTokenT<EcalSrFlagHostCollection> srFlagInEBToken_;
+  edm::EDGetTokenT<EcalSrFlagHostCollection> srFlagInEEToken_;
+
   // output digi collections in legacy format
   edm::EDPutTokenT<EBDigiCollection> digisOutEBToken_;
   edm::EDPutTokenT<EEDigiCollection> digisOutEEToken_;
 
+  // output SR flag collections in legacy format
+  edm::EDPutTokenT<EBSrFlagCollection> srFlagsOutEBToken_;
+  edm::EDPutTokenT<EESrFlagCollection> srFlagsOutEEToken_;
+
   // whether to produce dummy integrity collections
   bool produceDummyIntegrityCollections_;
-
-  // dummy producer collections
-  edm::EDPutTokenT<EBSrFlagCollection> ebSrFlagToken_;
-  edm::EDPutTokenT<EESrFlagCollection> eeSrFlagToken_;
 
   // dummy ECAL raw data collection
   edm::EDPutTokenT<EcalRawDataCollection> ecalRawDataToken_;
@@ -82,26 +87,28 @@ void EcalDigisFromPortableProducer::fillDescriptions(edm::ConfigurationDescripti
   desc.add<edm::InputTag>("digisInLabelEE", edm::InputTag{"ecalRawToDigiPortable", "eeDigis"});
   desc.add<std::string>("digisOutLabelEB", "ebDigis");
   desc.add<std::string>("digisOutLabelEE", "eeDigis");
+  desc.add<edm::InputTag>("srFlagInLabelEB", edm::InputTag{"ecalRawToDigiPortable", "ebSrFlags"});
+  desc.add<edm::InputTag>("srFlagInLabelEE", edm::InputTag{"ecalRawToDigiPortable", "eeSrFlags"});
   desc.add<bool>("produceDummyIntegrityCollections", false);
 
   confDesc.add("ecalDigisFromPortableProducer", desc);
 }
 
 EcalDigisFromPortableProducer::EcalDigisFromPortableProducer(const edm::ParameterSet& ps)
-    :  // input digi collections on host in SoA format
+    :  // input collections on host in SoA format
       digisInEBToken_{consumes(ps.getParameter<edm::InputTag>("digisInLabelEB"))},
       digisInEEToken_{consumes(ps.getParameter<edm::InputTag>("digisInLabelEE"))},
+      srFlagInEBToken_{consumes(ps.getParameter<edm::InputTag>("srFlagInLabelEB"))},
+      srFlagInEEToken_{consumes(ps.getParameter<edm::InputTag>("srFlagInLabelEE"))},
 
-      // output digi collections in legacy format
+      // output collections in legacy format
       digisOutEBToken_{produces<EBDigiCollection>(ps.getParameter<std::string>("digisOutLabelEB"))},
       digisOutEEToken_{produces<EEDigiCollection>(ps.getParameter<std::string>("digisOutLabelEE"))},
+      srFlagsOutEBToken_{produces<EBSrFlagCollection>()},
+      srFlagsOutEEToken_{produces<EESrFlagCollection>()},
 
       // whether to produce dummy integrity collections
       produceDummyIntegrityCollections_{ps.getParameter<bool>("produceDummyIntegrityCollections")},
-
-      // dummy collections
-      ebSrFlagToken_{dummyProduces<EBSrFlagCollection>()},
-      eeSrFlagToken_{dummyProduces<EESrFlagCollection>()},
 
       // dummy ECAL raw data collection
       ecalRawDataToken_{dummyProduces<EcalRawDataCollection>()},
@@ -136,7 +143,8 @@ EcalDigisFromPortableProducer::EcalDigisFromPortableProducer(const edm::Paramete
       ecalIntegrityMemGainErrorsToken_{dummyProduces<EcalElectronicsIdCollection>("EcalIntegrityMemGainErrors")} {}
 
 void EcalDigisFromPortableProducer::produce(edm::Event& event, edm::EventSetup const& setup) {
-  // output collections
+  ////////////////////////////////////////////////////////////////////////////
+  // digis
   auto digisEB = std::make_unique<EBDigiCollection>();
   auto digisEE = std::make_unique<EEDigiCollection>();
 
@@ -176,10 +184,39 @@ void EcalDigisFromPortableProducer::produce(edm::Event& event, edm::EventSetup c
   event.put(digisOutEBToken_, std::move(digisEB));
   event.put(digisOutEEToken_, std::move(digisEE));
 
+  ////////////////////////////////////////////////////////////////////////////
+  // SR flags
+  auto srFlagsEB = std::make_unique<EBSrFlagCollection>();
+  auto srFlagsEE = std::make_unique<EESrFlagCollection>();
+
+  auto const& srFlagEBSoAHostColl = event.get(srFlagInEBToken_);
+  auto const& srFlagEESoAHostColl = event.get(srFlagInEEToken_);
+  auto& srFlagEBSoAView = srFlagEBSoAHostColl.view();
+  auto& srFlagEESoAView = srFlagEESoAHostColl.view();
+
+  auto const srFlagEBSize = srFlagEBSoAView.size();
+  auto const srFlagEESize = srFlagEESoAView.size();
+
+  srFlagsEB->reserve(srFlagEBSize);
+  srFlagsEE->reserve(srFlagEESize);
+
+  for (size_t i = 0; i < srFlagEBSize; ++i) {
+    EcalTrigTowerDetId const tt(srFlagEBSoAView.id()[i]);
+    EBSrFlag const elem(tt, static_cast<int>(srFlagEBSoAView.flag()[i]));
+    srFlagsEB->push_back(elem);
+  }
+
+  for (size_t i = 0; i < srFlagEESize; ++i) {
+    EcalScDetId const scId(srFlagEESoAView.id()[i]);
+    EESrFlag const elem(scId, static_cast<int>(srFlagEESoAView.flag()[i]));
+    srFlagsEE->push_back(elem);
+  }
+
+  event.put(srFlagsOutEBToken_, std::move(srFlagsEB));
+  event.put(srFlagsOutEEToken_, std::move(srFlagsEE));
+
+  ////////////////////////////////////////////////////////////////////////////
   if (produceDummyIntegrityCollections_) {
-    // dummy collections
-    event.emplace(ebSrFlagToken_);
-    event.emplace(eeSrFlagToken_);
     // dummy ECAL raw data collection
     event.emplace(ecalRawDataToken_);
     // dummy integrity for xtal data
