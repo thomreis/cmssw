@@ -3,6 +3,7 @@
 
 #include "CondFormats/EcalObjects/interface/alpaka/EcalElectronicsMappingDevice.h"
 #include "DataFormats/EcalDigi/interface/alpaka/EcalDigiDeviceCollection.h"
+#include "DataFormats/EcalDigi/interface/alpaka/EcalSrFlagDeviceCollection.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/config.h"
 #include "DeclsForKernels.h"
 
@@ -12,6 +13,8 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                  InputDataHost const& inputHost,
                  EcalDigiDeviceCollection& digisDevEB,
                  EcalDigiDeviceCollection& digisDevEE,
+                 EcalSrFlagDeviceCollection& srFlagsDevEB,
+                 EcalSrFlagDeviceCollection& srFlagsDevEE,
                  EcalElectronicsMappingDevice const& mapping,
                  uint32_t const nfedsWithData,
                  uint32_t const nbytesTotal);
