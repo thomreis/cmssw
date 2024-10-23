@@ -102,6 +102,128 @@ def customizeHLTfor45063(process):
                     
     return process
             
+def customizeHLTforAlpakaEcalRecHitReco(process):
+    if hasattr(process, 'hltEcalRecHit'):
+        process.hltEcalRecHitSoA = cms.EDProducer("EcalRecHitProducerPortable@alpaka",
+            EBLaserMAX = cms.double(3),
+            EBLaserMIN = cms.double(0.5),
+            EELaserMAX = cms.double(8),
+            EELaserMIN = cms.double(0.5),
+            alpaka = cms.untracked.PSet(
+                backend = cms.untracked.string('')
+            ),
+            isPhase2 = cms.bool(False),
+            killDeadChannels = cms.bool(True),
+            mightGet = cms.optional.untracked.vstring,
+            recHitsLabelEB = cms.string('EcalRecHitsEB'),
+            recHitsLabelEE = cms.string('EcalRecHitsEE'),
+            recoverEBFE = cms.bool(False),
+            recoverEBIsolatedChannels = cms.bool(False),
+            recoverEBVFE = cms.bool(False),
+            recoverEEFE = cms.bool(False),
+            recoverEEIsolatedChannels = cms.bool(False),
+            recoverEEVFE = cms.bool(False),
+            uncalibrecHitsInLabelEB = cms.InputTag("hltEcalUncalibRecHitSoA","EcalUncalibRecHitsEB"),
+            uncalibrecHitsInLabelEE = cms.InputTag("hltEcalUncalibRecHitSoA","EcalUncalibRecHitsEE")
+        )
+
+        process.hltEcalRecHit = cms.EDProducer("EcalRecHitSoAToLegacy",
+            isPhase2 = cms.bool(False),
+            mightGet = cms.optional.untracked.vstring,
+            recHitsLabelCPUEB = cms.string('EcalRecHitsEB'),
+            recHitsLabelCPUEE = cms.string('EcalRecHitsEE'),
+            recHitsPortableEB = cms.InputTag("hltEcalRecHitSoA","EcalRecHitsEB"),
+            recHitsPortableEE = cms.InputTag("hltEcalRecHitSoA","EcalRecHitsEE")
+        )
+
+        if not process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerSequence.contains(process.hltEcalRecHitSoA):
+            process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerSequence.insert(-2, process.hltEcalRecHitSoA)
+
+    if hasattr(process, 'hltEcalRecHitSerialSync'):
+        process.hltEcalRecHitSoASerialSync = cms.EDProducer("alpaka_serial_sync::EcalRecHitProducerPortable",
+            EBLaserMAX = cms.double(3),
+            EBLaserMIN = cms.double(0.5),
+            EELaserMAX = cms.double(8),
+            EELaserMIN = cms.double(0.5),
+            alpaka = cms.untracked.PSet(
+                backend = cms.untracked.string('')
+            ),
+            isPhase2 = cms.bool(False),
+            killDeadChannels = cms.bool(True),
+            mightGet = cms.optional.untracked.vstring,
+            recHitsLabelEB = cms.string('EcalRecHitsEB'),
+            recHitsLabelEE = cms.string('EcalRecHitsEE'),
+            recoverEBFE = cms.bool(False),
+            recoverEBIsolatedChannels = cms.bool(False),
+            recoverEBVFE = cms.bool(False),
+            recoverEEFE = cms.bool(False),
+            recoverEEIsolatedChannels = cms.bool(False),
+            recoverEEVFE = cms.bool(False),
+            uncalibrecHitsInLabelEB = cms.InputTag("hltEcalUncalibRecHitSoASerialSync","EcalUncalibRecHitsEB"),
+            uncalibrecHitsInLabelEE = cms.InputTag("hltEcalUncalibRecHitSoASerialSync","EcalUncalibRecHitsEE")
+        )
+
+        process.hltEcalRecHitSerialSync = cms.EDProducer("EcalRecHitSoAToLegacy",
+            isPhase2 = cms.bool(False),
+            mightGet = cms.optional.untracked.vstring,
+            recHitsLabelCPUEB = cms.string('EcalRecHitsEB'),
+            recHitsLabelCPUEE = cms.string('EcalRecHitsEE'),
+            recHitsPortableEB = cms.InputTag("hltEcalRecHitSoASerialSync","EcalRecHitsEB"),
+            recHitsPortableEE = cms.InputTag("hltEcalRecHitSoASerialSync","EcalRecHitsEE")
+        )
+
+        if not process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerSequenceSerialSync.contains(process.hltEcalRecHitSoASerialSync):
+            process.HLTDoFullUnpackingEgammaEcalWithoutPreshowerSequenceSerialSync.insert(-2, process.hltEcalRecHitSoASerialSync)
+
+    if hasattr(process, 'hltEcalRecHit') or hasattr(process, 'hltEcalRecHitSerialSync'):
+        process.ecalRecHitConditionsHostESProducer = cms.ESProducer("EcalRecHitConditionsHostESProducer@alpaka",
+            alpaka = cms.untracked.PSet(
+                backend = cms.untracked.string('')
+            ),
+            appendToDataLabel = cms.string(''),
+            isPhase2 = cms.bool(False),
+            timeCalibTag = cms.ESInputTag("",""),
+            timeOffsetTag = cms.ESInputTag("","")
+        )
+
+        process.ecalRecHitParametersSource = cms.ESSource("EmptyESSource",
+            firstValid = cms.vuint32(1),
+            iovIsRunNotTime = cms.bool(True),
+            recordName = cms.string('EcalRecHitParametersRcd')
+        )
+
+        process.ecalRecHitParametersHostESProducer = cms.ESProducer("EcalRecHitParametersHostESProducer@alpaka",
+            ChannelStatusToBeExcluded = cms.vstring(),
+            alpaka = cms.untracked.PSet(
+                backend = cms.untracked.string('')
+            ),
+            appendToDataLabel = cms.string(''),
+            flagsMapDBReco = cms.PSet(
+                kDead = cms.vstring('kNoDataNoTP'),
+                kGood = cms.vstring(
+                    'kOk',
+                    'kDAC',
+                    'kNoLaser',
+                    'kNoisy'
+                ),
+                kNeighboursRecovered = cms.vstring(
+                    'kFixedG0',
+                    'kNonRespondingIsolated',
+                    'kDeadVFE'
+                ),
+                kNoisy = cms.vstring(
+                    'kNNoisy',
+                    'kFixedG6',
+                    'kFixedG1'
+                ),
+                kTowerRecovered = cms.vstring('kDeadFE')
+            )
+        )
+
+    if hasattr(process, 'hltEcalDetIdToBeRecovered'):
+        delattr(process, 'hltEcalDetIdToBeRecovered')
+
+    return process
 
 # CMSSW version specific customizations
 def customizeHLTforCMSSW(process, menuType="GRun"):
@@ -113,5 +235,6 @@ def customizeHLTforCMSSW(process, menuType="GRun"):
 
     process = customizeHLTfor44576(process)
     process = customizeHLTfor45063(process)
+    process = customizeHLTforAlpakaEcalRecHitReco(process)
 
     return process
