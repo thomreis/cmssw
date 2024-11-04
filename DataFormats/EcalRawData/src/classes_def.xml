@@ -36,4 +36,11 @@
    <class name="edm::StrictWeakOrdering<ESKCHIPBlock>" /> <!-- Root6 -->
    <class name="edm::Wrapper<edm::SortedCollection<ESKCHIPBlock,edm::StrictWeakOrdering<ESKCHIPBlock> > >" />
 
+  <class name="EcalDCCHeaderBlockSoA"/>
+  <class name="EcalDCCHeaderBlockSoA::View"/>
+  <class name="EcalDCCHeaderBlockHostCollection" ClassVersion="3">
+    <version ClassVersion="3" checksum="1257726360"/>
+  </class>
+  <class name="edm::Wrapper<EcalDCCHeaderBlockHostCollection>" splitLevel="0"/>
+
 </lcgdict>

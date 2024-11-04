@@ -1,6 +1,8 @@
 #include <vector>
 
 #include <DataFormats/EcalRawData/interface/EcalDCCHeaderBlock.h>
+#include <DataFormats/EcalRawData/interface/EcalDCCHeaderBlockHostCollection.h>
+#include <DataFormats/EcalRawData/interface/EcalDCCHeaderBlockSoA.h>
 #include <DataFormats/EcalRawData/interface/EcalRawDataCollections.h>
 #include <DataFormats/EcalRawData/interface/EcalListOfFEDS.h>
 #include <DataFormats/EcalRawData/interface/ESListOfFEDS.h>
