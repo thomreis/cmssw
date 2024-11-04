@@ -60,4 +60,12 @@
   <class name="edm::Wrapper<edm::EDCollection<EcalScDetId> >" id="364d0ca9-8daa-4baf-8203-9d86881b51ff"/>
   <class name="edm::Wrapper<edm::EDCollection<EcalElectronicsId> >" id="1CCDC3B0-D381-60A8-E3B1-B75C4D0F6802"/>
   <class name="edm::Wrapper<edm::EDCollection<EcalTriggerElectronicsId> >" id="D9FCAC56-29E2-54B9-2F75-EDC0D2E534F0"/>
+
+  <class name="EcalIdSoA"/>
+  <class name="EcalIdSoA::View"/>
+  <class name="EcalIdHostCollection" ClassVersion="3">
+    <version ClassVersion="3" checksum="433710284"/>
+  </class>
+  <class name="edm::Wrapper<EcalIdHostCollection>" splitLevel="0"/>
+
 </lcgdict>

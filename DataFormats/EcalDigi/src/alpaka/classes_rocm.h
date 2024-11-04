@@ -6,3 +6,7 @@
 #include "DataFormats/EcalDigi/interface/alpaka/EcalDigiPhase2DeviceCollection.h"
 #include "DataFormats/EcalDigi/interface/EcalSrFlagSoA.h"
 #include "DataFormats/EcalDigi/interface/alpaka/EcalSrFlagDeviceCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalPseudoStripInputDigiSoA.h"
+#include "DataFormats/EcalDigi/interface/alpaka/EcalPseudoStripInputDigiDeviceCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalTriggerPrimitiveDigiSoA.h"
+#include "DataFormats/EcalDigi/interface/alpaka/EcalTriggerPrimitiveDigiDeviceCollection.h"

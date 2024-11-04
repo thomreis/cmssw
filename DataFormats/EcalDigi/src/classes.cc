@@ -1,6 +1,14 @@
 #include "DataFormats/EcalDigi/interface/EcalDigiHostCollection.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiPhase2HostCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalPnDiodeDigiHostCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalPseudoStripInputDigiHostCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalSrFlagHostCollection.h"
+#include "DataFormats/EcalDigi/interface/EcalTriggerPrimitiveDigiHostCollection.h"
 #include "DataFormats/Portable/interface/PortableHostCollectionReadRules.h"
 
 SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalDigiHostCollection);
 SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalDigiPhase2HostCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalPnDiodeDigiHostCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalPseudoStripInputDigiHostCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalSrFlagHostCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(EcalTriggerPrimitiveDigiHostCollection);
