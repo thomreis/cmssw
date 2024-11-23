@@ -21,8 +21,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
   ALPAKA_STATIC_ACC_MEM_CONSTANT constexpr float ip10[] = {
       1.e5f, 1.e4f, 1.e3f, 1.e2f, 1.e1f, 1.e0f, 1.e-1f, 1.e-2f, 1.e-3f, 1.e-4};
 
-  ALPAKA_FN_ACC ALPAKA_FN_INLINE bool checkUncalibRecHitFlag(uint32_t const& flags,
-                                                             EcalUncalibratedRecHit::Flags flag) {
+  ALPAKA_FN_ACC ALPAKA_FN_INLINE bool checkUncalibRecHitFlag(uint32_t const flags, EcalUncalibratedRecHit::Flags flag) {
     return flags & (0x1 << flag);
   }
 
@@ -345,14 +344,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                                   EcalRecHitParametersDevice::ConstView parametersDev,
                                   // time, used for time dependent corrections
                                   edm::TimeValue_t const& eventTime,
-                                  // configuration
-                                  bool const killDeadChannels,
-                                  bool const recoverIsolatedChannels,
-                                  bool const recoverVFE,
-                                  bool const recoverFE,
-                                  float const laserMIN,
-                                  float const laserMAX,
-                                  uint32_t flagmask) const {
+                                  ConfigurationParameters const& configParams) const {
       auto const nchannels = uncalibRecHits.size();
 
       for (auto ch : cms::alpakatools::uniform_elements(acc, nchannels)) {
@@ -378,13 +370,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                    parametersDev,
                    eventTime,
                    true,
-                   killDeadChannels,
-                   recoverIsolatedChannels,
-                   recoverVFE,
-                   recoverFE,
-                   laserMIN,
-                   laserMAX,
-                   flagmask);
+                   configParams.killDeadChannels,
+                   configParams.recoverEBIsolatedChannels,
+                   configParams.recoverEBVFE,
+                   configParams.recoverEBFE,
+                   configParams.EBLaserMIN,
+                   configParams.EBLaserMAX,
+                   configParams.flagmask);
 
       }  // end channel
     }
@@ -402,19 +394,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                                   EcalRecHitParametersDevice::ConstView parametersDev,
                                   // time, used for time dependent corrections
                                   edm::TimeValue_t const& eventTime,
-                                  // configuration
-                                  bool const killDeadChannels,
-                                  bool const recoverEBIsolatedChannels,
-                                  bool const recoverEEIsolatedChannels,
-                                  bool const recoverEBVFE,
-                                  bool const recoverEEVFE,
-                                  bool const recoverEBFE,
-                                  bool const recoverEEFE,
-                                  float const EBLaserMIN,
-                                  float const EELaserMIN,
-                                  float const EBLaserMAX,
-                                  float const EELaserMAX,
-                                  uint32_t flagmask) const {
+                                  ConfigurationParameters const& configParams) const {
       auto const nchannelsEB = ebUncalibRecHits.size();
       auto const nchannelsEE = eeUncalibRecHits.size();
       auto const nchannels = nchannelsEB + nchannelsEE;
@@ -446,11 +426,12 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
         auto* flagBits = isEndcap ? eeRecHits.flagBits() : ebRecHits.flagBits();
         auto* extra = isEndcap ? eeRecHits.extra() : ebRecHits.extra();
 
-        bool const recoverIsolatedChannels = isEndcap ? recoverEEIsolatedChannels : recoverEBIsolatedChannels;
-        bool const recoverVFE = isEndcap ? recoverEEVFE : recoverEBVFE;
-        bool const recoverFE = isEndcap ? recoverEEFE : recoverEBFE;
-        float const laserMIN = isEndcap ? EELaserMIN : EBLaserMIN;
-        float const laserMAX = isEndcap ? EELaserMAX : EBLaserMAX;
+        bool const recoverIsolatedChannels =
+            isEndcap ? configParams.recoverEEIsolatedChannels : configParams.recoverEBIsolatedChannels;
+        bool const recoverVFE = isEndcap ? configParams.recoverEEVFE : configParams.recoverEBVFE;
+        bool const recoverFE = isEndcap ? configParams.recoverEEFE : configParams.recoverEBFE;
+        float const laserMIN = isEndcap ? configParams.EELaserMIN : configParams.EBLaserMIN;
+        float const laserMAX = isEndcap ? configParams.EELaserMAX : configParams.EBLaserMAX;
 
         makeRecHit(inputCh,
                    didCh,
@@ -469,13 +450,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                    parametersDev,
                    eventTime,
                    false,
-                   killDeadChannels,
+                   configParams.killDeadChannels,
                    recoverIsolatedChannels,
                    recoverVFE,
                    recoverFE,
                    laserMIN,
                    laserMAX,
-                   flagmask);
+                   configParams.flagmask);
 
       }  // end channel
     }

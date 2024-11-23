@@ -14,10 +14,10 @@
 #include "HeterogeneousCore/AlpakaInterface/interface/memory.h"
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {
-  class EcalRecHitParametersHostESProducer : public ESProducer {
+  class EcalRecHitParametersESProducer : public ESProducer {
   public:
-    EcalRecHitParametersHostESProducer(edm::ParameterSet const&);
-    ~EcalRecHitParametersHostESProducer() override = default;
+    EcalRecHitParametersESProducer(edm::ParameterSet const&);
+    ~EcalRecHitParametersESProducer() override = default;
 
     static void fillDescriptions(edm::ConfigurationDescriptions&);
     std::unique_ptr<EcalRecHitParametersHost> produce(EcalRecHitParametersRcd const&);
@@ -27,7 +27,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     RecoFlagBitsArray recoFlagBitsArray_;
   };
 
-  EcalRecHitParametersHostESProducer::EcalRecHitParametersHostESProducer(edm::ParameterSet const& iConfig)
+  EcalRecHitParametersESProducer::EcalRecHitParametersESProducer(edm::ParameterSet const& iConfig)
       : ESProducer(iConfig), recoFlagBitsArray_() {
     setWhatProduced(this);
 
@@ -52,7 +52,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     }
   }
 
-  void EcalRecHitParametersHostESProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  void EcalRecHitParametersESProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     edm::ParameterSetDescription desc;
     // channel statuses to be exluded from reconstruction
     desc.add<std::vector<std::string>>("ChannelStatusToBeExcluded",
@@ -79,7 +79,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     descriptions.addWithDefaultLabel(desc);
   }
 
-  std::unique_ptr<EcalRecHitParametersHost> EcalRecHitParametersHostESProducer::produce(
+  std::unique_ptr<EcalRecHitParametersHost> EcalRecHitParametersESProducer::produce(
       EcalRecHitParametersRcd const& iRecord) {
     size_t const sizeone = 1;
     auto product = std::make_unique<EcalRecHitParametersHost>(sizeone, cms::alpakatools::host());
@@ -94,4 +94,4 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
 
-DEFINE_FWK_EVENTSETUP_ALPAKA_MODULE(EcalRecHitParametersHostESProducer);
+DEFINE_FWK_EVENTSETUP_ALPAKA_MODULE(EcalRecHitParametersESProducer);

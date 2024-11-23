@@ -46,19 +46,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                           conditionsDev.const_view(),
                           parametersDev.const_view(),
                           eventTime,
-                          // configuration
-                          configParams.killDeadChannels,
-                          configParams.recoverEBIsolatedChannels,
-                          configParams.recoverEEIsolatedChannels,
-                          configParams.recoverEBVFE,
-                          configParams.recoverEEVFE,
-                          configParams.recoverEBFE,
-                          configParams.recoverEEFE,
-                          configParams.EBLaserMIN,
-                          configParams.EELaserMIN,
-                          configParams.EBLaserMAX,
-                          configParams.EELaserMAX,
-                          configParams.flagmask);
+                          configParams);
     } else {
       alpaka::exec<Acc1D>(queue,
                           workDiv,
@@ -68,14 +56,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                           conditionsDev.const_view(),
                           parametersDev.const_view(),
                           eventTime,
-                          // configuration
-                          configParams.killDeadChannels,
-                          configParams.recoverEBIsolatedChannels,
-                          configParams.recoverEBVFE,
-                          configParams.recoverEBFE,
-                          configParams.EBLaserMIN,
-                          configParams.EBLaserMAX,
-                          configParams.flagmask);
+                          configParams);
     }
   }
 
