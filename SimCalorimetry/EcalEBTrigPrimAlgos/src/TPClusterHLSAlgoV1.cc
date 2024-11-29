@@ -17,7 +17,7 @@
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalBcpPayloadParamsHelper.h"
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/TPClusterHLSAlgoV1.h"
 
-using namespace ecalph2::hls::bcpswisscross;
+using namespace ecalph2::bcpswisscross;
 
 ecalph2::TPClusterHLSAlgoV1::TPClusterHLSAlgoV1(const std::shared_ptr<ecalph2::EcalBcpPayloadParamsHelper> ecalBcpPayloadParamsHelper) : TPClusterAlgo(ecalBcpPayloadParamsHelper)
 {
@@ -29,7 +29,7 @@ void ecalph2::TPClusterHLSAlgoV1::processEvent(const EcalEBTrigPrimDigiCollectio
   std::cout << "This TP collection has size: " << ebTPs.size() << std::endl;
 
   // Since one FPGA handles 300 channels
-  // (ecalph2::hls::bcpswisscross::nchannels_eta * ecalph2::hls::bcpswisscross::nchannels_phi)
+  // (ecalph2::bcpswisscross::nchannels_eta * ecalph2::bcpswisscross::nchannels_phi)
   // the HLS swissCross function expects TPs from as many channels.
   // In addition TPs from the surrounding FPGAs are expected as well.
   std::array<std::array<input::indata, nchannels_phi>, nchannels_eta> data;
