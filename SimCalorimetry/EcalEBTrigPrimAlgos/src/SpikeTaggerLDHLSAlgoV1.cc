@@ -17,7 +17,7 @@
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalBcpPayloadParamsHelper.h"
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/SpikeTaggerLDHLSAlgoV1.h"
 
-using namespace ecalph2::hls::bcpspiketagger;
+using namespace ecalph2::bcpspiketagger;
 
 ecalph2::SpikeTaggerLDHLSAlgoV1::SpikeTaggerLDHLSAlgoV1(const std::shared_ptr<ecalph2::EcalBcpPayloadParamsHelper> ecalBcpPayloadParamsHelper, const edm::EventSetup &eventSetup) : SpikeTaggerLDAlgo(ecalBcpPayloadParamsHelper, eventSetup)
 {
@@ -34,7 +34,7 @@ void ecalph2::SpikeTaggerLDHLSAlgoV1::processEvent(const EBDigiCollection &ebDig
     std::cout << "This frame has size: " << ebDigis.size() << std::endl;
   }
 
-  // Since one FPGA handles 300 channels (ecalph2::hls::bcpspiketagger::nchannels)
+  // Since one FPGA handles 300 channels (ecalph2::bcpspiketagger::nchannels)
   // the HLS findSpikes function expects samples from as many channels each
   // clock cycle. Three arrays are filled with samples from channels as they
   // are in the ebDigis and once 300 channels are reached the findSpikes function is called.
