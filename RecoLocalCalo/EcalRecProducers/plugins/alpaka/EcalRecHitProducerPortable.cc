@@ -1,5 +1,4 @@
 #include "CondFormats/DataRecord/interface/EcalRecHitConditionsRcd.h"
-#include "CondFormats/DataRecord/interface/EcalRecHitParametersRcd.h"
 #include "CondFormats/EcalObjects/interface/alpaka/EcalRecHitConditionsDevice.h"
 #include "CondFormats/EcalObjects/interface/alpaka/EcalRecHitParametersDevice.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHit.h"
@@ -15,6 +14,7 @@
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/Event.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/EventSetup.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/stream/EDProducer.h"
+#include "HeterogeneousCore/CUDACore/interface/JobConfigurationGPURecord.h"
 
 #include "DeclsForKernels.h"
 #include "EcalRecHitBuilder.h"
@@ -45,7 +45,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     // conditions tokens
     const device::ESGetToken<EcalRecHitConditionsDevice, EcalRecHitConditionsRcd> recHitConditionsToken_;
-    const device::ESGetToken<EcalRecHitParametersDevice, EcalRecHitParametersRcd> recHitParametersToken_;
+    const device::ESGetToken<EcalRecHitParametersDevice, JobConfigurationGPURecord> recHitParametersToken_;
   };
 
   void EcalRecHitProducerPortable::fillDescriptions(edm::ConfigurationDescriptions& confDesc) {

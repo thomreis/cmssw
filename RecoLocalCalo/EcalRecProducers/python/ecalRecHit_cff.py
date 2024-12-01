@@ -77,7 +77,7 @@ from RecoLocalCalo.EcalRecProducers.ecalRecHitConditionsESProducer_cfi import ec
 from RecoLocalCalo.EcalRecProducers.ecalRecHitParametersESProducer_cfi import ecalRecHitParametersESProducer
 
 ecalRecHitParametersSource = cms.ESSource("EmptyESSource",
-    recordName = cms.string('EcalRecHitParametersRcd'),
+    recordName = cms.string('JobConfigurationGPURecord'),
     iovIsRunNotTime = cms.bool(True),
     firstValid = cms.vuint32(1)
 )

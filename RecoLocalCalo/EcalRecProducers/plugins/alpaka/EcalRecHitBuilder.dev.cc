@@ -24,7 +24,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
                           ConfigurationParameters const& configParams,
                           bool const isPhase2) {
     auto nchannels = static_cast<uint32_t>(ebUncalibRecHits->const_view().metadata().size());
-    if (!isPhase2 && eeUncalibRecHits != nullptr) {
+    if (!isPhase2) {
       nchannels += static_cast<uint32_t>(eeUncalibRecHits->const_view().metadata().size());
     }
 
@@ -35,7 +35,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::rechit {
     auto constexpr threads = nchannels_per_block;
     auto const blocks = cms::alpakatools::divide_up_by(nchannels, threads);
     auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(blocks, threads);
-    if (!isPhase2 && eeUncalibRecHits != nullptr) {
+    if (!isPhase2) {
       alpaka::exec<Acc1D>(queue,
                           workDiv,
                           KernelCreateEcalRechit{},
