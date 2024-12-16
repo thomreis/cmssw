@@ -1,5 +1,5 @@
-#ifndef DataFormats_EcalDigi_interface_alpaka_EcalIdDeviceCollection_h
-#define DataFormats_EcalDigi_interface_alpaka_EcalIdDeviceCollection_h
+#ifndef DataFormats_EcalDetId_interface_alpaka_EcalIdDeviceCollection_h
+#define DataFormats_EcalDetId_interface_alpaka_EcalIdDeviceCollection_h
 
 #include "DataFormats/Portable/interface/alpaka/PortableCollection.h"
 #include "DataFormats/EcalDetId/interface/EcalIdSoA.h"

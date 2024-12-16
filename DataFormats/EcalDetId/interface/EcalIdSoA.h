@@ -3,9 +3,7 @@
 
 #include "DataFormats/SoATemplate/interface/SoALayout.h"
 
-GENERATE_SOA_LAYOUT(EcalIdSoALayout,
-                    SOA_COLUMN(uint32_t, id),
-                    SOA_SCALAR(uint32_t, size))
+GENERATE_SOA_LAYOUT(EcalIdSoALayout, SOA_COLUMN(uint32_t, id), SOA_SCALAR(uint32_t, size))
 
 using EcalIdSoA = EcalIdSoALayout<>;
 

@@ -14,26 +14,46 @@ namespace ecaldqm {
       : DQWorkerTask(),
         runGpuTask_(false),
         enableDigi_(false),
+        enableSrFlag_(false),
+        enableTpDigi_(false),
         enableUncalib_(false),
         enableRecHit_(false),
         digi1D_(false),
         digi2D_(false),
+        srFlag1D_(false),
+        srFlag2D_(false),
+        tpDigi1D_(false),
+        tpDigi2D_(false),
         uncalib1D_(false),
         uncalib2D_(false),
         rechit1D_(false),
         rechit2D_(false),
         EBCpuDigis_(nullptr),
         EECpuDigis_(nullptr),
+        EBCpuSrFlags_(nullptr),
+        EECpuSrFlags_(nullptr),
+        CpuTpDigis_(nullptr),
         EBCpuUncalibRecHits_(nullptr),
         EECpuUncalibRecHits_(nullptr),
         EBCpuRecHits_(nullptr),
-        EECpuRecHits_(nullptr) {}
+        EECpuRecHits_(nullptr),
+        cpuTpDigisSizeEB_(0),
+        cpuTpDigisSizeEE_(0) {}
 
   void GpuTask::addDependencies(DependencySet& dependencies) {
     // Ensure we run on CPU objects before GPU objects
     if (enableDigi_) {
       dependencies.push_back(Dependency(kEBGpuDigi, kEBCpuDigi));
       dependencies.push_back(Dependency(kEEGpuDigi, kEECpuDigi));
+    }
+
+    if (enableSrFlag_) {
+      dependencies.push_back(Dependency(kEBGpuSrFlag, kEBCpuSrFlag));
+      dependencies.push_back(Dependency(kEEGpuSrFlag, kEECpuSrFlag));
+    }
+
+    if (enableTpDigi_) {
+      dependencies.push_back(Dependency(kGpuTpDigi, kCpuTpDigi));
     }
 
     if (enableUncalib_) {
@@ -52,12 +72,18 @@ namespace ecaldqm {
 
     // Enabling objects set to false if runGpuTask_ is false
     enableDigi_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableDigi");
+    enableSrFlag_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableSrFlag");
+    enableTpDigi_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableTpDigi");
     enableUncalib_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableUncalib");
     enableRecHit_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableRecHit");
 
     // Flags set to false if corresponding type is not enabled
     digi1D_ = enableDigi_ && params.getUntrackedParameter<bool>("digi1D");
     digi2D_ = enableDigi_ && params.getUntrackedParameter<bool>("digi2D");
+    srFlag1D_ = enableSrFlag_ && params.getUntrackedParameter<bool>("srFlag1D");
+    srFlag2D_ = enableSrFlag_ && params.getUntrackedParameter<bool>("srFlag2D");
+    tpDigi1D_ = enableTpDigi_ && params.getUntrackedParameter<bool>("tpDigi1D");
+    tpDigi2D_ = enableTpDigi_ && params.getUntrackedParameter<bool>("tpDigi2D");
     uncalib1D_ = enableUncalib_ && params.getUntrackedParameter<bool>("uncalib1D");
     uncalib2D_ = enableUncalib_ && params.getUntrackedParameter<bool>("uncalib2D");
     rechit1D_ = enableRecHit_ && params.getUntrackedParameter<bool>("rechit1D");
@@ -70,6 +96,18 @@ namespace ecaldqm {
       MEs_.erase(std::string("DigiCpuAmplitude"));
       MEs_.erase(std::string("DigiGpuCpu"));
       MEs_.erase(std::string("DigiGpuCpuAmplitude"));
+    }
+    if (!enableSrFlag_) {
+      MEs_.erase(std::string("SrFlagCpu"));
+      MEs_.erase(std::string("SrFlagCpuValue"));
+      MEs_.erase(std::string("SrFlagGpuCpu"));
+      MEs_.erase(std::string("SrFlagGpuCpuValue"));
+    }
+    if (!enableTpDigi_) {
+      MEs_.erase(std::string("TpDigiCpu"));
+      MEs_.erase(std::string("TpDigiCpuSample"));
+      MEs_.erase(std::string("TpDigiGpuCpu"));
+      MEs_.erase(std::string("TpDigiGpuCpuSample"));
     }
     if (!enableUncalib_) {
       MEs_.erase(std::string("UncalibCpu"));
@@ -113,6 +151,14 @@ namespace ecaldqm {
       MEs_.erase(std::string("DigiGpu"));
       MEs_.erase(std::string("DigiGpuAmplitude"));
     }
+    if (!srFlag1D_) {
+      MEs_.erase(std::string("SrFlagGpu"));
+      MEs_.erase(std::string("SrFlagGpuValue"));
+    }
+    if (!tpDigi1D_) {
+      MEs_.erase(std::string("TpDigiGpu"));
+      MEs_.erase(std::string("TpDigiGpuSample"));
+    }
     if (!uncalib1D_) {
       MEs_.erase(std::string("UncalibGpu"));
       MEs_.erase(std::string("UncalibGpuAmp"));
@@ -137,6 +183,14 @@ namespace ecaldqm {
     if (!digi2D_) {
       MEs_.erase(std::string("Digi2D"));
       MEs_.erase(std::string("Digi2DAmplitude"));
+    }
+    if (!srFlag2D_) {
+      MEs_.erase(std::string("SrFlag2D"));
+      MEs_.erase(std::string("SrFlag2DValue"));
+    }
+    if (!tpDigi2D_) {
+      MEs_.erase(std::string("TpDigi2D"));
+      MEs_.erase(std::string("TpDigi2DSample"));
     }
     if (!uncalib2D_) {
       MEs_.erase(std::string("Uncalib2D"));
@@ -175,10 +229,15 @@ namespace ecaldqm {
   void GpuTask::beginEvent(edm::Event const&, edm::EventSetup const&, bool const&, bool&) {
     EBCpuDigis_ = nullptr;
     EECpuDigis_ = nullptr;
+    EBCpuSrFlags_ = nullptr;
+    EECpuSrFlags_ = nullptr;
+    CpuTpDigis_ = nullptr;
     EBCpuUncalibRecHits_ = nullptr;
     EECpuUncalibRecHits_ = nullptr;
     EBCpuRecHits_ = nullptr;
     EECpuRecHits_ = nullptr;
+    cpuTpDigisSizeEB_ = 0;
+    cpuTpDigisSizeEE_ = 0;
   }
 
   template <typename DigiCollection>
@@ -287,6 +346,194 @@ namespace ecaldqm {
           meDigi2DAmplitude.fill(getEcalDQMSetupObjects(), iSubdet, cpuAmp, gpuAmp);
         }
       }
+    }
+  }
+
+  template <typename SrFlagCollection>
+  void GpuTask::runOnCpuSrFlags(SrFlagCollection const& cpuSrFlags, Collections collection) {
+    MESet& meSrFlagCpu(MEs_.at("SrFlagCpu"));
+    MESet& meSrFlagCpuValue(MEs_.at("SrFlagCpuValue"));
+
+    int iSubdet(collection == kEBCpuSrFlag ? EcalBarrel : EcalEndcap);
+
+    // Save CpuSrFlags for comparison with GpuSrFlags
+    // "if constexpr" ensures cpuSrFlags is the correct type at compile time
+    if constexpr (std::is_same_v<SrFlagCollection, EBSrFlagCollection>) {
+      assert(iSubdet == EcalBarrel);
+      EBCpuSrFlags_ = &cpuSrFlags;
+    } else {
+      assert(iSubdet == EcalEndcap);
+      EECpuSrFlags_ = &cpuSrFlags;
+    }
+
+    unsigned nCpuSrFlags(cpuSrFlags.size());
+    meSrFlagCpu.fill(getEcalDQMSetupObjects(), iSubdet, nCpuSrFlags);
+
+    for (auto const& cpuSrFlag : cpuSrFlags) {
+      meSrFlagCpuValue.fill(getEcalDQMSetupObjects(), iSubdet, cpuSrFlag.value());
+    }
+  }
+
+  template <typename SrFlagCollection>
+  void GpuTask::runOnGpuSrFlags(SrFlagCollection const& gpuSrFlags, Collections collection) {
+    MESet& meSrFlagGpuCpu(MEs_.at("SrFlagGpuCpu"));
+    MESet& meSrFlagGpuCpuValue(MEs_.at("SrFlagGpuCpuValue"));
+
+    int iSubdet(collection == kEBGpuSrFlag ? EcalBarrel : EcalEndcap);
+
+    // Get CpuSrFlags saved from GpuTask::runOnCpuSrFlags() for this event
+    // "if constexpr" ensures cpuSrFlags is the correct type at compile time
+    // Note: gpuSrFlags is a collection and cpuSrFlags is a pointer to a collection (for historical reasons)
+    SrFlagCollection const* cpuSrFlags;
+    if constexpr (std::is_same_v<SrFlagCollection, EBSrFlagCollection>) {
+      assert(iSubdet == EcalBarrel);
+      cpuSrFlags = EBCpuSrFlags_;
+    } else {
+      assert(iSubdet == EcalEndcap);
+      cpuSrFlags = EECpuSrFlags_;
+    }
+
+    if (!cpuSrFlags) {
+      edm::LogWarning("EcalDQM") << "GpuTask: Did not find " << ((iSubdet == EcalBarrel) ? "EB" : "EE")
+                                 << "CpuSrFlags Collection. Aborting runOnGpuSrFlags\n";
+      return;
+    }
+
+    auto const nGpuSrFlags(gpuSrFlags.size());
+    auto const nCpuSrFlags(cpuSrFlags->size());
+
+    meSrFlagGpuCpu.fill(getEcalDQMSetupObjects(), iSubdet, nGpuSrFlags - nCpuSrFlags);
+
+    if (srFlag1D_) {
+      MESet& meSrFlagGpu(MEs_.at("SrFlagGpu"));
+      meSrFlagGpu.fill(getEcalDQMSetupObjects(), iSubdet, nGpuSrFlags);
+    }
+
+    if (digi2D_) {
+      MESet& meSrFlag2D(MEs_.at("SrFlag2D"));
+      meSrFlag2D.fill(getEcalDQMSetupObjects(), iSubdet, nCpuSrFlags, nGpuSrFlags);
+    }
+
+    for (auto const& gpuSrFlag : gpuSrFlags) {
+      // Find CpuSrFlag with matching DetId
+      DetId gpuId(gpuSrFlag.id());
+      typename SrFlagCollection::const_iterator cpuItr(cpuSrFlags->find(gpuId));
+      if (cpuItr == cpuSrFlags->end()) {
+        edm::LogWarning("EcalDQM") << "GpuTask: Did not find CpuSrFlag DetId " << gpuId.rawId()
+                                   << " in CPU collection\n";
+        continue;
+      }
+
+      auto const gpuValue = gpuSrFlag.value();
+      auto const cpuValue = cpuItr->value();
+
+      meSrFlagGpuCpuValue.fill(getEcalDQMSetupObjects(), iSubdet, gpuValue - cpuValue);
+
+      if (srFlag1D_) {
+        MESet& meSrFlagGpuValue(MEs_.at("SrFlagGpuValue"));
+        meSrFlagGpuValue.fill(getEcalDQMSetupObjects(), iSubdet, gpuValue);
+      }
+
+      if (srFlag2D_) {
+        MESet& meSrFlag2DValue(MEs_.at("SrFlag2DValue"));
+        meSrFlag2DValue.fill(getEcalDQMSetupObjects(), iSubdet, cpuValue, gpuValue);
+      }
+    }
+  }
+
+  void GpuTask::runOnCpuTpDigis(EcalTrigPrimDigiCollection const& cpuTpDigis, Collections collection) {
+    MESet& meTpDigiCpu(MEs_.at("TpDigiCpu"));
+    MESet& meTpDigiCpuSample(MEs_.at("TpDigiCpuSample"));
+
+    // Save CpuTpDigis for comparison with GpuTpDigis
+    CpuTpDigis_ = &cpuTpDigis;
+
+    size_t ebSize = 0;
+    size_t eeSize = 0;
+    for (auto const& cpuTpDigi : cpuTpDigis) {
+      auto const iSubdet = cpuTpDigi.id().subDet();
+      if (iSubdet == EcalBarrel) {
+        ++ebSize;
+      } else {
+        ++eeSize;
+      }
+      for (int i = 0; i < cpuTpDigi.size(); ++i) {
+        static_cast<MESetMulti&>(meTpDigiCpuSample).use(i);
+        meTpDigiCpuSample.fill(getEcalDQMSetupObjects(), iSubdet, cpuTpDigi.sample(i).raw());
+      }
+    }
+    meTpDigiCpu.fill(getEcalDQMSetupObjects(), EcalBarrel, ebSize);
+    meTpDigiCpu.fill(getEcalDQMSetupObjects(), EcalEndcap, eeSize);
+    cpuTpDigisSizeEB_ = ebSize;
+    cpuTpDigisSizeEE_ = eeSize;
+  }
+
+  void GpuTask::runOnGpuTpDigis(EcalTrigPrimDigiCollection const& gpuTpDigis, Collections collection) {
+    MESet& meTpDigiGpuCpu(MEs_.at("TpDigiGpuCpu"));
+    MESet& meTpDigiGpuCpuSample(MEs_.at("TpDigiGpuCpuSample"));
+
+    // Get CpuTpDigis saved from GpuTask::runOnCpuTpDigis() for this event
+    // Note: gpuTpDigis is a collection and cpuTpDigis is a pointer to a collection (for historical reasons)
+    EcalTrigPrimDigiCollection const* cpuTpDigis = CpuTpDigis_;
+
+    if (!cpuTpDigis) {
+      edm::LogWarning("EcalDQM") << "GpuTask: Did not find CpuTpDigis Collection. Aborting runOnGpuTpDigis\n";
+      return;
+    }
+
+    size_t ebSize = 0;
+    size_t eeSize = 0;
+    for (auto const& gpuTpDigi : gpuTpDigis) {
+      auto const iSubdet = gpuTpDigi.id().subDet();
+      if (iSubdet == EcalBarrel) {
+        ++ebSize;
+      } else {
+        ++eeSize;
+      }
+
+      // Find CpuTpDigi with matching DetId
+      DetId gpuId(gpuTpDigi.id());
+      typename EcalTrigPrimDigiCollection::const_iterator cpuItr(cpuTpDigis->find(gpuId));
+      if (cpuItr == cpuTpDigis->end()) {
+        edm::LogWarning("EcalDQM") << "GpuTask: Did not find GpuTpDigi DetId " << gpuId.rawId()
+                                   << " in CPU collection\n";
+        continue;
+      }
+
+      for (unsigned int i = 0; i < static_cast<MESetMulti&>(meTpDigiGpuCpuSample).getMultiplicity(); ++i) {
+        auto const gpuSample = gpuTpDigi.sample(i).raw();
+        auto const cpuSample = i < static_cast<unsigned int>(cpuItr->size()) ? cpuItr->sample(i).raw() : 0u;
+
+        static_cast<MESetMulti&>(meTpDigiGpuCpuSample).use(i);
+        meTpDigiGpuCpuSample.fill(getEcalDQMSetupObjects(), iSubdet, gpuSample - cpuSample);
+
+        if (tpDigi1D_) {
+          MESet& meTpDigiGpuSample(MEs_.at("TpDigiGpuSample"));
+          static_cast<MESetMulti&>(meTpDigiGpuSample).use(i);
+          meTpDigiGpuSample.fill(getEcalDQMSetupObjects(), iSubdet, gpuSample);
+        }
+
+        if (tpDigi2D_) {
+          MESet& meTpDigi2DSample(MEs_.at("TpDigi2DSample"));
+          static_cast<MESetMulti&>(meTpDigi2DSample).use(i);
+          meTpDigi2DSample.fill(getEcalDQMSetupObjects(), iSubdet, cpuSample, gpuSample);
+        }
+      }
+    }
+
+    meTpDigiGpuCpu.fill(getEcalDQMSetupObjects(), EcalBarrel, ebSize - cpuTpDigisSizeEB_);
+    meTpDigiGpuCpu.fill(getEcalDQMSetupObjects(), EcalEndcap, eeSize - cpuTpDigisSizeEE_);
+
+    if (tpDigi1D_) {
+      MESet& meTpDigiGpu(MEs_.at("TpDigiGpu"));
+      meTpDigiGpu.fill(getEcalDQMSetupObjects(), EcalBarrel, ebSize);
+      meTpDigiGpu.fill(getEcalDQMSetupObjects(), EcalEndcap, eeSize);
+    }
+
+    if (digi2D_) {
+      MESet& meTpDigi2D(MEs_.at("TpDigi2D"));
+      meTpDigi2D.fill(getEcalDQMSetupObjects(), EcalBarrel, ebSize, cpuTpDigisSizeEB_);
+      meTpDigi2D.fill(getEcalDQMSetupObjects(), EcalEndcap, eeSize, cpuTpDigisSizeEE_);
     }
   }
 

@@ -85,6 +85,14 @@ enum headerFields {
   H_TTYPE_B = 56,
   H_TTYPE_MASK = 0xF,
 
+  H_BOE_B = 60,
+  H_BOE_MASK = 0xF,
+  H_BOE = 0x5,
+
+  H_DCCBLKIDENTIFIER_B = 62,
+  H_DCCBLKIDENTIFIER_MASK = 0x3,
+  H_DCCBLKIDENTIFIER = 0,
+
   H_EVLENGTH_MASK = 0xFFFFFF,
 
   H_ERRORS_B = 24,
@@ -146,6 +154,10 @@ enum detailedTriggerTypeFields {
 
 enum towerFields {
 
+  TOWER_BLKIDENTIFIER_B = 30,  // identifier for every 32 bit word of tower block
+  TOWER_BLKIDENTIFIER_MASK = 0x3,
+  TOWER_BLKIDENTIFIER = 0x3,
+
   TOWER_ID_MASK = 0x7F,
 
   TOWER_NSAMP_MASK = 0x7F,
@@ -172,6 +184,10 @@ enum towerFields {
 
 enum tccFields {
 
+  TCC_BLKIDENTIFIER_B = 29,  // identifier for every 32 bit word of TCC block
+  TCC_BLKIDENTIFIER_MASK = 0x7,
+  TCC_BLKIDENTIFIER = 0x3,
+
   TCC_ID_MASK = 0xFF,
 
   TCC_PS_B = 11,
@@ -179,8 +195,12 @@ enum tccFields {
   TCC_BX_MASK = 0xFFF,
   TCC_BX_B = 16,
 
+  TCC_E0_B = 28,
+
   TCC_L1_MASK = 0xFFF,
   TCC_L1_B = 32,
+
+  TCC_E1_B = 44,
 
   TCC_TT_MASK = 0x7F,
   TCC_TT_B = 48,
@@ -191,6 +211,10 @@ enum tccFields {
 };
 
 enum srpFields {
+
+  SRP_BLKIDENTIFIER_B = 29,  // identifier for every 32 bit word of SRP block
+  SRP_BLKIDENTIFIER_MASK = 0x7,
+  SRP_BLKIDENTIFIER = 0x4,
 
   SRP_NREAD = 0,
   SRP_FULLREADOUT = 3,

@@ -24,6 +24,12 @@ namespace ecaldqm {
     void runOnCpuDigis(DigiCollection const&, Collections);
     template <typename DigiCollection>
     void runOnGpuDigis(DigiCollection const&, Collections);
+    template <typename SrFlagCollection>
+    void runOnCpuSrFlags(SrFlagCollection const&, Collections);
+    template <typename SrFlagCollection>
+    void runOnGpuSrFlags(SrFlagCollection const&, Collections);
+    void runOnCpuTpDigis(EcalTrigPrimDigiCollection const&, Collections);
+    void runOnGpuTpDigis(EcalTrigPrimDigiCollection const&, Collections);
     void runOnCpuUncalibRecHits(EcalUncalibratedRecHitCollection const&, Collections);
     void runOnGpuUncalibRecHits(EcalUncalibratedRecHitCollection const&, Collections);
     void runOnCpuRecHits(EcalRecHitCollection const&, Collections);
@@ -34,11 +40,17 @@ namespace ecaldqm {
 
     bool runGpuTask_;
     bool enableDigi_;
+    bool enableSrFlag_;
+    bool enableTpDigi_;
     bool enableUncalib_;
     bool enableRecHit_;
 
     bool digi1D_;
     bool digi2D_;
+    bool srFlag1D_;
+    bool srFlag2D_;
+    bool tpDigi1D_;
+    bool tpDigi2D_;
     bool uncalib1D_;
     bool uncalib2D_;
     bool rechit1D_;
@@ -49,11 +61,19 @@ namespace ecaldqm {
     EBDigiCollection const* EBCpuDigis_;
     EEDigiCollection const* EECpuDigis_;
 
+    EBSrFlagCollection const* EBCpuSrFlags_;
+    EESrFlagCollection const* EECpuSrFlags_;
+
+    EcalTrigPrimDigiCollection const* CpuTpDigis_;
+
     EcalUncalibratedRecHitCollection const* EBCpuUncalibRecHits_;
     EcalUncalibratedRecHitCollection const* EECpuUncalibRecHits_;
 
     EcalRecHitCollection const* EBCpuRecHits_;
     EcalRecHitCollection const* EECpuRecHits_;
+
+    size_t cpuTpDigisSizeEB_;
+    size_t cpuTpDigisSizeEE_;
   };
 
   inline bool GpuTask::analyze(void const* collection_data, Collections collection) {
@@ -77,6 +97,36 @@ namespace ecaldqm {
         if (collection_data && runGpuTask_ && enableDigi_)
           runOnGpuDigis(*static_cast<EEDigiCollection const*>(collection_data), collection);
         return enableDigi_;
+        break;
+      case kEBCpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnCpuSrFlags(*static_cast<EBSrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEECpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnCpuSrFlags(*static_cast<EESrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEBGpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnGpuSrFlags(*static_cast<EBSrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEEGpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnGpuSrFlags(*static_cast<EESrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kCpuTpDigi:
+        if (collection_data && runGpuTask_ && enableTpDigi_)
+          runOnCpuTpDigis(*static_cast<EcalTrigPrimDigiCollection const*>(collection_data), collection);
+        return enableTpDigi_;
+        break;
+      case kGpuTpDigi:
+        if (collection_data && runGpuTask_ && enableTpDigi_)
+          runOnGpuTpDigis(*static_cast<EcalTrigPrimDigiCollection const*>(collection_data), collection);
+        return enableTpDigi_;
         break;
       case kEBCpuUncalibRecHit:
       case kEECpuUncalibRecHit:

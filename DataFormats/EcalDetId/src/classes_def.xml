@@ -63,9 +63,7 @@
 
   <class name="EcalIdSoA"/>
   <class name="EcalIdSoA::View"/>
-  <class name="EcalIdHostCollection" ClassVersion="3">
-    <version ClassVersion="3" checksum="433710284"/>
-  </class>
+  <class name="EcalIdHostCollection"/>
   <class name="edm::Wrapper<EcalIdHostCollection>" splitLevel="0"/>
 
 </lcgdict>

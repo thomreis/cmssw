@@ -104,10 +104,14 @@ void EcalDQMonitorTask::formSchedule(std::vector<ecaldqm::Collections> const& _p
         sch.first = &EcalDQMonitorTask::runOnCollection<EcalElectronicsIdCollection>;
         break;
       case ecaldqm::kEBSrFlag:
+      case ecaldqm::kEBCpuSrFlag:
+      case ecaldqm::kEBGpuSrFlag:
         collectionTokens_[*colItr] = edm::EDGetToken(consumes<EBSrFlagCollection>(tag));
         sch.first = &EcalDQMonitorTask::runOnCollection<EBSrFlagCollection>;
         break;
       case ecaldqm::kEESrFlag:
+      case ecaldqm::kEECpuSrFlag:
+      case ecaldqm::kEEGpuSrFlag:
         collectionTokens_[*colItr] = edm::EDGetToken(consumes<EESrFlagCollection>(tag));
         sch.first = &EcalDQMonitorTask::runOnCollection<EESrFlagCollection>;
         break;
@@ -129,6 +133,8 @@ void EcalDQMonitorTask::formSchedule(std::vector<ecaldqm::Collections> const& _p
         break;
       case ecaldqm::kTrigPrimDigi:
       case ecaldqm::kTrigPrimEmulDigi:
+      case ecaldqm::kCpuTpDigi:
+      case ecaldqm::kGpuTpDigi:
         collectionTokens_[*colItr] = edm::EDGetToken(consumes<EcalTrigPrimDigiCollection>(tag));
         sch.first = &EcalDQMonitorTask::runOnCollection<EcalTrigPrimDigiCollection>;
         break;

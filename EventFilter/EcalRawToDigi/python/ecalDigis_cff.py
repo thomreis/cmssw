@@ -51,6 +51,8 @@ from Configuration.ProcessModifiers.alpaka_cff import alpaka
 
 # ECAL conditions used by the portable unpacker
 from EventFilter.EcalRawToDigi.ecalElectronicsMappingHostESProducer_cfi import ecalElectronicsMappingHostESProducer
+from EventFilter.EcalRawToDigi.ecalSrMappingHostESProducer_cfi import ecalSrMappingHostESProducer
+from EventFilter.EcalRawToDigi.EcalSrMappingRecord_cfi import esrmapping
 
 # alpaka ECAL unpacker
 from EventFilter.EcalRawToDigi.ecalRawToDigiPortable_cfi import ecalRawToDigiPortable as _ecalRawToDigiPortable
@@ -62,7 +64,26 @@ from EventFilter.EcalRawToDigi.ecalDigisFromPortableProducer_cfi import ecalDigi
 _ecalDigisFromPortable = _ecalDigisFromPortableProducer.clone(
     digisInLabelEB = 'ecalDigisPortable:ebDigis',
     digisInLabelEE = 'ecalDigisPortable:eeDigis',
-    produceDummyIntegrityCollections = True
+    srFlagInLabelEB = 'ecalDigisPortable:ebSrFlags',
+    srFlagInLabelEE = 'ecalDigisPortable:eeSrFlags',
+    integrityGainErrorsInLabelEB = 'ecalDigisPortable:integrityGainErrorsEB',
+    integrityGainSwitchErrorsInLabelEB = 'ecalDigisPortable:integrityGainSwitchErrorsEB',
+    integrityChIdErrorsInLabelEB = 'ecalDigisPortable:integrityChIdErrorsEB',
+    integrityGainErrorsInLabelEE = 'ecalDigisPortable:integrityGainErrorsEE',
+    integrityGainSwitchErrorsInLabelEE = 'ecalDigisPortable:integrityGainSwitchErrorsEE',
+    integrityChIdErrorsInLabelEE = 'ecalDigisPortable:integrityChIdErrorsEE',
+    pnDiodeDigisInLabel = 'ecalDigisPortable',
+    ecalTriggerPrimitivesInLabel = 'ecalDigisPortable',
+    ecalPseudoStripInputsInLabel = 'ecalDigisPortable',
+    integrityTTIdErrorsInLabel = 'ecalDigisPortable:integrityTTIdErrors',
+    integrityZSXtalIdErrorsInLabel = 'ecalDigisPortable:integrityZSXtalIdErrors',
+    integrityBlockSizeErrorsInLabel = 'ecalDigisPortable:integrityBlockSizeErrors',
+    integrityMemTtIdErrorsInLabel = 'ecalDigisPortable:integrityMemTtIdErrors',
+    integrityMemBlockSizeErrorsInLabel = 'ecalDigisPortable:integrityMemBlockSizeErrors',
+    integrityMemChIdErrorsInLabel = 'ecalDigisPortable:integrityMemChIdErrors',
+    integrityMemGainErrorsInLabel = 'ecalDigisPortable:integrityMemGainErrors',
+    ecalRawDataInLabel = 'ecalDigisPortable'
+
 )
 alpaka.toModify(ecalDigis,
     cpu = _ecalDigisFromPortable.clone()
@@ -71,6 +92,7 @@ alpaka.toModify(ecalDigis,
 alpaka.toReplaceWith(ecalDigisTask, cms.Task(
     # ECAL conditions used by the portable unpacker
     ecalElectronicsMappingHostESProducer,
+    ecalSrMappingHostESProducer,
     # run the portable ECAL unpacker
     ecalDigisPortable,
     # copy the ECAL digis from GPU to CPU (if needed) and convert them from SoA to legacy format
