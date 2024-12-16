@@ -4,6 +4,7 @@
 #include "DataFormats/EcalDigi/interface/EcalConstants.h"
 #include "EventFilter/EcalRawToDigi/interface/ElectronicsIdGPU.h"
 #include "EventFilter/EcalRawToDigi/interface/DCCRawDataDefinitions.h"
+#include "Geometry/EcalMapping/interface/EcalElectronicsMapping.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/workdivision.h"
 
 #include "UnpackPortable.h"
@@ -13,6 +14,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
   using namespace ::ecal::raw;
   using namespace cms::alpakatools;
 
+  ////////////////////////////////////////////////////////////////////////////
+  // digis unpack kernel
+  ////////////////////////////////////////////////////////////////////////////
   class Kernel_unpack {
   public:
     template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
@@ -20,10 +24,18 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                                   unsigned char const* __restrict__ data,
                                   uint32_t const* __restrict__ offsets,
                                   int const* __restrict__ feds,
-                                  EcalDigiDeviceCollection::View digisDevEB,
-                                  EcalDigiDeviceCollection::View digisDevEE,
-                                  EcalSrFlagDeviceCollection::View srFlagsDevEB,
-                                  EcalSrFlagDeviceCollection::View srFlagsDevEE,
+                                  EcalDigiDeviceCollection::View digisEB,
+                                  EcalDigiDeviceCollection::View digisEE,
+                                  EcalIdDeviceCollection::View integrityGainErrorsEB,
+                                  EcalIdDeviceCollection::View integrityGainErrorsEE,
+                                  EcalIdDeviceCollection::View integrityGainSwitchErrorsEB,
+                                  EcalIdDeviceCollection::View integrityGainSwitchErrorsEE,
+                                  EcalIdDeviceCollection::View integrityChIdErrorsEB,
+                                  EcalIdDeviceCollection::View integrityChIdErrorsEE,
+                                  EcalIdDeviceCollection::View integrityTTIdErrors,
+                                  EcalIdDeviceCollection::View integrityZSXtalIdErrors,
+                                  EcalIdDeviceCollection::View integrityBlockSizeErrors,
+                                  EcalPnDiodeDigiDeviceCollection::View pnDiodeDigis,
                                   EcalElectronicsMappingDevice::ConstView eid2did,
                                   uint32_t const nbytesTotal) const {
       constexpr auto kSampleSize = ecalPh1::sampleSize;
@@ -41,11 +53,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
       // size
       auto const gridDim = alpaka::getWorkDiv<alpaka::Grid, alpaka::Blocks>(acc)[0u];
       auto const size = ifed == gridDim - 1 ? nbytesTotal - offset : offsets[ifed + 1] - offset;
-      auto* samples = isBarrel ? digisDevEB.data()->data() : digisDevEE.data()->data();
-      auto* ids = isBarrel ? digisDevEB.id() : digisDevEE.id();
-      auto* srs = isBarrel ? srFlagsDevEB.flag() : srFlagsDevEE.flag();
-      auto* srIds = isBarrel ? srFlagsDevEB.id() : srFlagsDevEE.id();
-      auto* pChannelsCounter = isBarrel ? &digisDevEB.size() : &digisDevEE.size();
+      auto* samples = isBarrel ? digisEB.data()->data() : digisEE.data()->data();
+      auto* ids = isBarrel ? digisEB.id() : digisEE.id();
+      auto* pChannelsCounter = isBarrel ? &digisEB.size() : &digisEE.size();
 
       // offset to the right raw buffer
       uint64_t const* buffer = reinterpret_cast<uint64_t const*>(data + offset);
@@ -103,35 +113,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
       //
       // print block headers
       //
-      uint8_t ntccblockwords = isBarrel ? 18 : 36;
-
-      // selective readout block
-      auto const* srp_block = buffer + HEADERLENGTH + ntccblockwords;
-      auto const srp_header = *srp_block;
-      const uint8_t srp_id = srp_header & SRP_ID_MASK;
-      uint8_t n_sr_flags = (srp_header >> SRP_NFLAGS_B) & SRP_NFLAGS_MASK;
-      // handle the two jump DCCs
-      if (dcc == SECTOR_EEM_CCU_JUMP || dcc == SECTOR_EEP_CCU_JUMP) {
-        n_sr_flags += MAX_CCUID_JUMP - MIN_CCUID_JUMP + 1;
-      }
-      uint64_t word = 0;
-      for (uint8_t n = 0, i = 0; n < n_sr_flags; ++n) {
-        if (n % 16 == 0) {  // 16 SR flags per 64 bit word
-          word = *(++srp_block);
-        } else if (n % 4) {  // four 16 bit words containing four SR flags each
-          word >>= 16;
-        }
-        ElectronicsIdGPU eid{dcc,
-                             static_cast<uint8_t>(n + 1u),
-                             0,
-                             0};  // test: abuse ElectronicsIdGPU to store dcc and ccu (replacing a ttId)
-        const uint8_t flag = (word >> ((n - (n / 4) * 4) * 3)) & SRP_SRFLAG_MASK;
-        if (flag > 0) {
-          srs[i] = flag;
-          srIds[i] = eid.linearIndex();
-          ++i;
-        }
-      }
+      uint8_t const ntccblockwords = isBarrel ? 18 : 36;
 
       // tower block
       auto const* tower_blocks_start = buffer + HEADERLENGTH + ntccblockwords + SRP_BLOCKLENGTH;
@@ -445,23 +427,778 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
     ALPAKA_FN_INLINE ALPAKA_FN_ACC int gainId(uint16_t sample) const { return (sample >> 12) & 0x3; }
   };
 
-  void unpackRaw(Queue& queue,
-                 InputDataHost const& inputHost,
-                 EcalDigiDeviceCollection& digisDevEB,
-                 EcalDigiDeviceCollection& digisDevEE,
-                 EcalSrFlagDeviceCollection& srFlagsDevEB,
-                 EcalSrFlagDeviceCollection& srFlagsDevEE,
-                 EcalElectronicsMappingDevice const& mapping,
-                 uint32_t const nfedsWithData,
-                 uint32_t const nbytesTotal) {
-    // input device buffers
-    ecal::raw::InputDataDevice inputDevice(queue, nbytesTotal, nfedsWithData);
+  ////////////////////////////////////////////////////////////////////////////
+  // SR unpack kernel
+  ////////////////////////////////////////////////////////////////////////////
+  class Kernel_unpack_srflags {
+  public:
+    template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
+    ALPAKA_FN_ACC void operator()(TAcc const& acc,
+                                  unsigned char const* __restrict__ data,
+                                  uint32_t const* __restrict__ offsets,
+                                  int const* __restrict__ feds,
+                                  EcalSrFlagDeviceCollection::View srFlagsEB,
+                                  EcalSrFlagDeviceCollection::View srFlagsEE) const {
+      // indices
+      auto const ifed = alpaka::getIdx<alpaka::Grid, alpaka::Blocks>(acc)[0u];
 
-    // transfer the raw data
-    alpaka::memcpy(queue, inputDevice.data, inputHost.data);
-    alpaka::memcpy(queue, inputDevice.offsets, inputHost.offsets);
-    alpaka::memcpy(queue, inputDevice.feds, inputHost.feds);
+      // offset in bytes
+      auto const offset = offsets[ifed];
+      // fed id
+      auto const fed = feds[ifed];
+      auto const dcc = fed2dcc(fed);
+      auto const isBarrel = is_barrel(dcc);
+      auto* srs = isBarrel ? srFlagsEB.flag() : srFlagsEE.flag();
+      auto* srIds = isBarrel ? srFlagsEB.id() : srFlagsEE.id();
+      auto* srCounter = isBarrel ? &srFlagsEB.size() : &srFlagsEE.size();
 
+      // offset to the right raw buffer
+      uint64_t const* buffer = reinterpret_cast<uint64_t const*>(data + offset);
+
+      uint8_t const ntccblockwords = isBarrel ? 18 : 36;
+
+      // selective readout block
+      auto const* srp_block = buffer + HEADERLENGTH + ntccblockwords;
+      auto const srp_header = *srp_block;
+      //const uint8_t srp_id = srp_header & SRP_ID_MASK;
+      uint8_t n_sr_flags = (srp_header >> SRP_NFLAGS_B) & SRP_NFLAGS_MASK;
+      // handle the two jump DCCs
+      if (dcc == SECTOR_EEM_CCU_JUMP || dcc == SECTOR_EEP_CCU_JUMP) {
+        n_sr_flags += MAX_CCUID_JUMP - MIN_CCUID_JUMP + 1;
+      }
+      uint64_t word = 0;
+      for (uint8_t n = 0; n < n_sr_flags; ++n) {
+        if (n % 16 == 0) {  // 16 SR flags per 64 bit word
+          word = *(++srp_block);
+        } else if (n % 4) {  // four 16 bit words containing four SR flags each
+          word >>= 16;
+        }
+        ElectronicsIdGPU eid{dcc,
+                             static_cast<uint8_t>(n + 1u),
+                             0,
+                             0};  // test: abuse ElectronicsIdGPU to store dcc and ccu (replacing a ttId)
+        const uint8_t flag = (word >> ((n - (n / 4) * 4) * 3)) & SRP_SRFLAG_MASK;
+        if (flag > 0) {
+          auto const pos = alpaka::atomicAdd(acc, srCounter, 1u, alpaka::hierarchy::Threads{});
+          srs[pos] = flag;
+          srIds[pos] = eid.linearIndex();
+        }
+      }
+    }
+
+  private:
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC bool is_barrel(uint8_t dccid) const {
+      return dccid >= ElectronicsIdGPU::MIN_DCCID_EBM && dccid <= ElectronicsIdGPU::MAX_DCCID_EBP;
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint8_t fed2dcc(int fed) const { return static_cast<uint8_t>(fed - 600); }
+  };
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Header unpack kernel
+  ////////////////////////////////////////////////////////////////////////////
+  class Kernel_unpack_headers {
+  public:
+    template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
+    ALPAKA_FN_ACC void operator()(TAcc const& acc,
+                                  unsigned char const* __restrict__ data,
+                                  uint32_t const* __restrict__ offsets,
+                                  int const* __restrict__ feds,
+                                  EcalDCCHeaderBlockDeviceCollection::View dccHeaders) const {
+      // indices
+      auto const ifed = alpaka::getIdx<alpaka::Grid, alpaka::Blocks>(acc)[0u];
+
+      // offset in bytes
+      auto const offset = offsets[ifed];
+      // fed id
+      auto const fed = feds[ifed];
+      auto const dcc = fed2dcc(fed);
+      auto const isBarrel = is_barrel(dcc);
+      uint8_t const ntccblockwords = isBarrel ? 18 : 36;
+      auto const gridDim = alpaka::getWorkDiv<alpaka::Grid, alpaka::Blocks>(acc)[0u];
+
+      // offset to the right raw buffer
+      uint64_t const* buffer = reinterpret_cast<uint64_t const*>(data + offset);
+
+      // fed header
+      auto const fed_header = buffer[0];
+      uint32_t const fedId = (fed_header >> H_FEDID_B) & H_FEDID_MASK;
+      if (!(fedId == static_cast<uint32_t>(fed))) {
+        // mismatch with expected FED ID
+      }
+      dccHeaders.fedId()[ifed] = static_cast<int32_t>(fedId);
+      dccHeaders.dccId()[ifed] = static_cast<int32_t>(fed2dcc(fedId));
+      dccHeaders.BX()[ifed] = static_cast<int32_t>((fed_header >> H_BX_B) & H_BX_MASK);
+      dccHeaders.LV1event()[ifed] = static_cast<int32_t>((fed_header >> H_L1_B) & H_L1_MASK);
+      int16_t const triggerType = (fed_header >> H_TTYPE_B) & H_TTYPE_MASK;
+      dccHeaders.basicTriggerType()[ifed] = triggerType;
+
+      auto const w1 = buffer[1];
+      dccHeaders.dccErrors()[ifed] = static_cast<int32_t>((w1 >> H_ERRORS_B) & H_ERRORS_MASK);
+      dccHeaders.runNumber()[ifed] = static_cast<int32_t>((w1 >> H_RNUMB_B) & H_RNUMB_MASK);
+
+      auto const w2 = buffer[2];
+      int16_t const runType = w2 & H_RTYPE_MASK;
+      uint16_t const detailedTrgType = (w2 >> H_DET_TTYPE_B) & H_DET_TTYPE_MASK;
+      decodeRunType(triggerType, detailedTrgType, runType, ifed, dccHeaders);
+
+      auto const w3 = buffer[3];
+      dccHeaders.orbitNumber()[ifed] = (w3 >> H_ORBITCOUNTER_B) & H_ORBITCOUNTER_MASK;
+      dccHeaders.selectiveReadout()[ifed] = (w3 >> H_SR_B) & B_MASK;
+      dccHeaders.zeroSuppression()[ifed] = (w3 >> H_ZS_B) & B_MASK;
+      dccHeaders.testZeroSuppression()[ifed] = (w3 >> H_TZS_B) & B_MASK;
+      dccHeaders.srpStatus()[ifed] = (w3 >> H_SRCHSTATUS_B) & H_CHSTATUS_MASK;
+      auto* tccChStatus = dccHeaders.tccStatus()->data();
+      tccChStatus[0] = (w3 >> H_TCC1CHSTATUS_B) & H_CHSTATUS_MASK;
+      tccChStatus[1] = (w3 >> H_TCC2CHSTATUS_B) & H_CHSTATUS_MASK;
+      tccChStatus[2] = (w3 >> H_TCC3CHSTATUS_B) & H_CHSTATUS_MASK;
+      tccChStatus[3] = (w3 >> H_TCC4CHSTATUS_B) & H_CHSTATUS_MASK;
+
+      // FE channel Status data
+      auto* feChStatus = dccHeaders.feStatus()->data();
+      uint8_t ch(0);
+      uint8_t shift(0);
+      for (uint8_t i = 4; i < HEADERLENGTH; ++i) {  // 4 data words with channel status info
+        for (uint8_t j = 0; j < 14 && ch < MAX_TT_SIZE; ++j, ++ch) {  // 14 channel status fields in one data word
+          shift = j * 4;  //each channel has 4 bits
+          feChStatus[ch] = (buffer[i] >> shift) & H_CHSTATUS_MASK;
+        }
+      }
+      dccHeaders.feStatusSize()[ifed] = ch;
+
+      // TCC headers information
+      auto* tccBx = dccHeaders.tccBx()->data();
+      auto* tccLv1 = dccHeaders.tccLv1()->data();
+      auto const* tcc_blocks_start = buffer + HEADERLENGTH;
+      auto const* sr_block_start = buffer + HEADERLENGTH + ntccblockwords;  // SR block follows the TCC blocks
+      auto const* current_tcc_block = tcc_blocks_start;
+      uint8_t ctr(0);
+      while (current_tcc_block < sr_block_start) {
+        auto const tcc_header = *current_tcc_block;
+
+        tccBx[ctr] = (tcc_header >> TCC_BX_B) & TCC_BX_MASK;
+        tccLv1[ctr] = (tcc_header >> TCC_L1_B) & TCC_L1_MASK;
+
+        uint8_t const nTTs = (tcc_header >> TCC_TT_B) & TCC_TT_MASK;
+        uint8_t const nTSamples = (tcc_header >> TCC_TS_B) & TCC_TS_MASK;
+        uint16_t const block_length = (nTTs * nTSamples) % 4 > 0 ? 1 + (nTTs * nTSamples) / 4 : 2 + (nTTs * nTSamples) / 4;
+        current_tcc_block += block_length;
+        ++ctr;
+      }
+      dccHeaders.tccBxSize()[ifed] = ctr;
+      dccHeaders.tccLv1Size()[ifed] = ctr;
+
+      // selective readout block
+      auto const* srp_block = buffer + HEADERLENGTH + ntccblockwords;
+      auto const srp_header = *srp_block;
+      dccHeaders.srpBx()[ifed] = (srp_header >> SRP_BX_B) & SRP_BX_MASK;
+      dccHeaders.srpLv1()[ifed] = (srp_header >> SRP_L1_B) & SRP_L1_MASK;
+
+      // FE headers information
+
+      dccHeaders.zs()[ifed] = -1;  // TODO seems unused in CPU unpacker
+    }
+
+  private:
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC bool is_barrel(uint8_t dccid) const {
+      return dccid >= ElectronicsIdGPU::MIN_DCCID_EBM && dccid <= ElectronicsIdGPU::MAX_DCCID_EBP;
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint8_t fed2dcc(int fed) const { return static_cast<uint8_t>(fed - 600); }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC void decodeRunType(int16_t trigType, int16_t detTrigType, int16_t runType, uint32_t ifed, EcalDCCHeaderBlockDeviceCollection::View dccHeaders) const {
+      constexpr unsigned int kWhichHalfOffset = 64;    //2^6
+      constexpr unsigned int kTypeOffset = 256;        //2^8
+      constexpr unsigned int kSubTypeOffset = 2048;    //2^11
+      constexpr unsigned int kSettingOffset = 131072;  //2^17
+      constexpr unsigned int kGainModeOffset = 16384;  //2^14
+
+      constexpr unsigned int kTwoBitsMask = 3;
+      constexpr unsigned int kThreeBitsMask = 7;
+      constexpr unsigned int kThirdBitMask = 4;
+
+      dccHeaders.rtHalf()[ifed] = static_cast<int>((runType / kWhichHalfOffset) & kTwoBitsMask);
+      auto const type = static_cast<int>((runType / kTypeOffset) & kThreeBitsMask);
+      auto const sequence = static_cast<int>((runType / kSubTypeOffset) & kThreeBitsMask);
+      dccHeaders.mgpaGain()[ifed] = static_cast<int>((runType / kGainModeOffset) & kTwoBitsMask);
+      dccHeaders.memGain()[ifed] = static_cast<int>((runType / kGainModeOffset) & kThirdBitMask) / kThirdBitMask;
+
+      if (type == 0 && sequence <= 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::COSMIC;
+      } else if (type == 0 && sequence == 2) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::BEAMH4;
+      } else if (type == 0 && sequence == 3) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::BEAMH2;
+      } else if (type == 0 && sequence == 4) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::MTCC;
+      } else if (type == 1 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::LASER_STD;
+      } else if (type == 1 && sequence == 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::LASER_POWER_SCAN;
+      } else if (type == 1 && sequence == 2) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::LASER_DELAY_SCAN;
+      } else if (type == 2 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::TESTPULSE_SCAN_MEM;
+      } else if (type == 2 && sequence == 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::TESTPULSE_MGPA;
+      } else if (type == 3 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::PEDESTAL_STD;
+      } else if (type == 3 && sequence == 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::PEDESTAL_OFFSET_SCAN;
+      } else if (type == 3 && sequence == 2) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::PEDESTAL_25NS_SCAN;
+      } else if (type == 4 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::LED_STD;
+      } else if (type == 5 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::PHYSICS_GLOBAL;
+      } else if (type == 5 && sequence == 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::COSMICS_GLOBAL;
+      } else if (type == 5 && sequence == 2) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::HALO_GLOBAL;
+      } else if (type == 6 && sequence == 0) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::PHYSICS_LOCAL;
+      } else if (type == 6 && sequence == 1) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::COSMICS_LOCAL;
+      } else if (type == 6 && sequence == 2) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::HALO_LOCAL;
+      } else if (type == 6 && sequence == 3) {
+        dccHeaders.runType()[ifed] = EcalDCCHeaderBlock::CALIB_LOCAL;
+      }
+      // decoding of settings depends on whether run is global or local
+      if (type == 5 || type == 6) {
+        decodeSettingGlobal(trigType, detTrigType, ifed, dccHeaders);
+      } else {
+        decodeSetting(int(runType / kSettingOffset), ifed, dccHeaders);
+      }
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC void decodeSettingGlobal(int16_t trigType,
+                                                       int16_t detTrigType,
+                                                       uint32_t ifed,
+                                                       EcalDCCHeaderBlockDeviceCollection::View dccHeaders) const {
+      dccHeaders.dccInTTCCommand()[ifed] = (detTrigType >> H_DCCID_B) & H_DCCID_MASK;
+      // if trigger type is physics, only dccIdInTTCCommand is meaningful
+      if (trigType == PHYSICTRIGGER) {
+        return;
+      }
+    
+      // if calibration trigger (gap)
+      if (trigType == CALIBRATIONTRIGGER) {
+        // TCC commands are decoded both in global (type == 5) and in local (type == 6)
+        // local or global calibration
+        bool const isLocal(dccHeaders.runType()[ifed] == EcalDCCHeaderBlock::CALIB_LOCAL);
+    
+        EcalDCCHeaderBlock::EcalDCCEventSettings evtSettings;
+        evtSettings.LaserPower = -1;
+        evtSettings.LaserFilter = -1;
+        evtSettings.wavelength = -1;
+        evtSettings.delay = -1;
+        evtSettings.MEMVinj = -1;
+        evtSettings.mgpa_content = -1;
+        evtSettings.ped_offset = -1;
+    
+        int const detailedTriggerTypeInTTCCommand = (detTrigType >> H_TR_TYPE_B) & H_TR_TYPE_MASK;
+        int const wavelengthInTTCCommand = (detTrigType >> H_WAVEL_B) & H_WAVEL_MASK;
+    
+        dccHeaders.rtHalf()[ifed] = (detTrigType >> H_HALF_B) & H_HALF_MASK;
+        if (detailedTriggerTypeInTTCCommand == EcalDCCHeaderBlock::TTC_LASER) {
+          dccHeaders.runType()[ifed] = isLocal ? EcalDCCHeaderBlock::LASER_STD : EcalDCCHeaderBlock::LASER_GAP;
+          evtSettings.wavelength = wavelengthInTTCCommand;
+        } else if (detailedTriggerTypeInTTCCommand == EcalDCCHeaderBlock::TTC_LED) {
+          dccHeaders.runType()[ifed] = isLocal ? EcalDCCHeaderBlock::LED_STD : EcalDCCHeaderBlock::LED_GAP;
+          evtSettings.wavelength = wavelengthInTTCCommand;
+        } else if (detailedTriggerTypeInTTCCommand == EcalDCCHeaderBlock::TTC_TESTPULSE) {
+          dccHeaders.runType()[ifed] = isLocal ? EcalDCCHeaderBlock::TESTPULSE_MGPA : EcalDCCHeaderBlock::TESTPULSE_GAP;
+        } else if (detailedTriggerTypeInTTCCommand == EcalDCCHeaderBlock::TTC_PEDESTAL) {
+          dccHeaders.runType()[ifed] = isLocal ? EcalDCCHeaderBlock::PEDESTAL_STD : EcalDCCHeaderBlock::PEDESTAL_GAP;
+        } else {
+          dccHeaders.runType()[ifed] = -1;
+        }
+        dccHeaders.eventSettings()[ifed] = evtSettings;
+      }
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC void decodeSetting(int setting, uint32_t ifed, EcalDCCHeaderBlockDeviceCollection::View dccHeaders) const {
+      EcalDCCHeaderBlock::EcalDCCEventSettings evtSettings;
+      evtSettings.LaserPower = -1;
+      evtSettings.LaserFilter = -1;
+      evtSettings.wavelength = -1;
+      evtSettings.delay = -1;
+      evtSettings.MEMVinj = -1;
+      evtSettings.mgpa_content = -1;
+      evtSettings.ped_offset = -1;
+    
+      auto const runType = dccHeaders.runType()[ifed];
+      if (runType == EcalDCCHeaderBlock::LASER_STD || runType == EcalDCCHeaderBlock::LASER_POWER_SCAN) {
+        evtSettings.LaserPower = (setting & 8128) / 64;
+        evtSettings.LaserFilter = (setting & 56) / 8;
+        evtSettings.wavelength = setting & 7;
+      } else if (runType == EcalDCCHeaderBlock::LASER_DELAY_SCAN) {
+        evtSettings.wavelength = setting & 7;
+        evtSettings.delay = (setting & 2040) / 8;
+      } else if (runType == EcalDCCHeaderBlock::TESTPULSE_SCAN_MEM) {
+        evtSettings.MEMVinj = setting & 511;
+      } else if (runType == EcalDCCHeaderBlock::TESTPULSE_MGPA) {
+        evtSettings.mgpa_content = setting & 255;
+      } else if (runType == EcalDCCHeaderBlock::PEDESTAL_OFFSET_SCAN) {
+        evtSettings.ped_offset = setting;
+      } else if (runType == EcalDCCHeaderBlock::PEDESTAL_25NS_SCAN) {
+        evtSettings.delay = (setting & 255);
+      } else if (runType == EcalDCCHeaderBlock::LED_STD) {
+        evtSettings.wavelength = setting & 7;
+      }
+      dccHeaders.eventSettings()[ifed] = evtSettings;
+    }
+  };
+
+  ////////////////////////////////////////////////////////////////////////////
+  // TCC unpack kernel
+  ////////////////////////////////////////////////////////////////////////////
+  class Kernel_unpack_tcc {
+  public:
+    template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
+    ALPAKA_FN_ACC void operator()(TAcc const& acc,
+                                  unsigned char const* __restrict__ data,
+                                  uint32_t const* __restrict__ offsets,
+                                  int const* __restrict__ feds,
+                                  EcalTriggerPrimitiveDigiDeviceCollection::View tpDigis,
+                                  EcalPseudoStripInputDigiDeviceCollection::View psDigis) const {
+      constexpr auto kTpSampleSize = EcalTriggerPrimitiveDigi::MAXSAMPLES;
+      constexpr auto kPsSampleSize = EcalTriggerPrimitiveDigi::MAXSAMPLES;
+      // indices
+      auto const ifed = alpaka::getIdx<alpaka::Grid, alpaka::Blocks>(acc)[0u];
+      auto const threadIdx = alpaka::getIdx<alpaka::Block, alpaka::Threads>(acc)[0u];
+
+      // offset in bytes
+      auto const offset = offsets[ifed];
+      // fed id
+      auto const fed = feds[ifed];
+      auto const dcc = fed2dcc(fed);
+      auto const isBarrel = is_barrel(dcc);
+      uint8_t const ntccblockwords = isBarrel ? 18 : 36;
+
+      auto* tps = tpDigis.data()->data();
+      auto* tpIds = tpDigis.id();
+      auto* tpCounter = &tpDigis.size();
+
+      auto* pss = psDigis.data()->data();
+      auto* psIds = psDigis.id();
+      auto* psCounter = &psDigis.size();
+
+      // offset to the right raw buffer
+      uint64_t const* buffer = reinterpret_cast<uint64_t const*>(data + offset);
+
+      // DCC header to compare with TCC header fields
+      auto const fed_header = buffer[0];
+      uint32_t bx = (fed_header >> H_BX_B) & H_BX_MASK;
+      uint32_t lv1 = (fed_header >> H_L1_B) & H_L1_MASK;
+      uint8_t const dccfov = (buffer[2] >> H_FOV_B) & H_FOV_MASK;
+      //bool tccChStatus[4];  // TODO implement status check
+      //tccChStatus[0] = (buffer[3] >> H_TCC1CHSTATUS_B) & B_MASK;
+      //tccChStatus[1] = (buffer[3] >> H_TCC2CHSTATUS_B) & B_MASK;
+      //tccChStatus[2] = (buffer[3] >> H_TCC3CHSTATUS_B) & B_MASK;
+      //tccChStatus[3] = (buffer[3] >> H_TCC4CHSTATUS_B) & B_MASK;
+
+      // trigger concentrator card block
+      auto const* tcc_blocks_start = buffer + HEADERLENGTH;
+      auto const* sr_block_start = buffer + HEADERLENGTH + ntccblockwords;  // SR block follows the TCC blocks
+      auto const* current_tcc_block = tcc_blocks_start;
+      while (current_tcc_block < sr_block_start) {
+        auto const tcc_header = *current_tcc_block;
+
+        // check that this is a TCC block word
+        if ((((tcc_header >> TCC_BLKIDENTIFIER_B) & TCC_BLKIDENTIFIER_MASK) != TCC_BLKIDENTIFIER) ||
+            (((tcc_header >> TCC_BLKIDENTIFIER_B + 32) & TCC_BLKIDENTIFIER_MASK) != TCC_BLKIDENTIFIER)) {
+          // TODO try next word
+        }
+
+        // TCC header information
+        uint8_t const tccId = tcc_header & TCC_ID_MASK;
+        bool const ps = (tcc_header >> TCC_PS_B) & B_MASK;
+        //uint16_t const bxlocal = (tcc_header >> TCC_BX_B) & TCC_BX_MASK;
+        bool const e0 = (tcc_header >> TCC_E0_B) & B_MASK;
+        //uint16_t const lv1local = (tcc_header >> TCC_L1_B) & TCC_L1_MASK;
+        bool const e1 = (tcc_header >> TCC_E1_B) & B_MASK;
+        uint8_t const nTTs = (tcc_header >> TCC_TT_B) & TCC_TT_MASK;
+        uint8_t const nTSamples = (tcc_header >> TCC_TS_B) & TCC_TS_MASK;
+
+        uint16_t const block_length = (nTTs * nTSamples) % 4 > 0 ? 1 + (nTTs * nTSamples) / 4 : 2 + (nTTs * nTSamples) / 4;
+
+        if (e0 || e1) {
+          // data corruption detected. local BX or L1 mismatch with DCC header
+          // TODO something
+        }
+
+        // check expected TCC id
+        uint8_t exp_tccid = isBarrel ? dcc + TCCID_SMID_SHIFT_EB : 0;
+        if (tccId != exp_tccid) {
+          // TODO not the expected TCC ID
+        }
+
+        // use 16 bit data words for TPs
+        uint16_t const* wtt = reinterpret_cast<const uint16_t*>(current_tcc_block + 1);
+
+        auto const threadsPerBlock = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc)[0u];
+        if (isBarrel) {
+          // 1 d per TP in this block
+          // All threads enter the loop regardless if they will treat channel indices channel >= nchannels.
+          // The threads with excess indices perform no operations but also reach the syncBlockThreads() inside the loop.
+          for (uint32_t i = 0; i < nTTs; i += threadsPerBlock) {
+            auto const itt = i + threadIdx;
+
+            if (itt < nTTs) {
+              auto const* tpsamples_start = wtt + (itt * nTSamples); 
+
+              uint16_t sampleValues[kTpSampleSize];
+              for (uint32_t si = 0; si < kTpSampleSize; ++si) {
+                sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+              }
+
+              // store to global
+              auto const pos = alpaka::atomicAdd(acc, tpCounter, 1u, alpaka::hierarchy::Threads{});
+              tpIds[pos] = getTrigTowerDetId(tccId, itt + 1, isBarrel);
+              std::memcpy(&tps[pos * kTpSampleSize], sampleValues, kTpSampleSize * sizeof(uint16_t));
+            }
+          }
+        } else {
+          uint32_t const nPS = ps ? NUMB_PSEUDOSTRIPS : 0;
+          auto const nWords = nTTs + nPS;
+          // 1 d per TP in this block
+          // All threads enter the loop regardless if they will treat channel indices channel >= nchannels.
+          // The threads with excess indices perform no operations but also reach the syncBlockThreads() inside the loop.
+          for (uint32_t i = 0; i < nWords; i += threadsPerBlock) {
+            auto const ipstt = i + threadIdx;
+
+            if (ipstt < nWords) {
+              auto const* tpsamples_start = wtt + (ipstt * nTSamples);
+
+              /////////////////////////
+              // MC raw data based on CMS NOTE 2005/021
+              // (and raw data when FOV was unassigned, earlier than mid 2008)
+              if (dccfov == dcc_FOV_0) {
+                if (ipstt < NUMB_PSEUDOSTRIPS) {
+                  // Unpack TPG1 pseudostrip input block
+                  auto const iloc = ipstt;
+                  uint16_t sampleValues[kPsSampleSize];
+                  for (uint32_t si = 0; si < kPsSampleSize; ++si) {
+                    sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                  }
+                  // store to global
+                  auto const pos = alpaka::atomicAdd(acc, psCounter, 1u, alpaka::hierarchy::Threads{});
+                  psIds[pos] = getTriggerElectronicsId(tccId, iloc + 1);
+                  std::memcpy(&pss[pos * kPsSampleSize], sampleValues, kPsSampleSize * sizeof(uint16_t));
+                } else if (ipstt < NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1) {
+                  // Unpack TPG1 trigger primitive block
+                  auto const iloc = ipstt - NUMB_PSEUDOSTRIPS;
+                  if (iloc < nTTs) {
+                    uint16_t sampleValues[kTpSampleSize];
+                    for (uint32_t si = 0; si < kTpSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    // store to global
+                    auto const pos = alpaka::atomicAdd(acc, tpCounter, 1u, alpaka::hierarchy::Threads{});
+                    tpIds[pos] = getTrigTowerDetId(tccId, iloc + 1, isBarrel);
+                    std::memcpy(&tps[pos * kTpSampleSize], sampleValues, kTpSampleSize * sizeof(uint16_t));
+                  }
+                } else if (ipstt < 2 * NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1) {
+                  // Unpack TPG2 pseudostrip input block
+                  auto const iloc = ipstt - NUMB_PSEUDOSTRIPS - NUMB_TTS_TPG1;
+                  auto const pos = alpaka::atomicAdd(acc, psCounter, 1u, alpaka::hierarchy::Threads{});
+                  if (iloc >= NUMB_TTS_TPG2_DUPL) {
+                    uint16_t sampleValues[kPsSampleSize];
+                    for (uint32_t si = 0; si < kPsSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    // store to global
+                    psIds[pos] = getTriggerElectronicsId(tccId, iloc + 1);
+                    std::memcpy(&pss[pos * kPsSampleSize], sampleValues, kPsSampleSize * sizeof(uint16_t));
+                  }
+                } else if (ipstt < 2 * NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1 + NUMB_TTS_TPG2) {
+                  // Unpack TPG2 trigger primitive block
+                  auto const iloc = ipstt - 2 * NUMB_PSEUDOSTRIPS;
+                  if (iloc < nTTs) {
+                    uint16_t sampleValues[kTpSampleSize];
+                    for (uint32_t si = 0; si < kTpSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    // store to global
+                    auto const pos = alpaka::atomicAdd(acc, tpCounter, 1u, alpaka::hierarchy::Threads{});
+                    tpIds[pos] = getTrigTowerDetId(tccId, iloc + 1, isBarrel);
+                    std::memcpy(&tps[pos * kTpSampleSize], sampleValues, kTpSampleSize * sizeof(uint16_t));
+                  }
+                }
+              } else if (dccfov == dcc_FOV_1 || dccfov == dcc_FOV_2) {
+              ///////////////////////////
+              // real data since ever FOV was initialized; only 2 used >= June 09
+                // Unpack TPG1 pseudostrip input block
+                if (ipstt < NUMB_PSEUDOSTRIPS) {
+                  // Unpack TPG1 pseudostrip input block
+                  auto const iloc = ipstt;
+                  uint16_t sampleValues[kPsSampleSize];
+                  for (uint32_t si = 0; si < kPsSampleSize; ++si) {
+                    sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                  }
+                  // store to global
+                  auto const pos = alpaka::atomicAdd(acc, psCounter, 1u, alpaka::hierarchy::Threads{});
+                  psIds[pos] = getTriggerElectronicsId(tccId, iloc + 1);
+                  std::memcpy(&pss[pos * kPsSampleSize], sampleValues, kPsSampleSize * sizeof(uint16_t));
+                } else if (ipstt < NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1) {
+                  // Unpack TPG1 trigger primitive block
+                  auto const iloc = ipstt - NUMB_PSEUDOSTRIPS;
+                  if (iloc < nTTs) {
+                    uint16_t sampleValues[kTpSampleSize];
+                    for (uint32_t si = 0; si < kTpSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    int32_t offset(0);
+                    if (iloc > 7 && isTCCExternal(tccId)) {
+                      if (iloc < 16 || iloc > 23) {
+                        continue;  // skip blank TPs [9,16] and [25, 28]
+                      }
+                      offset = 8;
+                    }
+                    // store to global
+                    auto const pos = alpaka::atomicAdd(acc, tpCounter, 1u, alpaka::hierarchy::Threads{});
+                    tpIds[pos] = getTrigTowerDetId(tccId, iloc + 1 - offset, isBarrel);
+                    std::memcpy(&tps[pos * kTpSampleSize], sampleValues, kTpSampleSize * sizeof(uint16_t));
+                  }
+                } else if (ipstt < 2 * NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1) {
+                  // Unpack TPG2 pseudostrip input block
+                  auto const iloc = ipstt - NUMB_PSEUDOSTRIPS - NUMB_TTS_TPG1;
+                  auto const pos = alpaka::atomicAdd(acc, psCounter, 1u, alpaka::hierarchy::Threads{});
+                  if (iloc >= NUMB_TTS_TPG2_DUPL) {
+                    uint16_t sampleValues[kPsSampleSize];
+                    for (uint32_t si = 0; si < kPsSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    // store to global
+                    psIds[pos] = getTriggerElectronicsId(tccId, iloc + 1);
+                    std::memcpy(&pss[pos * kPsSampleSize], sampleValues, kPsSampleSize * sizeof(uint16_t));
+                  }
+                } else if (ipstt < 2 * NUMB_PSEUDOSTRIPS + NUMB_TTS_TPG1 + NUMB_TTS_TPG2) {
+                  // Unpack TPG2 trigger primitive block
+                  auto const iloc = ipstt - 2 * NUMB_PSEUDOSTRIPS;
+                  if (iloc < nTTs) {
+                    uint16_t sampleValues[kTpSampleSize];
+                    for (uint32_t si = 0; si < kTpSampleSize; ++si) {
+                      sampleValues[si] = (si < nTSamples) ? *(tpsamples_start + si) & 0xfff : 0;
+                    }
+                    int32_t offset(0);
+                    if (iloc > 7 && isTCCExternal(tccId)) {
+                      if (iloc < 16 || iloc > 23) {
+                        continue;  // skip blank TPs [9,16] and [25, 28]
+                      }
+                      offset = 8;
+                    }
+                    // store to global
+                    auto const pos = alpaka::atomicAdd(acc, tpCounter, 1u, alpaka::hierarchy::Threads{});
+                    tpIds[pos] = getTrigTowerDetId(tccId, iloc + 1 - offset, isBarrel);
+                    std::memcpy(&tps[pos * kTpSampleSize], sampleValues, kTpSampleSize * sizeof(uint16_t));
+                  }
+                }
+              } else {
+                // TODO FOV does not exist. CPU unpacker uses FOV2 in this case
+              }
+            }
+          }
+        }
+
+        current_tcc_block += block_length;
+      }
+    }
+
+  private:
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC bool is_barrel(uint8_t dccid) const {
+      return dccid >= ElectronicsIdGPU::MIN_DCCID_EBM && dccid <= ElectronicsIdGPU::MAX_DCCID_EBP;
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint8_t fed2dcc(int fed) const { return static_cast<uint8_t>(fed - 600); }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC bool isTCCExternal(uint32_t tccId) const {
+      return ((NUMB_TCC_EE_MIN_EXT_MIN <= tccId && tccId <= NUMB_TCC_EE_MIN_EXT_MAX) ||
+              (NUMB_TCC_EE_PLU_EXT_MIN <= tccId && tccId <= NUMB_TCC_EE_PLU_EXT_MAX));
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC int32_t zside(int tcc) const {
+    //int EcalElectronicsMapping::zside(int dcctcc, int mode) const {
+      if (tcc >= EcalElectronicsMapping::MIN_TCCID_EBM && tcc <= EcalElectronicsMapping::MAX_TCCID_EBM)
+        return -1;
+      if (tcc >= EcalElectronicsMapping::MIN_TCCID_EBP && tcc <= EcalElectronicsMapping::MAX_TCCID_EBP)
+        return +1;
+      if (tcc >= EcalElectronicsMapping::MIN_TCCID_EEM && tcc <= EcalElectronicsMapping::MAX_TCCID_EEM)
+        return -1;
+      if (tcc >= EcalElectronicsMapping::MIN_TCCID_EEP && tcc <= EcalElectronicsMapping::MAX_TCCID_EEP)
+        return +1;
+      return 0;
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint32_t getTrigTowerDetId(int tccId, int iTT, bool isBarrel) const {
+      auto const zIndex = zside(tccId);
+      uint32_t id = ((DetId::Ecal & DetId::kDetMask) << DetId::kDetOffset) | ((EcalSubdetector::EcalTriggerTower & DetId::kSubdetMask) << DetId::kSubdetOffset) | ((zIndex > 0) ? 0x8000 : 0x0);
+
+      if (isBarrel) {
+        auto const dccId = zIndex > 0 ? tccId - EcalElectronicsMapping::TCCID_PHI0_EBP + EcalElectronicsMapping::DCCID_PHI0_EBP : tccId - EcalElectronicsMapping::TCCID_PHI0_EBM + EcalElectronicsMapping::DCCID_PHI0_EBM;
+        auto const smId = zIndex > 0 ? dccId - 27 : dccId + 9;
+        auto const jtower = iTT - 1;
+        auto const kTowersInPhi = ElectronicsIdGPU::kTowersInPhi;
+
+        auto const etaTT = jtower / kTowersInPhi + 1;  // between 1 and 17
+        auto phiTT = zIndex > 0 ? (smId - 1) * kTowersInPhi + (kTowersInPhi - (jtower % kTowersInPhi)) - 2 : (smId - 19) * kTowersInPhi + jtower % kTowersInPhi - 1;
+        if (phiTT <= 0) {
+          phiTT += 72;
+        }
+
+        id |= 0x4000 | (etaTT << 7) | (phiTT & 0x7F);
+        return id;
+      } else {
+        auto const kTCCinPhi = EcalElectronicsMapping::kTCCinPhi;
+        int iz = 0;
+        if (tccId < EcalElectronicsMapping::TCCID_PHI0_EEM_OUT + kTCCinPhi)
+          iz = -1;
+        else if (tccId >= EcalElectronicsMapping::TCCID_PHI0_EEP_OUT)
+          iz = +1;
+
+        bool const inner = (iz < 0 && tccId >= EcalElectronicsMapping::TCCID_PHI0_EEM_IN && tccId < EcalElectronicsMapping::TCCID_PHI0_EEM_IN + kTCCinPhi) || (iz > 0 && tccId >= EcalElectronicsMapping::TCCID_PHI0_EEP_IN && tccId < EcalElectronicsMapping::TCCID_PHI0_EEP_IN + kTCCinPhi);
+        bool const outer = !inner;
+
+        int ieta = (iTT - 1) / EcalElectronicsMapping::kEETowersInPhiPerTCC;
+        int iphi = (iTT - 1) % EcalElectronicsMapping::kEETowersInPhiPerTCC;
+        if (inner)
+          ieta += EcalElectronicsMapping::iEEEtaMinInner;
+        else
+          ieta += EcalElectronicsMapping::iEEEtaMinOuter;
+
+        if (inner && iz < 0) {
+          tccId -= EcalElectronicsMapping::TCCID_PHI0_EEM_IN;
+        } else if (outer && iz < 0) {
+          tccId -= EcalElectronicsMapping::TCCID_PHI0_EEM_OUT;
+        } else if (inner && iz > 0) {
+          tccId -= EcalElectronicsMapping::TCCID_PHI0_EEP_IN;
+        } else if (outer && iz > 0) {
+          tccId -= EcalElectronicsMapping::TCCID_PHI0_EEP_OUT;
+        }
+
+        iphi += EcalElectronicsMapping::kEETowersInPhiPerTCC * tccId;
+        iphi = (iphi - 2 + 4 * EcalElectronicsMapping::kEETowersInPhiPerQuadrant) % (4 * EcalElectronicsMapping::kEETowersInPhiPerQuadrant) + 1;
+    
+        id |= (abs(ieta) << 7) | (iphi & 0x7F);
+        return id;
+      }
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint32_t getTriggerElectronicsId(uint32_t tccId, uint32_t psCtr) const {
+      //// developing mapping for pseudostrip input data: (tccId,psNumber)->(tccId,towerId,psId)
+      //int16_t numStripInTT[EcalTrigTowerDetId::kEBTowersPerSM];
+      //for (int tt = 0; tt < EcalTrigTowerDetId::kEBTowersPerSM; tt++) {
+      //  numStripInTT[tt] = -2;
+      //}
+
+      //// assumption: if ps_max is the largest pseudostripId within a trigger tower
+      //// all the pseudostrip 1 ...  ps_max are actually present
+      //// loop over all constituents of a TCC and collect
+      //// the largest pseudostripId within each trigger tower
+      //std::vector<DetId> tccConstituents = mappingBuilder_->tccConstituents(tccId);
+      //for (std::vector<DetId>::iterator theTCCConstituent = tccConstituents.begin(); theTCCConstituent != tccConstituents.end(); theTCCConstituent++) {
+      //  int towerId = (mappingBuilder_->getTriggerElectronicsId(*theTCCConstituent)).ttId();
+      //  int ps = (mappingBuilder_->getTriggerElectronicsId(*theTCCConstituent)).pseudoStripId();
+      //  if (ps > numStripInTT[towerId - 1])
+      //    numStripInTT[towerId - 1] = ps;
+      //}
+
+      //int16_t tTandPs[EcalTrigTowerDetId::kEBTowersPerSM * NUMB_STRIP][2]; 
+      //// initialise TT and PS map
+      //for (int psCtr = 0; psCtr < EcalTrigTowerDetId::kEBTowersPerSM * NUMB_STRIP; ++psCtr) {
+      //  for (int u = 0; u < 2; ++u) {
+      //    tTandPs[psCounter][u] = -1;
+      //  }
+      //}
+      //int psCtr = 0;
+      //for (int towerId = 0; towerId < EcalTrigTowerDetId::kEBTowersPerSM; ++towerId) {
+      //  for (int ps = 0; ps < numStripInTT[tccId][towerId]; ++ps, ++psCtr) {
+      //    tTandPs[psCtr][0] = towerId + 1;
+      //    tTandPs[psCtr][1] = ps + 1;
+      //  }
+      //}
+      //// EE
+      //// Note:
+      //// for TCC 48 in EE, pseudostrip data in the interval:
+      //// + 1-30 is good pseudostrip data
+      //// + 31-42 is a duplication of the last 12 ps of the previous block, and needs be ignored
+      //// + 43-60 is further good pseudostrip data
+      //int16_t tTandPs_tmp[18][2];
+      //// store entries _after_ the pseudostrip data which gets duplicated
+      //for (int psCtr = 30; psCtr < 48; psCtr++) {
+      //  tTandPs_tmp[psCtr - 30][0] = tTandPs[psCtr][0];
+      //  tTandPs_tmp[psCtr - 30][1] = tTandPs[psCtr][1];
+      //}
+      //// duplication
+      //for (int psCtr = 18; psCtr < 30; psCtr++) {
+      //  tTandPs[psCtr + 12][0] = tTandPs[psCtr][0];
+      //  tTandPs[psCtr + 12][1] = tTandPs[psCtr][1];
+      //}
+      //// append stored
+      //for (int psCtr = 42; psCtr < 60; psCtr++) {
+      //  tTandPs[psCtr][0] = tTandPs_tmp[psCtr - 42][0];
+      //  tTandPs[psCtr][1] = tTandPs_tmp[psCtr - 42][1];
+      //}
+      //uint32_t id = (channelid & 0x7) | ((pseudostripid & 0x7) << 3) | ((ttid & 0x7F) << 6) | ((tccId & 0x7F) << 13);
+      uint32_t id = ((psCtr & 0x7F) << 6) | ((tccId & 0x7F) << 13);
+      return id;
+    } 
+  };
+
+  ////////////////////////////////////////////////////////////////////////////
+  // MEM unpack kernel
+  ////////////////////////////////////////////////////////////////////////////
+  class Kernel_unpack_mem {
+  public:
+    template <typename TAcc, typename = std::enable_if_t<alpaka::isAccelerator<TAcc>>>
+    ALPAKA_FN_ACC void operator()(TAcc const& acc,
+                                  unsigned char const* __restrict__ data,
+                                  uint32_t const* __restrict__ offsets,
+                                  int const* __restrict__ feds,
+                                  EcalIdDeviceCollection::View integrityMemTtIdErrors,
+                                  EcalIdDeviceCollection::View integrityMemBlockSizeErrors,
+                                  EcalIdDeviceCollection::View integrityMemChIdErrors,
+                                  EcalIdDeviceCollection::View integrityMemGainErrors) const {
+      // indices
+      auto const ifed = alpaka::getIdx<alpaka::Grid, alpaka::Blocks>(acc)[0u];
+
+      // offset in bytes
+      auto const offset = offsets[ifed];
+      // fed id
+      auto const fed = feds[ifed];
+      auto const dcc = fed2dcc(fed);
+    }
+
+  private:
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC bool is_barrel(uint8_t dccid) const {
+      return dccid >= ElectronicsIdGPU::MIN_DCCID_EBM && dccid <= ElectronicsIdGPU::MAX_DCCID_EBP;
+    }
+
+    ALPAKA_FN_INLINE ALPAKA_FN_ACC uint8_t fed2dcc(int fed) const { return static_cast<uint8_t>(fed - 600); }
+  };
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Unpack digis
+  ////////////////////////////////////////////////////////////////////////////
+  void unpackFe(Queue& queue,
+                InputDataDevice const& inputDevice,
+                EcalDigiDeviceCollection& digisDevEB,
+                EcalDigiDeviceCollection& digisDevEE,
+                EcalIdDeviceCollection& integrityGainErrorsDevEB,
+                EcalIdDeviceCollection& integrityGainErrorsDevEE,
+                EcalIdDeviceCollection& integrityGainSwitchErrorsDevEB,
+                EcalIdDeviceCollection& integrityGainSwitchErrorsDevEE,
+                EcalIdDeviceCollection& integrityChIdErrorsDevEB,
+                EcalIdDeviceCollection& integrityChIdErrorsDevEE,
+                EcalIdDeviceCollection& integrityTTIdErrorsDev,
+                EcalIdDeviceCollection& integrityZSXtalIdErrorsDev,
+                EcalIdDeviceCollection& integrityBlockSizeErrorsDev,
+                EcalPnDiodeDigiDeviceCollection& pnDiodeDigisDev,
+                EcalElectronicsMappingDevice const& mapping,
+                uint32_t const nfedsWithData,
+                uint32_t const nbytesTotal) {
     auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
     alpaka::exec<Acc1D>(queue,
                         workDiv,
@@ -471,10 +1208,96 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw {
                         inputDevice.feds.data(),
                         digisDevEB.view(),
                         digisDevEE.view(),
-                        srFlagsDevEB.view(),
-                        srFlagsDevEE.view(),
+                        integrityGainErrorsDevEB.view(),
+                        integrityGainErrorsDevEE.view(),
+                        integrityGainSwitchErrorsDevEB.view(),
+                        integrityGainSwitchErrorsDevEE.view(),
+                        integrityChIdErrorsDevEB.view(),
+                        integrityChIdErrorsDevEE.view(),
+                        integrityTTIdErrorsDev.view(),
+                        integrityZSXtalIdErrorsDev.view(),
+                        integrityBlockSizeErrorsDev.view(),
+                        pnDiodeDigisDev.view(),
                         mapping.const_view(),
                         nbytesTotal);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Unpack SR flags
+  ////////////////////////////////////////////////////////////////////////////
+  void unpackSrFlags(Queue& queue,
+                     InputDataDevice const& inputDevice,
+                     EcalSrFlagDeviceCollection& srFlagsDevEB,
+                     EcalSrFlagDeviceCollection& srFlagsDevEE,
+                     uint32_t const nfedsWithData) {
+    auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
+    alpaka::exec<Acc1D>(queue,
+                        workDiv,
+                        Kernel_unpack_srflags{},
+                        inputDevice.data.data(),
+                        inputDevice.offsets.data(),
+                        inputDevice.feds.data(),
+                        srFlagsDevEB.view(),
+                        srFlagsDevEE.view());
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Unpack headers
+  ////////////////////////////////////////////////////////////////////////////
+  void unpackHeaders(Queue& queue,
+                     InputDataDevice const& inputDevice,
+                     EcalDCCHeaderBlockDeviceCollection& dccHeaders,
+                     uint32_t const nfedsWithData) {
+    auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
+    alpaka::exec<Acc1D>(queue,
+                        workDiv,
+                        Kernel_unpack_headers{},
+                        inputDevice.data.data(),
+                        inputDevice.offsets.data(),
+                        inputDevice.feds.data(),
+                        dccHeaders.view());
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Unpack TCC
+  ////////////////////////////////////////////////////////////////////////////
+  void unpackTcc(Queue& queue,
+                 InputDataDevice const& inputDevice,
+                 EcalTriggerPrimitiveDigiDeviceCollection& tpDigisDev,
+                 EcalPseudoStripInputDigiDeviceCollection& psDigisDev,
+                 uint32_t const nfedsWithData) {
+    auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
+    alpaka::exec<Acc1D>(queue,
+                        workDiv,
+                        Kernel_unpack_tcc{},
+                        inputDevice.data.data(),
+                        inputDevice.offsets.data(),
+                        inputDevice.feds.data(),
+                        tpDigisDev.view(),
+                        psDigisDev.view());
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Unpack MEM
+  ////////////////////////////////////////////////////////////////////////////
+  void unpackMem(Queue& queue,
+                 InputDataDevice const& inputDevice,
+                 EcalIdDeviceCollection& integrityMemTtIdErrorsDev,
+                 EcalIdDeviceCollection& integrityMemBlockSizeErrorsDev,
+                 EcalIdDeviceCollection& integrityMemChIdErrorsDev,
+                 EcalIdDeviceCollection& integrityMemGainErrorsDev,
+                 uint32_t const nfedsWithData) {
+    auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(nfedsWithData, 32);  // 32 channels per block
+    alpaka::exec<Acc1D>(queue,
+                        workDiv,
+                        Kernel_unpack_mem{},
+                        inputDevice.data.data(),
+                        inputDevice.offsets.data(),
+                        inputDevice.feds.data(),
+                        integrityMemTtIdErrorsDev.view(),
+                        integrityMemBlockSizeErrorsDev.view(),
+                        integrityMemChIdErrorsDev.view(),
+                        integrityMemGainErrorsDev.view());
   }
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE::ecal::raw

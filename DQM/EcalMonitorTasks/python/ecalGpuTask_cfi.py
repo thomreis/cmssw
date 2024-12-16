@@ -8,6 +8,7 @@ ecalGpuTask = cms.untracked.PSet(
         # ecalGpuTask must be explicitly turned on when using
         runGpuTask = cms.untracked.bool(False),
         enableDigi = cms.untracked.bool(True),
+        enableSrFlag = cms.untracked.bool(True),
         enableUncalib = cms.untracked.bool(True),
 
         # GPU rechits currently unavailable; last edited Sep 2023
@@ -17,6 +18,8 @@ ecalGpuTask = cms.untracked.PSet(
         # 2D flags enable 2D comparison maps
         digi1D = cms.untracked.bool(True),
         digi2D = cms.untracked.bool(True),
+        srFlag1D = cms.untracked.bool(True),
+        srFlag2D = cms.untracked.bool(True),
         uncalib1D = cms.untracked.bool(True),
         uncalib2D = cms.untracked.bool(True),
         rechit1D = cms.untracked.bool(True),
@@ -156,6 +159,126 @@ ecalGpuTask = cms.untracked.PSet(
                 title = cms.untracked.string('GPU ADC Counts')
             ),
             description = cms.untracked.string('Digi amplitudes for individual digi samples (1-10). GPU vs CPU comparison')
+        ),
+        # CPU SR flag
+        SrFlagCpu = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag nSrFlags cpu'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(100),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(5000),
+                title = cms.untracked.string('SR flags per Event')
+            ),
+            description = cms.untracked.string('Number of CPU SR flags per Event')
+        ),
+        SrFlagCpuValue = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag value cpu'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(8),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(8),
+                title = cms.untracked.string('SR flag value')
+            ),
+            description = cms.untracked.string('CPU SR flag value')
+        ),
+        # GPU SR flag (optional)
+        SrFlagGpu = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag nSrFlags gpu'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(100),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(5000),
+                title = cms.untracked.string('SR flags per Event')
+            ),
+            description = cms.untracked.string('Number of GPU SR flags per Event')
+        ),
+        SrFlagGpuValue = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag value gpu'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(8),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(8),
+                title = cms.untracked.string('SR flag value')
+            ),
+            description = cms.untracked.string('GPU SR flag value')
+        ),
+        # SR flag GPU-CPU Difference
+        SrFlagGpuCpu = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag nSrFlags gpu-cpu diff'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(100),
+                low = cms.untracked.double(-500),
+                high = cms.untracked.double(500),
+                title = cms.untracked.string('GPU-CPU SR flags per Event')
+            ),
+            description = cms.untracked.string('GPU-CPU difference of number of SR flags per Event')
+        ),
+        SrFlagGpuCpuValue = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag value gpu-cpu diff'),
+            kind = cms.untracked.string('TH1F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(16),
+                low = cms.untracked.double(-7),
+                high = cms.untracked.double(8),
+                title = cms.untracked.string('GPU-CPU SR flag value')
+            ),
+            description = cms.untracked.string('GPU-CPU difference of SR flag value')
+        ),
+        # SR flag 2D plots
+        SrFlag2D = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlags/%(prefix)sGT SR flag nSrFlags gpu-cpu map2D'),
+            kind = cms.untracked.string('TH2F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(100),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(5000),
+                title = cms.untracked.string('CPU SR flags per Event')
+            ),
+            yaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(100),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(5000),
+                title = cms.untracked.string('GPU SR flags per Event')
+            ),
+            description = cms.untracked.string('Number of SR flags per Event. GPU vs CPU comparison')
+        ),
+        SrFlag2DValue = cms.untracked.PSet(
+            path = cms.untracked.string('%(subdet)s/%(prefix)sGpuTask/SrFlag/%(prefix)sGT SR flag value gpu-cpu map2D'),
+            kind = cms.untracked.string('TH2F'),
+            otype = cms.untracked.string('Ecal2P'),
+            btype = cms.untracked.string('User'),
+            xaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(8),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(8),
+                title = cms.untracked.string('CPU SR flag value')
+            ),
+            yaxis = cms.untracked.PSet(
+                nbins = cms.untracked.int32(8),
+                low = cms.untracked.double(0),
+                high = cms.untracked.double(8),
+                title = cms.untracked.string('GPU SR flag value')
+            ),
+            description = cms.untracked.string('SR flag value. GPU vs CPU comparison')
         ),
         # CPU UncalibRecHit
         UncalibCpu = cms.untracked.PSet(

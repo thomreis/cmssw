@@ -14,6 +14,7 @@ namespace ecaldqm {
       : DQWorkerTask(),
         runGpuTask_(false),
         enableDigi_(false),
+        enableSrFlag_(false),
         enableUncalib_(false),
         enableRecHit_(false),
         digi1D_(false),
@@ -36,6 +37,11 @@ namespace ecaldqm {
       dependencies.push_back(Dependency(kEEGpuDigi, kEECpuDigi));
     }
 
+    if (enableSrFlag_) {
+      dependencies.push_back(Dependency(kEBGpuSrFlag, kEBCpuSrFlag));
+      dependencies.push_back(Dependency(kEEGpuSrFlag, kEECpuSrFlag));
+    }
+
     if (enableUncalib_) {
       dependencies.push_back(Dependency(kEBGpuUncalibRecHit, kEBCpuUncalibRecHit));
       dependencies.push_back(Dependency(kEEGpuUncalibRecHit, kEECpuUncalibRecHit));
@@ -52,12 +58,15 @@ namespace ecaldqm {
 
     // Enabling objects set to false if runGpuTask_ is false
     enableDigi_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableDigi");
+    enableSrFlag_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableSrFlags");
     enableUncalib_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableUncalib");
     enableRecHit_ = runGpuTask_ && params.getUntrackedParameter<bool>("enableRecHit");
 
     // Flags set to false if corresponding type is not enabled
     digi1D_ = enableDigi_ && params.getUntrackedParameter<bool>("digi1D");
     digi2D_ = enableDigi_ && params.getUntrackedParameter<bool>("digi2D");
+    srFlags1D_ = enableSrFlag_ && params.getUntrackedParameter<bool>("srFlags1D");
+    srFlags2D_ = enableSrFlag_ && params.getUntrackedParameter<bool>("srFlags2D");
     uncalib1D_ = enableUncalib_ && params.getUntrackedParameter<bool>("uncalib1D");
     uncalib2D_ = enableUncalib_ && params.getUntrackedParameter<bool>("uncalib2D");
     rechit1D_ = enableRecHit_ && params.getUntrackedParameter<bool>("rechit1D");
@@ -70,6 +79,12 @@ namespace ecaldqm {
       MEs_.erase(std::string("DigiCpuAmplitude"));
       MEs_.erase(std::string("DigiGpuCpu"));
       MEs_.erase(std::string("DigiGpuCpuAmplitude"));
+    }
+    if (!enableSrFlag_) {
+      MEs_.erase(std::string("SrFlagCpu"));
+      MEs_.erase(std::string("SrFlagCpuValue"));
+      MEs_.erase(std::string("SrFlagGpuCpu"));
+      MEs_.erase(std::string("SrFlagGpuCpuValue"));
     }
     if (!enableUncalib_) {
       MEs_.erase(std::string("UncalibCpu"));
@@ -105,6 +120,10 @@ namespace ecaldqm {
       MEs_.erase(std::string("DigiGpu"));
       MEs_.erase(std::string("DigiGpuAmplitude"));
     }
+    if (!srFlags1D_) {
+      MEs_.erase(std::string("SrFlagGpu"));
+      MEs_.erase(std::string("SrFlagGpuAmplitude"));
+    }
     if (!uncalib1D_) {
       MEs_.erase(std::string("UncalibGpu"));
       MEs_.erase(std::string("UncalibGpuAmp"));
@@ -125,6 +144,10 @@ namespace ecaldqm {
     if (!digi2D_) {
       MEs_.erase(std::string("Digi2D"));
       MEs_.erase(std::string("Digi2DAmplitude"));
+    }
+    if (!srFlags2D_) {
+      MEs_.erase(std::string("SrFlag2D"));
+      MEs_.erase(std::string("SrFlag2DValue"));
     }
     if (!uncalib2D_) {
       MEs_.erase(std::string("Uncalib2D"));
@@ -159,6 +182,8 @@ namespace ecaldqm {
   void GpuTask::beginEvent(edm::Event const&, edm::EventSetup const&, bool const&, bool&) {
     EBCpuDigis_ = nullptr;
     EECpuDigis_ = nullptr;
+    EBCpuSrFlags_ = nullptr;
+    EECpuSrFlags_ = nullptr;
     EBCpuUncalibRecHits_ = nullptr;
     EECpuUncalibRecHits_ = nullptr;
     EBCpuRecHits_ = nullptr;
@@ -270,6 +295,97 @@ namespace ecaldqm {
           static_cast<MESetMulti&>(meDigi2DAmplitude).use(iSample);
           meDigi2DAmplitude.fill(getEcalDQMSetupObjects(), iSubdet, cpuAmp, gpuAmp);
         }
+      }
+    }
+  }
+
+  template <typename SrFlagCollection>
+  void GpuTask::runOnCpuSrFlags(SrFlagCollection const& cpuSrFlags, Collections collection) {
+    MESet& meSrFlagCpu(MEs_.at("SrFlagCpu"));
+    MESet& meSrFlagCpuValue(MEs_.at("SrFlagCpuValue"));
+
+    int iSubdet(collection == kEBCpuSrFlag ? EcalBarrel : EcalEndcap);
+
+    // Save CpuSrFlags for comparison with GpuSrFlags
+    // "if constexpr" ensures cpuSrFlags is the correct type at compile time
+    if constexpr (std::is_same_v<SrFlagCollection, EBSrFlagCollection>) {
+      assert(iSubdet == EcalBarrel);
+      EBCpuSrFlags_ = &cpuSrFlags;
+    } else {
+      assert(iSubdet == EcalEndcap);
+      EECpuSrFlags_ = &cpuSrFlags;
+    }
+
+    unsigned nCpuSrFlags(cpuSrFlags.size());
+    meSrFlagCpu.fill(getEcalDQMSetupObjects(), iSubdet, nCpuSrFlags);
+
+    for (auto const& cpuSrFlag : cpuSrFlags) {
+      meSrFlagCpuValue.fill(getEcalDQMSetupObjects(), iSubdet, cpuSrFlag.value());
+    }
+  }
+
+  template <typename SrFlagCollection>
+  void GpuTask::runOnGpuSrFlags(SrFlagCollection const& gpuSrFlags, Collections collection) {
+    MESet& meSrFlagGpuCpu(MEs_.at("SrFlagGpuCpu"));
+    MESet& meSrFlagGpuCpuValue(MEs_.at("SrFlagGpuCpuValue"));
+
+    int iSubdet(collection == kEBGpuSrFlag ? EcalBarrel : EcalEndcap);
+
+    // Get CpuSrFlags saved from GpuTask::runOnCpuSrFlags() for this event
+    // "if constexpr" ensures cpuSrFlags is the correct type at compile time
+    // Note: gpuSrFlags is a collection and cpuSrFlags is a pointer to a collection (for historical reasons)
+    SrFlagCollection const* cpuSrFlags;
+    if constexpr (std::is_same_v<SrFlagCollection, EBSrFlagCollection>) {
+      assert(iSubdet == EcalBarrel);
+      cpuSrFlags = EBCpuSrFlags_;
+    } else {
+      assert(iSubdet == EcalEndcap);
+      cpuSrFlags = EECpuSrFlags_;
+    }
+
+    if (!cpuSrFlags) {
+      edm::LogWarning("EcalDQM") << "GpuTask: Did not find " << ((iSubdet == EcalBarrel) ? "EB" : "EE")
+                                 << "CpuSrFlags Collection. Aborting runOnGpuSrFlags\n";
+      return;
+    }
+
+    auto const nGpuSrFlags(gpuSrFlags.size());
+    auto const nCpuSrFlags(cpuSrFlags->size());
+
+    meSrFlagGpuCpu.fill(getEcalDQMSetupObjects(), iSubdet, nGpuSrFlags - nCpuSrFlags);
+
+    if (srFlags1D_) {
+      MESet& meSrFlagGpu(MEs_.at("SrFlagGpu"));
+      meSrFlagGpu.fill(getEcalDQMSetupObjects(), iSubdet, nGpuSrFlags);
+    }
+
+    if (digi2D_) {
+      MESet& meSrFlag2D(MEs_.at("SrFlag2D"));
+      meSrFlag2D.fill(getEcalDQMSetupObjects(), iSubdet, nCpuSrFlags, nGpuSrFlags);
+    }
+
+    for (auto const& gpuSrFlag : gpuSrFlags) {
+      // Find CpuSrFlag with matching DetId
+      DetId gpuId(gpuSrFlag.id());
+      typename SrFlagCollection::const_iterator cpuItr(cpuSrFlags->find(gpuId));
+      if (cpuItr == cpuSrFlags->end()) {
+        edm::LogWarning("EcalDQM") << "GpuTask: Did not find CpuSrFlag DetId " << gpuId.rawId() << " in CPU collection\n";
+        continue;
+      }
+
+      auto const gpuValue = gpuSrFlag.value();
+      auto const cpuValue = cpuItr->value();
+
+      meSrFlagGpuCpuValue.fill(getEcalDQMSetupObjects(), iSubdet, gpuValue - cpuValue);
+
+      if (srFlags1D_) {
+        MESet& meSrFlagGpuValue(MEs_.at("SrFlagGpuValue"));
+        meSrFlagGpuValue.fill(getEcalDQMSetupObjects(), iSubdet, gpuValue);
+      }
+
+      if (srFlags2D_) {
+        MESet& meSrFlag2DValue(MEs_.at("SrFlag2DValue"));
+        meSrFlag2DValue.fill(getEcalDQMSetupObjects(), iSubdet, cpuValue, gpuValue);
       }
     }
   }

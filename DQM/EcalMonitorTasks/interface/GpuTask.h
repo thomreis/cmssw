@@ -24,6 +24,10 @@ namespace ecaldqm {
     void runOnCpuDigis(DigiCollection const&, Collections);
     template <typename DigiCollection>
     void runOnGpuDigis(DigiCollection const&, Collections);
+    template <typename SrFlagCollection>
+    void runOnCpuSrFlags(SrFlagCollection const&, Collections);
+    template <typename SrFlagCollection>
+    void runOnGpuSrFlags(SrFlagCollection const&, Collections);
     void runOnCpuUncalibRecHits(EcalUncalibratedRecHitCollection const&, Collections);
     void runOnGpuUncalibRecHits(EcalUncalibratedRecHitCollection const&, Collections);
     void runOnCpuRecHits(EcalRecHitCollection const&, Collections);
@@ -34,11 +38,14 @@ namespace ecaldqm {
 
     bool runGpuTask_;
     bool enableDigi_;
+    bool enableSrFlag_;
     bool enableUncalib_;
     bool enableRecHit_;
 
     bool digi1D_;
     bool digi2D_;
+    bool srFlags1D_;
+    bool srFlags2D_;
     bool uncalib1D_;
     bool uncalib2D_;
     bool rechit1D_;
@@ -48,6 +55,9 @@ namespace ecaldqm {
 
     EBDigiCollection const* EBCpuDigis_;
     EEDigiCollection const* EECpuDigis_;
+
+    EBSrFlagCollection const* EBCpuSrFlags_;
+    EESrFlagCollection const* EECpuSrFlags_;
 
     EcalUncalibratedRecHitCollection const* EBCpuUncalibRecHits_;
     EcalUncalibratedRecHitCollection const* EECpuUncalibRecHits_;
@@ -77,6 +87,26 @@ namespace ecaldqm {
         if (collection_data && runGpuTask_ && enableDigi_)
           runOnGpuDigis(*static_cast<EEDigiCollection const*>(collection_data), collection);
         return enableDigi_;
+        break;
+      case kEBCpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnCpuSrFlags(*static_cast<EBSrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEECpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnCpuSrFlags(*static_cast<EESrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEBGpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnGpuSrFlags(*static_cast<EBSrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
+        break;
+      case kEEGpuSrFlag:
+        if (collection_data && runGpuTask_ && enableSrFlag_)
+          runOnGpuSrFlags(*static_cast<EESrFlagCollection const*>(collection_data), collection);
+        return enableSrFlag_;
         break;
       case kEBCpuUncalibRecHit:
       case kEECpuUncalibRecHit:

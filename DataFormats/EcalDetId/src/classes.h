@@ -1,3 +1,4 @@
+#include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDetId/interface/EEDetId.h"
 #include "DataFormats/EcalDetId/interface/ESDetId.h"
@@ -9,4 +10,3 @@
 #include "DataFormats/EcalDetId/interface/EcalIdSoA.h"
 
 #include "DataFormats/EcalDetId/interface/EcalDetIdCollections.h"
-#include "DataFormats/Common/interface/Wrapper.h"

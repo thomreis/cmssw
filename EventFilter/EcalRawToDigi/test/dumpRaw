@@ -216,7 +216,7 @@ fi
 cmssw_path="${cmssw_path}process.dumpRaw"
 cat >> "$TMPFILE" <<EOF
 process.load("EventFilter.EcalRawToDigi.EcalDumpRaw_cfi")
-process.dumpRaw.fedRawDataCollectionTag = "source"
+process.dumpRaw.fedRawDataCollectionTag = "rawDataCollector"
 process.dumpRaw.l1aMinX = $l1axmin
 process.dumpRaw.l1aMaxX = $l1axmax
 

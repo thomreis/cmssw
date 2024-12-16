@@ -62,7 +62,26 @@ from EventFilter.EcalRawToDigi.ecalDigisFromPortableProducer_cfi import ecalDigi
 _ecalDigisFromPortable = _ecalDigisFromPortableProducer.clone(
     digisInLabelEB = 'ecalDigisPortable:ebDigis',
     digisInLabelEE = 'ecalDigisPortable:eeDigis',
-    produceDummyIntegrityCollections = True
+    srFlagInLabelEB = 'ecalDigisPortable:ebSrFlags',
+    srFlagInLabelEE = 'ecalDigisPortable:eeSrFlags',
+    integrityGainErrorsInLabelEB = 'ecalDigisPortable:integrityGainErrorsEB',
+    integrityGainSwitchErrorsInLabelEB = 'ecalDigisPortable:integrityGainSwitchErrorsEB',
+    integrityChIdErrorsInLabelEB = 'ecalDigisPortable:integrityChIdErrorsEB',
+    integrityGainErrorsInLabelEE = 'ecalDigisPortable:integrityGainErrorsEE',
+    integrityGainSwitchErrorsInLabelEE = 'ecalDigisPortable:integrityGainSwitchErrorsEE',
+    integrityChIdErrorsInLabelEE = 'ecalDigisPortable:integrityChIdErrorsEE',
+    pnDiodeDigisInLabel = 'ecalDigisPortable',
+    ecalTriggerPrimitivesInLabel = 'ecalDigisPortable',
+    ecalPseudoStripInputsInLabel = 'ecalDigisPortable',
+    integrityTTIdErrorsInLabel = 'ecalDigisPortable:integrityTTIdErrors',
+    integrityZSXtalIdErrorsInLabel = 'ecalDigisPortable:integrityZSXtalIdErrors',
+    integrityBlockSizeErrorsInLabel = 'ecalDigisPortable:integrityBlockSizeErrors',
+    integrityMemTtIdErrorsInLabel = 'ecalDigisPortable:integrityMemTtIdErrors',
+    integrityMemBlockSizeErrorsInLabel = 'ecalDigisPortable:integrityMemBlockSizeErrors',
+    integrityMemChIdErrorsInLabel = 'ecalDigisPortable:integrityMemChIdErrors',
+    integrityMemGainErrorsInLabel = 'ecalDigisPortable:integrityMemGainErrors',
+    ecalRawDataInLabel = 'ecalDigisPortable'
+
 )
 alpaka.toModify(ecalDigis,
     cpu = _ecalDigisFromPortable.clone()
