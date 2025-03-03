@@ -9,6 +9,7 @@
 <use name="Geometry/EcalMapping"/>
 <use name="clhep"/>
 <use name="hls"/>
+<use name="hls4mlEmulatorExtras"/>
 <use name="EbSpikeTaggerHLS"/>
 <use name="EbSwissCrossHLS"/>
 <export>
