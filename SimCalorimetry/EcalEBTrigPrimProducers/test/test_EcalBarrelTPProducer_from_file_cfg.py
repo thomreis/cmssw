@@ -9,27 +9,22 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport = cms.untracked.PSet(
     reportEvery = cms.untracked.int32(1)
 )
+process.MessageLogger.cerr.INFO.limit = 1000000
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
 
-#process.source = cms.Source("EcalBCPFileInputSource",
-#    fileNames = cms.untracked.vstring('file:../../../hls/testbench_data/rx_tbspikes0p9_ld2_2800evts.txt'),
-#    firstLuminosityBlockForEachRun = cms.untracked.VLuminosityBlockID([]),
-#    runNumber = cms.untracked.uint32(1),
-#    firstEventNumber = cms.untracked.uint32(1),
-#    startSample = cms.untracked.uint32(4),
-#    #skipEvents = cms.untracked.int32(467)
-#)
-
-process.source = cms.Source("EcalBCPH4FileInputSource",
-    fileNames = cms.untracked.vstring('file:../../../hls/testbench_data/H4_test_input.txt'),
+process.source = cms.Source("EcalTBFileInputToDigiSource",
+    #fileNames = cms.untracked.vstring('file:../../../hls/testbench_data/H4_test_input.txt'),
+    fileNames = cms.untracked.vstring('file:../../../hls/testbench_data/rx_tbspikes0p9_ld2_2800evts.txt'),
     firstLuminosityBlockForEachRun = cms.untracked.VLuminosityBlockID([]),
     runNumber = cms.untracked.uint32(1),
     firstEventNumber = cms.untracked.uint32(1),
-    startSample = cms.untracked.uint32(0),
-    #skipEvents = cms.untracked.int32(467)
+    startSample = cms.untracked.uint32(7),
+    skipEvents = cms.untracked.int32(0),
+    #skipEvents = cms.untracked.int32(467),
+    attenuation = cms.untracked.double(4.)
 )
 
 process.ecalBcpPayloadParamsSource = cms.ESSource("EmptyESSource",
