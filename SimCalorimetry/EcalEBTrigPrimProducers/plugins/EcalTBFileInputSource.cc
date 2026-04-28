@@ -30,7 +30,8 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
-#include "FWCore/Sources/interface/ProducerSourceFromFiles.h"
+#include "FWCore/Sources/interface/ProducerSourceBase.h"
+#include "FWStorage/Catalog/interface/FromFiles.h"
 
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
@@ -42,7 +43,7 @@
 //
 
 template <typename T>
-class EcalTBFileInputSource : public edm::ProducerSourceFromFiles {
+class EcalTBFileInputSource : public edm::ProducerSourceBase {
 public:
   explicit EcalTBFileInputSource(const edm::ParameterSet&, edm::InputSourceDescription const&);
   ~EcalTBFileInputSource();
@@ -60,6 +61,7 @@ private:
   void setSample(T& digis, unsigned int chidx, unsigned int sampleidx, int adc, int gain);
 
   // ----------member data ---------------------------
+  edm::FromFiles fromFiles_;
   std::string fname_;
   std::ifstream fstream_;
 
@@ -83,7 +85,8 @@ private:
 template <typename T>
 EcalTBFileInputSource<T>::EcalTBFileInputSource(const edm::ParameterSet& iConfig,
                                                 const edm::InputSourceDescription& iSrcDesc)
-    : edm::ProducerSourceFromFiles(iConfig, iSrcDesc, true),
+    : edm::ProducerSourceBase(iConfig, iSrcDesc, true),
+      fromFiles_(iConfig),
       runnr_(iConfig.getUntrackedParameter<unsigned int>("runNumber")),
       evtnr_(iConfig.getUntrackedParameter<unsigned int>("firstEventNumber")),
       startSample_(iConfig.getUntrackedParameter<unsigned int>("startSample")),
@@ -91,10 +94,11 @@ EcalTBFileInputSource<T>::EcalTBFileInputSource(const edm::ParameterSet& iConfig
       attenuation_(iConfig.getUntrackedParameter<double>("attenuation", 1.)),
       nchannels_(0),
       ebDigiToken_(produces<T>()) {
-  if (fileNames(0).empty()) {
+  auto fileNames = fromFiles_.fileNames(0);
+  if (fileNames.empty()) {
     throw cms::Exception("FileOpenError") << "No input file";
   }
-  fname_ = fileNames(0)[0].substr(fileNames(0)[0].find(":") + 1);
+  fname_ = fileNames[0].substr(fileNames[0].find(":") + 1);
   openFile();
   readHeader();
 }
@@ -244,7 +248,8 @@ void EcalTBFileInputSource<T>::produce(edm::Event& iEvent) {
 template <typename T>
 void EcalTBFileInputSource<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  edm::ProducerSourceFromFiles::fillDescription(desc);
+  edm::ProducerSourceBase::fillDescription(desc);
+  edm::FromFiles::fillDescription(desc);
   desc.addUntracked<unsigned int>("runNumber", 1);
   desc.addUntracked<unsigned int>("firstEventNumber", 1);
   desc.addUntracked<unsigned int>("startSample", 0);
