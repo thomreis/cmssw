@@ -26,7 +26,8 @@
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Sources/interface/ProducerSourceFromFiles.h"
+#include "FWCore/Sources/interface/ProducerSourceBase.h"
+#include "FWStorage/Catalog/interface/FromFiles.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/InputSourceMacros.h"
@@ -41,7 +42,7 @@
 // class declaration
 //
 
-class EcalBCPH4FileInputSource : public edm::ProducerSourceFromFiles {
+class EcalBCPH4FileInputSource : public edm::ProducerSourceBase {
  public:
   explicit EcalBCPH4FileInputSource(const edm::ParameterSet&, edm::InputSourceDescription const&);
   ~EcalBCPH4FileInputSource();
@@ -56,6 +57,7 @@ class EcalBCPH4FileInputSource : public edm::ProducerSourceFromFiles {
   void readHeader();
 
   // ----------member data ---------------------------
+  edm::FromFiles fromFiles_;
   std::string fname_;
   std::ifstream fstream_;
 
@@ -76,7 +78,8 @@ class EcalBCPH4FileInputSource : public edm::ProducerSourceFromFiles {
 // constructors and destructor
 //
 EcalBCPH4FileInputSource::EcalBCPH4FileInputSource(const edm::ParameterSet& iConfig, const edm::InputSourceDescription &iSrcDesc) :
-  edm::ProducerSourceFromFiles(iConfig, iSrcDesc, true),
+  edm::ProducerSourceBase(iConfig, iSrcDesc, true),
+  fromFiles_(iConfig),
   runnr_(iConfig.getUntrackedParameter<unsigned int>("runNumber")),
   evtnr_(iConfig.getUntrackedParameter<unsigned int>("firstEventNumber")),
   startSample_(iConfig.getUntrackedParameter<unsigned int>("startSample")),
@@ -84,10 +87,11 @@ EcalBCPH4FileInputSource::EcalBCPH4FileInputSource(const edm::ParameterSet& iCon
   nchannels_(0),
   ebDigiToken_(produces<EBDigiCollection>())
 {
-  if (fileNames(0).empty()) {
+  auto fileNames = fromFiles_.fileNames(0);
+  if (fileNames.empty()) {
     throw cms::Exception("FileOpenError") << "No input file";
   }
-  fname_ = fileNames(0)[0].substr(fileNames(0)[0].find(":") + 1);
+  fname_ = fileNames[0].substr(fileNames[0].find(":") + 1);
   openFile();
   readHeader();
 }

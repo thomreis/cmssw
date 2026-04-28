@@ -4,6 +4,7 @@
 <use name="FWCore/ServiceRegistry"/>
 <use name="FWCore/Sources"/>
 <use name="FWCore/Utilities"/>
+<use name="FWStorage/Catalog"/>
 <use name="SimCalorimetry/EcalEBTrigPrimAlgos"/>
 <use name="DataFormats/EcalDigi"/>
 <use name="DataFormats/EcalRecHit"/>
