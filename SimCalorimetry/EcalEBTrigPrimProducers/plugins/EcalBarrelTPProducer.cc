@@ -41,7 +41,7 @@
 // class declaration
 //
 
-class EcalBarrelTPProducer : public edm::stream::EDProducer<> {
+class EcalBarrelTPProducer : public edm::stream::EDProducer<edm::stream::WatchRuns> {
  public:
   explicit EcalBarrelTPProducer(const edm::ParameterSet&);
   ~EcalBarrelTPProducer();
