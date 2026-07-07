@@ -12,22 +12,22 @@ ecalMonitorTaskEcalOnly = _ecalMonitorTask.clone(
 
 # Changes for Phase 2
 from DQM.EcalMonitorTasks.CollectionTags_cfi import ecalDQMCollectionTagsPhase2
-from DQM.EcalMonitorTasks.ClusterTask_cfi import ecalClusterTask
-from DQM.EcalMonitorTasks.EnergyTask_cfi import ecalEnergyTask
-from DQM.EcalMonitorTasks.TimingTask_cfi import ecalTimingTask
+from DQM.EcalMonitorTasks.ClusterTask_cfi import ecalClusterTaskPhase2
+from DQM.EcalMonitorTasks.EnergyTask_cfi import ecalEnergyTaskPhase2
+from DQM.EcalMonitorTasks.TimingTask_cfi import ecalTimingTaskPhase2
 from DQM.EcalMonitorTasks.ecalPiZeroTask_cfi import ecalPiZeroTask
 
 ecalMonitorTaskEcalOnlyPhase2 = ecalMonitorTaskEcalOnly.clone(
     workers = cms.untracked.vstring(
         "ClusterTask",
-        "EnergyTask",
-        "TimingTask",
+#        "EnergyTask",
+#        "TimingTask",
         "PiZeroTask"
     ),
     workerParameters = cms.untracked.PSet(
-        ClusterTask = ecalClusterTask,
-        EnergyTask = ecalEnergyTask,
-        TimingTask = ecalTimingTask,
+        ClusterTask = ecalClusterTaskPhase2,
+#        EnergyTask = ecalEnergyTaskPhase2,
+#        TimingTask = ecalTimingTaskPhase2,
         PiZeroTask = ecalPiZeroTask
     ),
     collectionTags = ecalDQMCollectionTagsPhase2,

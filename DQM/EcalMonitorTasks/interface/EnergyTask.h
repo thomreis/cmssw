@@ -24,13 +24,18 @@ namespace ecaldqm {
 
     bool isPhysicsRun_;
     //    float threshS9_;
+    bool doEndcaps_;
   };
 
   inline bool EnergyTask::analyze(void const* _p, Collections _collection) {
     switch (_collection) {
       case kEBRecHit:
-      case kEERecHit:
         if (_p)
+          runOnRecHits(*static_cast<EcalRecHitCollection const*>(_p));
+        return true;
+        break;
+      case kEERecHit:
+        if (doEndcaps_ && _p)
           runOnRecHits(*static_cast<EcalRecHitCollection const*>(_p));
         return true;
         break;

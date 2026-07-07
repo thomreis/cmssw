@@ -29,6 +29,9 @@ alpaka.toModify(ecalMonitorTask.skipCollections, func = lambda skipCollections: 
 
 # Changes for Phase 2
 from DQM.EcalMonitorTasks.CollectionTags_cfi import ecalDQMCollectionTagsPhase2
+from DQM.EcalMonitorTasks.ClusterTask_cfi import ecalClusterTaskPhase2
+from DQM.EcalMonitorTasks.EnergyTask_cfi import ecalEnergyTaskPhase2
+from DQM.EcalMonitorTasks.TimingTask_cfi import ecalTimingTaskPhase2
 ecalMonitorTaskPhase2 = ecalMonitorTask.clone(
     workers = cms.untracked.vstring(
         "ClusterTask",
@@ -37,9 +40,9 @@ ecalMonitorTaskPhase2 = ecalMonitorTask.clone(
         "PiZeroTask"
     ),
     workerParameters = cms.untracked.PSet(
-        ClusterTask = ecalClusterTask,
-        EnergyTask = ecalEnergyTask,
-        TimingTask = ecalTimingTask,
+        ClusterTask = ecalClusterTaskPhase2,
+        EnergyTask = ecalEnergyTaskPhase2,
+        TimingTask = ecalTimingTaskPhase2,
         PiZeroTask = ecalPiZeroTask
     ),
     collectionTags = ecalDQMCollectionTagsPhase2,
