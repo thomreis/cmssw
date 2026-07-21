@@ -27,7 +27,7 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Sources/interface/ProducerSourceBase.h"
-#include "FWStorage/Catalog/interface/FromFiles.h"
+#include "FWStorage/Catalog/interface/InputFileCatalog.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/InputSourceMacros.h"
@@ -57,7 +57,7 @@ class EcalBCPH4FileInputSource : public edm::ProducerSourceBase {
   void readHeader();
 
   // ----------member data ---------------------------
-  edm::FromFiles fromFiles_;
+  edm::InputFileCatalog inputFileCatalog_;
   std::string fname_;
   std::ifstream fstream_;
 
@@ -79,7 +79,7 @@ class EcalBCPH4FileInputSource : public edm::ProducerSourceBase {
 //
 EcalBCPH4FileInputSource::EcalBCPH4FileInputSource(const edm::ParameterSet& iConfig, const edm::InputSourceDescription &iSrcDesc) :
   edm::ProducerSourceBase(iConfig, iSrcDesc, true),
-  fromFiles_(iConfig),
+  inputFileCatalog_(iConfig),
   runnr_(iConfig.getUntrackedParameter<unsigned int>("runNumber")),
   evtnr_(iConfig.getUntrackedParameter<unsigned int>("firstEventNumber")),
   startSample_(iConfig.getUntrackedParameter<unsigned int>("startSample")),
@@ -87,7 +87,7 @@ EcalBCPH4FileInputSource::EcalBCPH4FileInputSource(const edm::ParameterSet& iCon
   nchannels_(0),
   ebDigiToken_(produces<EBDigiCollection>())
 {
-  auto fileNames = fromFiles_.fileNames(0);
+  auto fileNames = inputFileCatalog_.allPFNsFromFirstCatalog();
   if (fileNames.empty()) {
     throw cms::Exception("FileOpenError") << "No input file";
   }

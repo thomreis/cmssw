@@ -31,7 +31,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
 #include "FWCore/Sources/interface/ProducerSourceBase.h"
-#include "FWStorage/Catalog/interface/FromFiles.h"
+#include "FWStorage/Catalog/interface/InputFileCatalog.h"
 
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
@@ -61,7 +61,7 @@ private:
   void setSample(T& digis, unsigned int chidx, unsigned int sampleidx, int adc, int gain);
 
   // ----------member data ---------------------------
-  edm::FromFiles fromFiles_;
+  edm::InputFileCatalog inputFileCatalog_;
   std::string fname_;
   std::ifstream fstream_;
 
@@ -86,7 +86,7 @@ template <typename T>
 EcalTBFileInputSource<T>::EcalTBFileInputSource(const edm::ParameterSet& iConfig,
                                                 const edm::InputSourceDescription& iSrcDesc)
     : edm::ProducerSourceBase(iConfig, iSrcDesc, true),
-      fromFiles_(iConfig),
+      inputFileCatalog_(iConfig),
       runnr_(iConfig.getUntrackedParameter<unsigned int>("runNumber")),
       evtnr_(iConfig.getUntrackedParameter<unsigned int>("firstEventNumber")),
       startSample_(iConfig.getUntrackedParameter<unsigned int>("startSample")),
@@ -94,7 +94,7 @@ EcalTBFileInputSource<T>::EcalTBFileInputSource(const edm::ParameterSet& iConfig
       attenuation_(iConfig.getUntrackedParameter<double>("attenuation", 1.)),
       nchannels_(0),
       ebDigiToken_(produces<T>()) {
-  auto fileNames = fromFiles_.fileNames(0);
+  auto fileNames = inputFileCatalog_.allPFNsFromFirstCatalog();
   if (fileNames.empty()) {
     throw cms::Exception("FileOpenError") << "No input file";
   }
@@ -249,7 +249,7 @@ template <typename T>
 void EcalTBFileInputSource<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   edm::ProducerSourceBase::fillDescription(desc);
-  edm::FromFiles::fillDescription(desc);
+  edm::InputFileCatalog::fillDescription(desc);
   desc.addUntracked<unsigned int>("runNumber", 1);
   desc.addUntracked<unsigned int>("firstEventNumber", 1);
   desc.addUntracked<unsigned int>("startSample", 0);
