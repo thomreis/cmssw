@@ -7,9 +7,11 @@ import FWCore.ParameterSet.Config as cms
 simEcalEBTriggerPrimitivePhase2Digis = cms.EDProducer("EcalEBTrigPrimPhase2Producer",
     barrelEcalDigis = cms.InputTag("simEcalUnsuppressedDigis"),
     binOfMaximum = cms.int32(6), 
-    Famos = cms.bool(False),
-    TcpOutput = cms.bool(False),
-    Debug = cms.bool(False)
+    Debug = cms.bool(False),
+    spikeTagger = cms.PSet(
+        algoType = cms.string("ld"),
+        version = cms.uint32(1)
+    )
 )
 
 
