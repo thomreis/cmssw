@@ -43,7 +43,7 @@
 
 // Class declaration
 /** \class EcalEBTrigPrimPhase2Producer
-  \author L. Lutton, N. Marinelli - Univ. of Notre Dame
+\author L. Lutton, N. Marinelli - Univ. of Notre Dame
 Description: forPhase II
 It consumes the new Phase2 digis based on the new EB electronics
 and plugs in the main steering algo for TP emulation
