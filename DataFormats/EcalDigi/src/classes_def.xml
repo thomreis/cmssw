@@ -29,15 +29,11 @@
    <class name="io_v1::EcalTriggerPrimitiveDigi" ClassVersion="3">
     <version ClassVersion="3" checksum="1294491512"/>
    </class>
-   <class name="io_v1::EcalEBTriggerPrimitiveDigi" ClassVersion="4">
-    <version ClassVersion="4" checksum="849705032"/>
+   <class name="io_v1::EcalEBTriggerPrimitiveDigi" ClassVersion="3">
     <version ClassVersion="3" checksum="299137641"/>
    </class>
    <class name="EcalEBPhase2TriggerPrimitiveDigi" ClassVersion="3">
     <version ClassVersion="3" checksum="553470717"/>
-   </class>
-   <class name="EcalEBTriggerPrimitiveCluster" ClassVersion="3">
-    <version ClassVersion="3" checksum="1690078582"/>
    </class>
 
    <class name="EcalPseudoStripInputSample" ClassVersion="3">
@@ -80,7 +76,6 @@
    <class name="std::vector<EcalEBPhase2TriggerPrimitiveDigi>"/>
    <class name="std::vector<io_v1::EcalPseudoStripInputDigi>"/>
    <class name="std::vector<io_v1::EcalPnDiodeDigi>"/>
-   <class name="std::vector<EcalEBTriggerPrimitiveCluster>"/>
    <class name="std::vector<EcalMatacqDigi>"/>
    <class name="std::vector<io_v1::EcalTimeDigi>"/>
 
@@ -113,7 +108,6 @@
    <class name="edm::Wrapper<io_v1::EEDigiCollection>" />
    <class name="edm::Wrapper<io_v1::ESDigiCollection>" splitLevel="0"/>
    <class name="edm::Wrapper<io_v1::EcalTrigPrimCompactColl>" splitLevel="0"/>   
-   <class name="edm::Wrapper<std::vector<EcalEBTriggerPrimitiveCluster>>"/>
    
    <class name="edm::SortedCollection<ESDataFrame,edm::StrictWeakOrdering<ESDataFrame> >"/>
    <class name="edm::SortedCollection<io_v1::EcalTimeDigi,edm::StrictWeakOrdering<io_v1::EcalTimeDigi> >"/>

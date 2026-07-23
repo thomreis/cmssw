@@ -78,4 +78,3 @@
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGLinearizationConst.h"
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGPedestals.h"
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGSpikeTaggerParams.h"
-#include "CondFormats/EcalObjects/interface/EcalBcpPayloadParams.h"

@@ -1,11 +1,10 @@
-#ifndef DataFormats_EcalDigi_EcalEBTriggerPrimitiveDigi_h
-#define DataFormats_EcalDigi_EcalEBTriggerPrimitiveDigi_h
+#ifndef ECALEBTRIGGERPRIMITIVEDIGI_H
+#define ECALEBTRIGGERPRIMITIVEDIGI_H 1
 
 #include <ostream>
 #include <vector>
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDigi/interface/EcalEBTriggerPrimitiveSample.h"
-#include "DataFormats/EcalDigi/interface/EcalEBTriggerPrimitiveAuxiliary.h"
 
 /** \class EcalEBTriggerPrimitiveDigi
 \author N. Marinelli - Univ. of Notre Dame
@@ -53,16 +52,10 @@ namespace io_v1 {
     /// Gets the interesting sample
     int sampleOfInterest() const;
 
-    /// Get the auxiliary data
-    const EcalEBTriggerPrimitiveAuxiliary& auxiliary(int i) const { return auxData_[i]; }
-    /// Set the auxiliary data
-    void setAuxiliary(int i, const EcalEBTriggerPrimitiveAuxiliary& aux) { auxData_[i] = aux; }
-
   private:
     EBDetId id_;
     int size_;
     std::vector<EcalEBTriggerPrimitiveSample> data_;
-    std::vector<EcalEBTriggerPrimitiveAuxiliary> auxData_;
   };
 
   inline void swap(EcalEBTriggerPrimitiveDigi& lh, EcalEBTriggerPrimitiveDigi& rh) { lh.swap(rh); }
