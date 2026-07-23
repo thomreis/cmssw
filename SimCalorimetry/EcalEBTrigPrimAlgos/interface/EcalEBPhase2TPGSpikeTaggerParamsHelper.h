@@ -9,12 +9,12 @@
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGSpikeTaggerParams.h"
 
 class EcalEBPhase2TPGSpikeTaggerParamsHelper : public EcalEBPhase2TPGSpikeTaggerParams {
- public:
+public:
   EcalEBPhase2TPGSpikeTaggerParamsHelper();
   EcalEBPhase2TPGSpikeTaggerParamsHelper(const EcalEBPhase2TPGSpikeTaggerParams &params);
-  EcalEBPhase2TPGSpikeTaggerParamsHelper(const edm::ParameterSet& config);
+  EcalEBPhase2TPGSpikeTaggerParamsHelper(const edm::ParameterSet &config);
 
-  void createFromPSet(const edm::ParameterSet& config);
+  void createFromPSet(const edm::ParameterSet &config);
 
   // Global parameters
   unsigned int fwVersion() const;
@@ -32,16 +32,12 @@ class EcalEBPhase2TPGSpikeTaggerParamsHelper : public EcalEBPhase2TPGSpikeTagger
 
   // print parameters to stream:
   void print(std::ostream &out) const;
-  friend std::ostream & operator<<(std::ostream &out, const EcalEBPhase2TPGSpikeTaggerParamsHelper &params);
+  friend std::ostream &operator<<(std::ostream &out, const EcalEBPhase2TPGSpikeTaggerParamsHelper &params);
 
- private:
+private:
   // Defines the content of each node
   // New nodes can only be added before NUM_NODES
-  enum EcalSpikeTaggerParamNode {
-    kGlobalAlgoParams = 0,
-    kGlobalSpikeTaggerLdParams,
-    NUM_NODES
-  };
+  enum EcalSpikeTaggerParamNode { kGlobalAlgoParams = 0, kGlobalSpikeTaggerLdParams, NUM_NODES };
 
   // Defines the content of each crystal node
   // New nodes can only be added before NUM_CRYSTAL_NODES
@@ -53,8 +49,8 @@ class EcalEBPhase2TPGSpikeTaggerParamsHelper : public EcalEBPhase2TPGSpikeTagger
   };
 
   // index of variabe inside a node vector
-  enum DIdx {kSpikeThreshold = 0};
-  enum UIdx {kFwVersion = 0, kSampleOfInterest = 0};
+  enum DIdx { kSpikeThreshold = 0 };
+  enum UIdx { kFwVersion = 0, kSampleOfInterest = 0 };
   enum IIdx {};
   enum SIdx {};
 

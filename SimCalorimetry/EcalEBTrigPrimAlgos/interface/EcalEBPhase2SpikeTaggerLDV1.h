@@ -11,15 +11,14 @@
 */
 
 class EcalEBPhase2SpikeTaggerLDV1 : public EcalEBPhase2SpikeTagger {
- public:
+public:
   EcalEBPhase2SpikeTaggerLDV1(edm::ConsumesCollector& cc, bool debug);
 
-  bool process(const std::vector<int> &linInput) override;
+  bool process(const std::vector<int>& linInput) override;
   void getRecords(edm::EventSetup const& setup) override;
-  void setParameters(EBDetId id,
-                     const EcalTPGCrystalStatus *ecaltpBadX) override;
+  void setParameters(EBDetId id, const EcalTPGCrystalStatus* ecaltpBadX) override;
 
- private:
+private:
   edm::ESGetToken<EcalEBPhase2TPGSpikeTaggerParams, EcalEBPhase2TPGSpikeTaggerParamsRcd> spikeTaggerParamsToken_;
   unsigned int peakIdx_;
   float spikeThreshold_;

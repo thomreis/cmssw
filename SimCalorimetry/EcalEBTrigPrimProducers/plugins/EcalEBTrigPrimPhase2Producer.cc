@@ -96,7 +96,6 @@ EcalEBTrigPrimPhase2Producer::EcalEBTrigPrimPhase2Producer(const edm::ParameterS
       spikeTaggerParams_(iConfig.getParameter<edm::ParameterSet>("spikeTagger")) {
   tokenEBdigi_ = consumes<EBDigiCollectionPh2>(iConfig.getParameter<edm::InputTag>("barrelEcalDigis"));
 
-
   theEcalTPGPedestals_Token_ =
       esConsumes<EcalLiteDTUPedestalsMap, EcalLiteDTUPedestalsRcd, edm::Transition::BeginRun>();
   theEcalEBPhase2TPGPedestals_Token_ =
@@ -116,8 +115,7 @@ EcalEBTrigPrimPhase2Producer::EcalEBTrigPrimPhase2Producer(const edm::ParameterS
   produces<EcalEBPhase2TrigPrimDigiCollection>();
 
   auto cc = consumesCollector();
-  algo_ =
-      std::make_unique<EcalEBPhase2TrigPrimAlgo>(binOfMaximum_, spikeTaggerParams_, cc, debug_);
+  algo_ = std::make_unique<EcalEBPhase2TrigPrimAlgo>(binOfMaximum_, spikeTaggerParams_, cc, debug_);
 }
 
 void EcalEBTrigPrimPhase2Producer::beginRun(edm::Run const& run, edm::EventSetup const& setup) {

@@ -7,7 +7,7 @@
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalEBPhase2SpikeTagger.h"
 
 class EcalEBPhase2SpikeTaggerFactory {
- public:
+public:
   EcalEBPhase2SpikeTaggerFactory() {};
   ~EcalEBPhase2SpikeTaggerFactory() {};
 

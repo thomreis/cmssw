@@ -13,8 +13,10 @@
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalEBPhase2SpikeTaggerFactory.h"
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalEBPhase2SpikeTaggerLDV1.h"
 
-EcalEBPhase2SpikeTaggerFactory::ReturnType EcalEBPhase2SpikeTaggerFactory::create(std::string const& algoType, uint32_t version, edm::ConsumesCollector& cc, bool debug)
-{
+EcalEBPhase2SpikeTaggerFactory::ReturnType EcalEBPhase2SpikeTaggerFactory::create(std::string const& algoType,
+                                                                                  uint32_t version,
+                                                                                  edm::ConsumesCollector& cc,
+                                                                                  bool debug) {
   ReturnType algo;
 
   // factory
@@ -31,4 +33,3 @@ EcalEBPhase2SpikeTaggerFactory::ReturnType EcalEBPhase2SpikeTaggerFactory::creat
 
   return algo;
 }
-

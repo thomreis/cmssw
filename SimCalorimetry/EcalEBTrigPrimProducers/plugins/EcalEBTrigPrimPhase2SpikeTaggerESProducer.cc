@@ -2,7 +2,7 @@
 //
 // Package:    SimCalorimetry/EcalEBTrigPrimProducers
 // Class:      EcalEBTrigPrimPhase2SpikeTaggerESProducer
-// 
+//
 /**\class EcalEBTrigPrimPhase2SpikeTaggerESProducer
 
  Description: Produces the configuration parameters for the BCP payload
@@ -35,40 +35,37 @@
 //
 
 class EcalEBTrigPrimPhase2SpikeTaggerESProducer : public edm::ESProducer {
- public:
+public:
   EcalEBTrigPrimPhase2SpikeTaggerESProducer(const edm::ParameterSet&);
   ~EcalEBTrigPrimPhase2SpikeTaggerESProducer() override;
 
   using ReturnType = std::unique_ptr<EcalEBPhase2TPGSpikeTaggerParams>;
 
   ReturnType produce(const EcalEBPhase2TPGSpikeTaggerParamsRcd&);
- private:
+
+private:
   EcalEBPhase2TPGSpikeTaggerParams params_;
 };
 
 //
 // constructors and destructor
 //
-EcalEBTrigPrimPhase2SpikeTaggerESProducer::EcalEBTrigPrimPhase2SpikeTaggerESProducer(const edm::ParameterSet& iConfig)
-{
+EcalEBTrigPrimPhase2SpikeTaggerESProducer::EcalEBTrigPrimPhase2SpikeTaggerESProducer(const edm::ParameterSet& iConfig) {
   setWhatProduced(this);
 
   EcalEBPhase2TPGSpikeTaggerParamsHelper paramsHelper(iConfig);
   params_ = static_cast<EcalEBPhase2TPGSpikeTaggerParams>(paramsHelper);
 }
 
-EcalEBTrigPrimPhase2SpikeTaggerESProducer::~EcalEBTrigPrimPhase2SpikeTaggerESProducer()
-{
-}
+EcalEBTrigPrimPhase2SpikeTaggerESProducer::~EcalEBTrigPrimPhase2SpikeTaggerESProducer() {}
 
 //
 // member functions
 //
 
 // ------------ method called to produce the data  ------------
-EcalEBTrigPrimPhase2SpikeTaggerESProducer::ReturnType
-EcalEBTrigPrimPhase2SpikeTaggerESProducer::produce(const EcalEBPhase2TPGSpikeTaggerParamsRcd& iRecord)
-{
+EcalEBTrigPrimPhase2SpikeTaggerESProducer::ReturnType EcalEBTrigPrimPhase2SpikeTaggerESProducer::produce(
+    const EcalEBPhase2TPGSpikeTaggerParamsRcd& iRecord) {
   auto product = std::make_unique<EcalEBPhase2TPGSpikeTaggerParams>(params_);
   return product;
 }

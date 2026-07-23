@@ -19,7 +19,9 @@ EcalEBPhase2TPGSpikeTaggerParamsHelper::EcalEBPhase2TPGSpikeTaggerParamsHelper()
   nodes_.resize(NUM_NODES);
 }
 
-EcalEBPhase2TPGSpikeTaggerParamsHelper::EcalEBPhase2TPGSpikeTaggerParamsHelper(const EcalEBPhase2TPGSpikeTaggerParams &params) : EcalEBPhase2TPGSpikeTaggerParams(params) {
+EcalEBPhase2TPGSpikeTaggerParamsHelper::EcalEBPhase2TPGSpikeTaggerParamsHelper(
+    const EcalEBPhase2TPGSpikeTaggerParams &params)
+    : EcalEBPhase2TPGSpikeTaggerParams(params) {
   nodes_.resize(NUM_NODES);
 }
 
@@ -28,14 +30,13 @@ EcalEBPhase2TPGSpikeTaggerParamsHelper::EcalEBPhase2TPGSpikeTaggerParamsHelper(c
   createFromPSet(config);
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::createFromPSet(const edm::ParameterSet &config)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::createFromPSet(const edm::ParameterSet &config) {
   version_ = 1;
 
   setFwVersion(config.getParameter<unsigned int>("fwVersion"));
   setSamplesOfInterest(config.getParameter<std::vector<edm::ParameterSet>>("samplesOfInterest"));
 
-  // algo parameters        
+  // algo parameters
   const auto algoConfigs = config.getParameter<std::vector<edm::ParameterSet>>("algoConfigs");
   for (const auto &algoConfig : algoConfigs) {
     const auto algo = algoConfig.getParameter<std::string>("algo");
@@ -49,14 +50,13 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::createFromPSet(const edm::Parameter
 
 //////////////////////////////////////////////////////////////////////////////
 // Global parameters
-unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::fwVersion() const
-{
+unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::fwVersion() const {
   return nodes_[kGlobalAlgoParams].uparams_.size() > UIdx::kFwVersion
-      ? nodes_[kGlobalAlgoParams].uparams_[UIdx::kFwVersion] : 0;
+             ? nodes_[kGlobalAlgoParams].uparams_[UIdx::kFwVersion]
+             : 0;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setFwVersion(const unsigned int fwVersion)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setFwVersion(const unsigned int fwVersion) {
   if (nodes_[kGlobalAlgoParams].uparams_.size() > UIdx::kFwVersion) {
     nodes_[kGlobalAlgoParams].uparams_[UIdx::kFwVersion] = fwVersion;
   } else {
@@ -64,15 +64,14 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setFwVersion(const unsigned int fwV
   }
 }
 
-unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::sampleOfInterest(const EBDetId &detId) const
-{
+unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::sampleOfInterest(const EBDetId &detId) const {
   const auto nodesIt = crystalNodes_.find(detId.rawId());
   return nodesIt->at(kCrystalAlgoParams).uparams_.size() > UIdx::kSampleOfInterest
-      ? nodesIt->at(kCrystalAlgoParams).uparams_[UIdx::kSampleOfInterest] : 0;
+             ? nodesIt->at(kCrystalAlgoParams).uparams_[UIdx::kSampleOfInterest]
+             : 0;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSampleOfInterest(const EBDetId &detId, const unsigned int soi)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSampleOfInterest(const EBDetId &detId, const unsigned int soi) {
   const auto rawId = detId.rawId();
 
   // make sure that all nodes exist
@@ -88,15 +87,14 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSampleOfInterest(const EBDetId &
 
 //////////////////////////////////////////////////////////////////////////////
 // Spike tagger LD parameters
-double EcalEBPhase2TPGSpikeTaggerParamsHelper::spikeTaggerLdThreshold(const EBDetId &detId) const
-{
+double EcalEBPhase2TPGSpikeTaggerParamsHelper::spikeTaggerLdThreshold(const EBDetId &detId) const {
   const auto nodesIt = crystalNodes_.find(detId.rawId());
   return nodesIt->at(kCrystalSpikeTaggerLdParams).dparams_.size() > DIdx::kSpikeThreshold
-      ? nodesIt->at(kCrystalSpikeTaggerLdParams).dparams_[DIdx::kSpikeThreshold] : 0.;
+             ? nodesIt->at(kCrystalSpikeTaggerLdParams).dparams_[DIdx::kSpikeThreshold]
+             : 0.;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdThreshold(const EBDetId &detId, const double &thr)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdThreshold(const EBDetId &detId, const double &thr) {
   const auto rawId = detId.rawId();
 
   // make sure that all nodes exist
@@ -110,14 +108,13 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdThreshold(const EBD
   }
 }
 
-std::vector<double> EcalEBPhase2TPGSpikeTaggerParamsHelper::spikeTaggerLdWeights(const EBDetId &detId) const
-{
+std::vector<double> EcalEBPhase2TPGSpikeTaggerParamsHelper::spikeTaggerLdWeights(const EBDetId &detId) const {
   const auto nodesIt = crystalNodes_.find(detId.rawId());
   return nodesIt->at(kCrystalSpikeTaggerLdWeights).dparams_;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdWeights(const EBDetId &detId, const std::vector<double> &weights)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdWeights(const EBDetId &detId,
+                                                                     const std::vector<double> &weights) {
   const auto rawId = detId.rawId();
 
   // make sure that all nodes exist
@@ -128,8 +125,7 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSpikeTaggerLdWeights(const EBDet
 }
 
 // print parameters to stream:
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::print(std::ostream &out) const
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::print(std::ostream &out) const {
   out << "ECAL spike tagger parameters" << std::endl;
   out << "Parameter version 0x" << std::hex << version_ << std::dec << std::endl;
   out << "Global parameters:" << std::endl;
@@ -144,14 +140,12 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::print(std::ostream &out) const
   //}
 }
 
-std::ostream & operator<<(std::ostream &out, const EcalEBPhase2TPGSpikeTaggerParamsHelper &params)
-{
+std::ostream &operator<<(std::ostream &out, const EcalEBPhase2TPGSpikeTaggerParamsHelper &params) {
   params.print(out);
   return out;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSamplesOfInterest(const std::vector<edm::ParameterSet> &pSets)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSamplesOfInterest(const std::vector<edm::ParameterSet> &pSets) {
   for (const auto &pSet : pSets) {
     int ietaMin, ietaMax;
     int iphiMin, iphiMax;
@@ -159,7 +153,8 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSamplesOfInterest(const std::vec
     parseCrystalRange(pSet.getParameter<std::string>("iphiRange"), iphiMin, iphiMax, false);
     for (int ieta = ietaMin; ieta <= ietaMax; ++ieta) {
       // skip non-existing ieta == 0 crystal
-      if (ieta == 0) continue;
+      if (ieta == 0)
+        continue;
       for (int iphi = iphiMin; iphi <= iphiMax; ++iphi) {
         if (EBDetId::validDetId(ieta, iphi)) {
           const EBDetId detId(ieta, iphi);
@@ -170,8 +165,8 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSamplesOfInterest(const std::vec
   }
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(const std::vector<edm::ParameterSet> &pSets)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(
+    const std::vector<edm::ParameterSet> &pSets) {
   for (const auto &pSet : pSets) {
     int ietaMin, ietaMax;
     int iphiMin, iphiMax;
@@ -179,7 +174,8 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(cons
     parseCrystalRange(pSet.getParameter<std::string>("iphiRange"), iphiMin, iphiMax, false);
     for (int ieta = ietaMin; ieta <= ietaMax; ++ieta) {
       // skip non-existing ieta == 0 crystals
-      if (ieta == 0) continue;
+      if (ieta == 0)
+        continue;
       for (int iphi = iphiMin; iphi <= iphiMax; ++iphi) {
         if (EBDetId::validDetId(ieta, iphi)) {
           const EBDetId detId(ieta, iphi);
@@ -191,8 +187,10 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(cons
   }
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::parseCrystalRange(const std::string &rangeStr, int &iMin, int &iMax, const bool isEta)
-{
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::parseCrystalRange(const std::string &rangeStr,
+                                                               int &iMin,
+                                                               int &iMax,
+                                                               const bool isEta) {
   const auto divPos = rangeStr.find(':');
   const auto minStr = rangeStr.substr(0, divPos);
   const auto maxStr = rangeStr.substr(divPos + 1);
@@ -203,4 +201,3 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::parseCrystalRange(const std::string
   iMin = !minStr.empty() ? std::stoi(minStr) : min;
   iMax = !maxStr.empty() ? std::stoi(maxStr) : max;
 }
-

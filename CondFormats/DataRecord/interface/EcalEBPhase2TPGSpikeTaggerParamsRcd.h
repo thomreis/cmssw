@@ -3,6 +3,7 @@
 
 #include "FWCore/Framework/interface/EventSetupRecordImplementation.h"
 
-class EcalEBPhase2TPGSpikeTaggerParamsRcd : public edm::eventsetup::EventSetupRecordImplementation<EcalEBPhase2TPGSpikeTaggerParamsRcd> {};
+class EcalEBPhase2TPGSpikeTaggerParamsRcd
+    : public edm::eventsetup::EventSetupRecordImplementation<EcalEBPhase2TPGSpikeTaggerParamsRcd> {};
 
 #endif

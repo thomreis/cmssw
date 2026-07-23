@@ -4,33 +4,35 @@
 
 #include "SimCalorimetry/EcalEBTrigPrimAlgos/interface/EcalEBPhase2SpikeTaggerLDV1.h"
 
-EcalEBPhase2SpikeTaggerLDV1::EcalEBPhase2SpikeTaggerLDV1(edm::ConsumesCollector& cc, bool debug) : EcalEBPhase2SpikeTagger(cc, debug), spikeTaggerParamsToken_(cc.esConsumes<edm::Transition::BeginRun>()) {}
+EcalEBPhase2SpikeTaggerLDV1::EcalEBPhase2SpikeTaggerLDV1(edm::ConsumesCollector& cc, bool debug)
+    : EcalEBPhase2SpikeTagger(cc, debug), spikeTaggerParamsToken_(cc.esConsumes<edm::Transition::BeginRun>()) {}
 
-void EcalEBPhase2SpikeTaggerLDV1::getRecords(edm::EventSetup const& setup)
-{
+void EcalEBPhase2SpikeTaggerLDV1::getRecords(edm::EventSetup const& setup) {
   auto const& spikeTaggerParams = setup.getData(spikeTaggerParamsToken_);
   spikeTaggerParamsHelper_ = std::make_shared<EcalEBPhase2TPGSpikeTaggerParamsHelper>(spikeTaggerParams);
 }
 
-void EcalEBPhase2SpikeTaggerLDV1::setParameters(EBDetId detId,
-                                            const EcalTPGCrystalStatus* ecaltpBadX) {
+void EcalEBPhase2SpikeTaggerLDV1::setParameters(EBDetId detId, const EcalTPGCrystalStatus* ecaltpBadX) {
   peakIdx_ = spikeTaggerParamsHelper_->sampleOfInterest(detId);
   spikeThreshold_ = spikeTaggerParamsHelper_->spikeTaggerLdThreshold(detId);
   weights_ = spikeTaggerParamsHelper_->spikeTaggerLdWeights(detId);
 
   LogDebug("EcalEBPhase2SpikeTaggerLDV1").log([&](auto& lm) {
-    lm << "Set parameters for channel at " << detId.ieta() << "," << detId.iphi() << " (ieta,iphi). peak index: " << peakIdx_ << ", spike threshold: " << spikeThreshold_ << ", weights (ascending order):";
+    lm << "Set parameters for channel at " << detId.ieta() << "," << detId.iphi()
+       << " (ieta,iphi). peak index: " << peakIdx_ << ", spike threshold: " << spikeThreshold_
+       << ", weights (ascending order):";
     for (auto const weight : weights_) {
       lm << " " << weight;
     }
   });
-
 }
 
 bool EcalEBPhase2SpikeTaggerLDV1::process(const std::vector<int>& linInput) {
   // need to be able to access a sample before and after the peak sample
   if (peakIdx_ == 0 || peakIdx_ > linInput.size() - 2) {
-    throw cms::Exception("IndexOutOfBounds") << "Index of peak sample (" << peakIdx_ << ") for LD spike tagger is outside of allowed values (0 < idx < " << linInput.size() - 1 << ")."; 
+    throw cms::Exception("IndexOutOfBounds")
+        << "Index of peak sample (" << peakIdx_ << ") for LD spike tagger is outside of allowed values (0 < idx < "
+        << linInput.size() - 1 << ").";
   }
 
   // calculate the LD variable with as many polynomial terms as there are weights
@@ -48,8 +50,7 @@ bool EcalEBPhase2SpikeTaggerLDV1::process(const std::vector<int>& linInput) {
   return ld < spikeThreshold_;
 }
 
-float EcalEBPhase2SpikeTaggerLDV1::calcLD(std::vector<int> const& linInput) const
-{
+float EcalEBPhase2SpikeTaggerLDV1::calcLD(std::vector<int> const& linInput) const {
   if (linInput[peakIdx_] == 0)
     return 0.;
 
@@ -60,8 +61,7 @@ float EcalEBPhase2SpikeTaggerLDV1::calcLD(std::vector<int> const& linInput) cons
   return rPlus1 - calcRMinus1Poly(linInput);
 }
 
-float EcalEBPhase2SpikeTaggerLDV1::calcRMinus1Poly(std::vector<int> const& linInput) const
-{
+float EcalEBPhase2SpikeTaggerLDV1::calcRMinus1Poly(std::vector<int> const& linInput) const {
   auto const sMinus1 = linInput[peakIdx_ - 1];
   auto const sMax = static_cast<float>(linInput[peakIdx_]);
   auto const rMinus1 = sMinus1 / sMax;
