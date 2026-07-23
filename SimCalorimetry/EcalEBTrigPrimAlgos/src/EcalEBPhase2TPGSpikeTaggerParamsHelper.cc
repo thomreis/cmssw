@@ -193,14 +193,14 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(cons
 
 void EcalEBPhase2TPGSpikeTaggerParamsHelper::parseCrystalRange(const std::string &rangeStr, int &iMin, int &iMax, const bool isEta)
 {
-  const auto divPos = rangeStr.find(":");
+  const auto divPos = rangeStr.find(':');
   const auto minStr = rangeStr.substr(0, divPos);
   const auto maxStr = rangeStr.substr(divPos + 1);
 
   const int min = isEta ? -1 * EBDetId::MAX_IETA : EBDetId::MIN_IPHI;
   const int max = isEta ? EBDetId::MAX_IETA : EBDetId::MAX_IPHI;
 
-  iMin = minStr != "" ? std::stoi(minStr) : min;
-  iMax = maxStr != "" ? std::stoi(maxStr) : max;
+  iMin = !minStr.empty() ? std::stoi(minStr) : min;
+  iMax = !maxStr.empty() ? std::stoi(maxStr) : max;
 }
 

@@ -136,7 +136,7 @@ void EcalEBTrigPrimPhase2Producer::fillDescriptions(edm::ConfigurationDescriptio
 
   edm::ParameterSetDescription spikeTaggerDesc;
   spikeTaggerDesc.addNode(edm::ParameterDescription<std::string>("algoType", "ld") and
-                          edm::ParameterDescription<unsigned int>("version", 1));
+                          edm::ParameterDescription<unsigned int>("version", true));
   desc.add<edm::ParameterSetDescription>("spikeTagger", spikeTaggerDesc);
   descriptions.addDefault(desc);
 }
