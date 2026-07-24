@@ -128,15 +128,14 @@ void EcalEBTrigPrimPhase2Producer::beginRun(edm::Run const& run, edm::EventSetup
 void EcalEBTrigPrimPhase2Producer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<bool>("Debug", false);
-  desc.add<bool>("Famos", false);
   desc.add<int>("binOfMaximum", 6);  // this needs to be at the same value used for the Phase2 LiteDTU digis !
   desc.add<edm::InputTag>("barrelEcalDigis", edm::InputTag("simEcalUnsuppressedDigis"));
 
   edm::ParameterSetDescription spikeTaggerDesc;
-  spikeTaggerDesc.addNode(edm::ParameterDescription<std::string>("algoType", "ld") and
-                          edm::ParameterDescription<unsigned int>("version", true));
+  spikeTaggerDesc.addNode(edm::ParameterDescription<std::string>("algoType", "ld", true) and
+                          edm::ParameterDescription<unsigned int>("version", 1, true));
   desc.add<edm::ParameterSetDescription>("spikeTagger", spikeTaggerDesc);
-  descriptions.addDefault(desc);
+  descriptions.addWithDefaultLabel(desc);
 }
 
 unsigned long long EcalEBTrigPrimPhase2Producer::getRecords(edm::EventSetup const& setup) {
