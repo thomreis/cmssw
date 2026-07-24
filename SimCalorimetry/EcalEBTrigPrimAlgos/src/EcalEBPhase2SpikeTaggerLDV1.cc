@@ -13,7 +13,7 @@ void EcalEBPhase2SpikeTaggerLDV1::getRecords(edm::EventSetup const& setup) {
 }
 
 void EcalEBPhase2SpikeTaggerLDV1::setParameters(EBDetId detId, const EcalTPGCrystalStatus* ecaltpBadX) {
-  peakIdx_ = spikeTaggerParamsHelper_->sampleOfInterest(detId);
+  peakIdx_ = spikeTaggerParamsHelper_->peakSampleIndex(detId);
   spikeThreshold_ = spikeTaggerParamsHelper_->spikeTaggerLdThreshold(detId);
   weights_ = spikeTaggerParamsHelper_->spikeTaggerLdWeights(detId);
 

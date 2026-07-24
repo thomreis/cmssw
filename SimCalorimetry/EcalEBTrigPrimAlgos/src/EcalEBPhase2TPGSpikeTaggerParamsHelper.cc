@@ -34,7 +34,6 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::createFromPSet(const edm::Parameter
   version_ = 1;
 
   setFwVersion(config.getParameter<unsigned int>("fwVersion"));
-  setSamplesOfInterest(config.getParameter<std::vector<edm::ParameterSet>>("samplesOfInterest"));
 
   // algo parameters
   const auto algoConfigs = config.getParameter<std::vector<edm::ParameterSet>>("algoConfigs");
@@ -64,24 +63,24 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setFwVersion(const unsigned int fwV
   }
 }
 
-unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::sampleOfInterest(const EBDetId &detId) const {
+unsigned int EcalEBPhase2TPGSpikeTaggerParamsHelper::peakSampleIndex(const EBDetId &detId) const {
   const auto nodesIt = crystalNodes_.find(detId.rawId());
-  return nodesIt->at(kCrystalAlgoParams).uparams_.size() > UIdx::kSampleOfInterest
-             ? nodesIt->at(kCrystalAlgoParams).uparams_[UIdx::kSampleOfInterest]
+  return nodesIt->at(kCrystalSpikeTaggerLdParams).uparams_.size() > UIdx::kPeakSampleIndex
+             ? nodesIt->at(kCrystalSpikeTaggerLdParams).uparams_[UIdx::kPeakSampleIndex]
              : 0;
 }
 
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSampleOfInterest(const EBDetId &detId, const unsigned int soi) {
+void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPeakSampleIndex(const EBDetId &detId, const unsigned int soi) {
   const auto rawId = detId.rawId();
 
   // make sure that all nodes exist
   crystalNodes_[rawId].resize(NUM_CRYSTAL_NODES);
 
   // set parameters for this crystal
-  if (crystalNodes_[rawId][kCrystalAlgoParams].uparams_.size() > UIdx::kSampleOfInterest) {
-    crystalNodes_[rawId][kCrystalAlgoParams].uparams_[UIdx::kSampleOfInterest] = soi;
+  if (crystalNodes_[rawId][kCrystalSpikeTaggerLdParams].uparams_.size() > UIdx::kPeakSampleIndex) {
+    crystalNodes_[rawId][kCrystalSpikeTaggerLdParams].uparams_[UIdx::kPeakSampleIndex] = soi;
   } else {
-    crystalNodes_[rawId][kCrystalAlgoParams].uparams_.push_back(soi);
+    crystalNodes_[rawId][kCrystalSpikeTaggerLdParams].uparams_.push_back(soi);
   }
 }
 
@@ -131,7 +130,7 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::print(std::ostream &out) const {
   out << "Global parameters:" << std::endl;
   out << " Spike tagger firmware version 0x" << std::hex << this->fwVersion() << std::dec << std::endl;
   // TODO: output of per crystal parameters in usable format
-  //out << "  Sample of interest " << this->sampleOfInterest() << std::endl;
+  //out << "  Peak sample index " << this->peakSampleIndex() << std::endl;
   out << "Spike tagger LD parameters:" << std::endl;
   //out << "  Spike threshold " << this->spikeTaggerLdThreshold() << std::endl;
   //out << "  Polynomial weights (ascending order)" << std::endl;
@@ -143,26 +142,6 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::print(std::ostream &out) const {
 std::ostream &operator<<(std::ostream &out, const EcalEBPhase2TPGSpikeTaggerParamsHelper &params) {
   params.print(out);
   return out;
-}
-
-void EcalEBPhase2TPGSpikeTaggerParamsHelper::setSamplesOfInterest(const std::vector<edm::ParameterSet> &pSets) {
-  for (const auto &pSet : pSets) {
-    int ietaMin, ietaMax;
-    int iphiMin, iphiMax;
-    parseCrystalRange(pSet.getParameter<std::string>("ietaRange"), ietaMin, ietaMax);
-    parseCrystalRange(pSet.getParameter<std::string>("iphiRange"), iphiMin, iphiMax, false);
-    for (int ieta = ietaMin; ieta <= ietaMax; ++ieta) {
-      // skip non-existing ieta == 0 crystal
-      if (ieta == 0)
-        continue;
-      for (int iphi = iphiMin; iphi <= iphiMax; ++iphi) {
-        if (EBDetId::validDetId(ieta, iphi)) {
-          const EBDetId detId(ieta, iphi);
-          this->setSampleOfInterest(detId, pSet.getParameter<unsigned int>("sampleOfInterest"));
-        }
-      }
-    }
-  }
 }
 
 void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(
@@ -179,6 +158,7 @@ void EcalEBPhase2TPGSpikeTaggerParamsHelper::setPerCrystalSpikeTaggerParams(
       for (int iphi = iphiMin; iphi <= iphiMax; ++iphi) {
         if (EBDetId::validDetId(ieta, iphi)) {
           const EBDetId detId(ieta, iphi);
+          this->setPeakSampleIndex(detId, pSet.getParameter<unsigned int>("peakSampleIndex"));
           this->setSpikeTaggerLdThreshold(detId, pSet.getParameter<double>("spikeThreshold"));
           this->setSpikeTaggerLdWeights(detId, pSet.getParameter<std::vector<double>>("weights"));
         }

@@ -20,8 +20,8 @@ public:
   unsigned int fwVersion() const;
   void setFwVersion(const unsigned int fwVersion);
 
-  unsigned int sampleOfInterest(const EBDetId &detId) const;
-  void setSampleOfInterest(const EBDetId &detId, const unsigned int soi);
+  unsigned int peakSampleIndex(const EBDetId &detId) const;
+  void setPeakSampleIndex(const EBDetId &detId, const unsigned int soi);
 
   // Spike tagger LD parameters
   double spikeTaggerLdThreshold(const EBDetId &detId) const;
@@ -37,24 +37,22 @@ public:
 private:
   // Defines the content of each node
   // New nodes can only be added before NUM_NODES
-  enum EcalSpikeTaggerParamNode { kGlobalAlgoParams = 0, kGlobalSpikeTaggerLdParams, NUM_NODES };
+  enum EcalSpikeTaggerParamNode { kGlobalAlgoParams = 0, NUM_NODES };
 
   // Defines the content of each crystal node
   // New nodes can only be added before NUM_CRYSTAL_NODES
   enum EcalSpikeTaggerParamCrystalNode {
-    kCrystalAlgoParams = 0,
-    kCrystalSpikeTaggerLdParams,
+    kCrystalSpikeTaggerLdParams = 0,
     kCrystalSpikeTaggerLdWeights,
     NUM_CRYSTAL_NODES
   };
 
   // index of variabe inside a node vector
   enum DIdx { kSpikeThreshold = 0 };
-  enum UIdx { kFwVersion = 0, kSampleOfInterest = 0 };
+  enum UIdx { kFwVersion = 0, kPeakSampleIndex = 0 };
   enum IIdx {};
   enum SIdx {};
 
-  void setSamplesOfInterest(const std::vector<edm::ParameterSet> &pSets);
   void setPerCrystalSpikeTaggerParams(const std::vector<edm::ParameterSet> &pSets);
   void parseCrystalRange(const std::string &rangeStr, int &iMin, int &iMax, const bool isEta = true);
 };

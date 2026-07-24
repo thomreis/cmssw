@@ -37,11 +37,11 @@
 class EcalEBTrigPrimPhase2SpikeTaggerESProducer : public edm::ESProducer {
 public:
   EcalEBTrigPrimPhase2SpikeTaggerESProducer(const edm::ParameterSet&);
-  ~EcalEBTrigPrimPhase2SpikeTaggerESProducer() override;
 
   using ReturnType = std::unique_ptr<EcalEBPhase2TPGSpikeTaggerParams>;
 
   ReturnType produce(const EcalEBPhase2TPGSpikeTaggerParamsRcd&);
+  static void fillDescriptions(edm::ConfigurationDescriptions&);
 
 private:
   EcalEBPhase2TPGSpikeTaggerParams params_;
@@ -57,8 +57,6 @@ EcalEBTrigPrimPhase2SpikeTaggerESProducer::EcalEBTrigPrimPhase2SpikeTaggerESProd
   params_ = static_cast<EcalEBPhase2TPGSpikeTaggerParams>(paramsHelper);
 }
 
-EcalEBTrigPrimPhase2SpikeTaggerESProducer::~EcalEBTrigPrimPhase2SpikeTaggerESProducer() {}
-
 //
 // member functions
 //
@@ -68,6 +66,38 @@ EcalEBTrigPrimPhase2SpikeTaggerESProducer::ReturnType EcalEBTrigPrimPhase2SpikeT
     const EcalEBPhase2TPGSpikeTaggerParamsRcd& iRecord) {
   auto product = std::make_unique<EcalEBPhase2TPGSpikeTaggerParams>(params_);
   return product;
+}
+
+void EcalEBTrigPrimPhase2SpikeTaggerESProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  edm::ParameterSetDescription desc;
+  desc.add<unsigned int>("fwVersion", 1);
+
+  // algoConfigs VPSet
+  edm::ParameterSetDescription algoDefaults;
+  algoDefaults.add<std::string>("algo", "ld");
+
+  // perCrystalParams VPSet within algoConfigs
+  edm::ParameterSetDescription perXtalDefaults;
+  perXtalDefaults.add<std::string>("ietaRange", ":");
+  perXtalDefaults.add<std::string>("iphiRange", ":");
+  perXtalDefaults.add<unsigned int>("peakSampleIndex", 5);
+  perXtalDefaults.add<double>("spikeThreshold", -0.1);
+  perXtalDefaults.add<std::vector<double>>("weights",
+                                           {
+                                               1.5173,
+                                               -2.1034,
+                                               1.8117,
+                                               -0.6451,
+                                           });
+  std::vector<edm::ParameterSet> perXtals;
+  perXtals.emplace_back();
+  algoDefaults.addVPSet("perCrystalParams", perXtalDefaults, perXtals);
+
+  std::vector<edm::ParameterSet> algos;
+  algos.emplace_back();
+  desc.addVPSet("algoConfigs", algoDefaults, algos);
+
+  descriptions.addWithDefaultLabel(desc);
 }
 
 //define this as a plug-in
